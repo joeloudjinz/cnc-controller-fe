@@ -1,7 +1,7 @@
 import axios from "axios";
 import AgentServices from "./agent.js";
 
-const url = "http://localhost:3000/api/local/images";
+const url = "api/local/images";
 // /convert
 
 class ConversionServices {

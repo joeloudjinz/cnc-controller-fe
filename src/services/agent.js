@@ -1,5 +1,5 @@
 import axios from 'axios';
-const url = "http://localhost:3000/api/local/agents/";
+const url = "api/local/agents/";
 
 //! console.log(error.response.status == 406); true
 //! console.log(error.response.status === '406'); false

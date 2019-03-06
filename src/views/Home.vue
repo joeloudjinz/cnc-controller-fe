@@ -139,16 +139,17 @@ export default {
   props: {
     source: String
   },
+  //! DON'T use arrow functions here
   created: function() {
     // get the id
     const id = window.localStorage.getItem("id");
     // check for role of the current agent
     AgentServices.getRole(id)
       .then(result => {
-        console.log(typeof result.data.result);
+        // console.log(typeof result.data.result);
         // update the value isAdmin
         this.isAdmin = result.data.result;
-        console.log(this.isAdmin);
+        // console.log(this.isAdmin);
       })
       .catch(error => {
         this.snackbar = true;
