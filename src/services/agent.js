@@ -191,13 +191,21 @@ class AgentServices {
             });
         });
     }
+    /**
+     * Update agent password
+     * @param {*} password 
+     */
     static UpdatePassword(password) {
         return new Promise((resolve, reject) => {
             const id = window.localStorage.getItem('id');
             if (id) {
                 axios.put(url + "password/" + id, {
                         password
-                    }, )
+                    }, {
+                        headers: {
+                            Authorization: "Bearer " + window.localStorage.token
+                        }
+                    })
                     .then((result) => {
                         resolve(result.data.success);
                     }).catch((error) => {
@@ -219,9 +227,42 @@ class AgentServices {
                         }
                     });
             } else {
-                reject('ID is not defined!')
+                reject('ID is not defined!');
             }
 
+        });
+    }
+    /**
+     * Reset the password of an agent account
+     * @param {*} id 
+     */
+    static resetAgentPassword(id) {
+        return new Promise((resolve, reject) => {
+            axios.get(url + "reset/" + id, {
+                    headers: {
+                        Authorization: "Bearer " + window.localStorage.token
+                    }
+                })
+                .then((result) => {
+                    resolve(result);
+                }).catch((error) => {
+                    if (error.response) {
+                        if (error.response.status == 406) {
+                            AgentServices.RefreshToken()
+                                .then(() => {
+                                    resolve(AgentServices.resetAgentPassword(id));
+                                }).catch((error) => {
+                                    reject(error);
+                                });
+                        } else {
+                            reject(error.response.data.failure);
+                        }
+                    } else if (error.request) {
+                        reject("Check you internet connection!");
+                    } else {
+                        reject(error.message);
+                    }
+                });
         });
     }
 }

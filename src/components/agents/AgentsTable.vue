@@ -35,9 +35,22 @@
           </v-chip>
         </td>
         <td>
-          <v-btn icon @click="deleteAgent(props.item.id)">
-            <v-icon color="error">fas fa-user-minus</v-icon>
-          </v-btn>
+          <v-tooltip bottom>
+            <template #activator="data">
+              <v-btn icon @click="deleteAgent(props.item.id)" v-on="data.on">
+                <v-icon color="error">fas fa-user-minus</v-icon>
+              </v-btn>
+            </template>
+            <span>Delete This User Account</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template #activator="data">
+              <v-btn icon @click="resetPassword(props.item.id)" v-on="data.on">
+                <v-icon color="red darken-2">fas fa-power-off</v-icon>
+              </v-btn>
+            </template>
+            <span>Reset The Password Of This User Account</span>
+          </v-tooltip>
         </td>
       </template>
       <v-alert
@@ -47,6 +60,21 @@
         icon="warning"
       >Your search for "{{ search }}" found no results.</v-alert>
     </v-data-table>
+    <!-- dialog tag u ididot -->
+    <v-dialog v-model="dialog" persistent width="300">
+      <v-card color="teal" dark>
+        <v-card-text>
+          {{dialogContent}}
+          <v-progress-linear indeterminate color="white" class="mb-0" :active="loadingPass"></v-progress-linear>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn flat @click="dialog = false" class="align-self-center">
+            Ok
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-snackbar
       v-model="snackbar"
       :timeout="5000"
@@ -63,6 +91,9 @@ export default {
   data() {
     return {
       search: "",
+      dialog: false,
+      dialogContent: "Please stand by",
+      loadingPass: true,
       loading: true,
       // the selected items ....
       // selected: [],
@@ -114,6 +145,23 @@ export default {
           this.snackbarColor = "error";
           this.snackbarContent = error;
           this.loading = false;
+        });
+    },
+    resetPassword(id) {
+      console.log(id);
+      this.dialog = true;
+      AgentServices.resetAgentPassword(id)
+        .then(result => {
+          this.loadingPass = false;
+          this.snackbar = true;
+          this.snackbarColor = "success";
+          this.snackbarContent = result.data.success;
+          this.dialogContent = "The New Password is: " + result.data.password;
+        })
+        .catch(error => {
+          this.snackbar = true;
+          this.snackbarColor = "error";
+          this.snackbarContent = error;
         });
     }
   }

@@ -4,6 +4,8 @@ import Home from './views/Home.vue'
 import Login from "./views/Login.vue";
 import Dashboard from "./views/Dashboard.vue";
 import Agents from "./views/Agents.vue"
+import Images from './views/Images.vue'
+
 
 Vue.use(Router)
 
@@ -23,11 +25,11 @@ const router = new Router({
         {
           path: 'agents',
           component: Agents
+        },
+        {
+          path: 'images',
+          component: Images
         }
-        // {
-        //   path: 'machines',
-        //   component: Machines
-        // }
       ]
     },
     {

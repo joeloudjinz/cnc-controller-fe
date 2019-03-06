@@ -1,64 +1,48 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer v-model="drawer" :clipped="$vuetify.breakpoint.lgAndUp" fixed app>
-      <v-list dense>
-        <template v-for="item in items">
-          <v-layout v-if="item.heading" :key="item.heading" row align-center>
-            <v-flex xs6>
-              <v-subheader v-if="item.heading">{{ item.heading }}</v-subheader>
-            </v-flex>
-            <v-flex xs6 class="text-xs-center">
-              <a href="#!" class="body-2 black--text">EDIT</a>
-            </v-flex>
-          </v-layout>
-          <v-list-group
-            v-else-if="item.children"
-            :key="item.text"
-            v-model="item.model"
-            :prepend-icon="item.model ? item.icon : item['icon-alt']"
-            append-icon
-          >
-            <v-list-tile slot="activator">
-              <v-list-tile-content>
-                <v-list-tile-title>{{ item.text }}</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <!-- @click="" -->
-            <v-list-tile v-for="(child, i) in item.children" :key="i">
-              <v-list-tile-action v-if="child.icon">
-                <v-icon>{{ child.icon }}</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>{{ child.text }}</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-          </v-list-group>
-          <!-- @click -->
-          <v-list-tile v-else :key="item.text">
-            <v-list-tile-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-tile-action>
+    <!-- <v-navigation-drawer v-model="drawer" :clipped="$vuetify.breakpoint.lgAndUp" fixed app absolute>
+      <v-toolbar flat class="transparent">
+        <v-list class="pa-0">
+          <v-list-tile avatar>
+            <v-list-tile-avatar>
+              <img src="https://randomuser.me/api/portraits/men/85.jpg">
+            </v-list-tile-avatar>
+
             <v-list-tile-content>
-              <v-list-tile-title>{{ item.text }}</v-list-tile-title>
+              <v-list-tile-title>{{ fullName }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
-        </template>
+        </v-list>
+      </v-toolbar>
+
+      <v-list class="pt-0" dense>
+        <v-divider></v-divider>
+
+        <v-list-tile v-for="item in items" :key="item.title">
+          <v-list-tile-action>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
       </v-list>
-    </v-navigation-drawer>
+    </v-navigation-drawer> -->
     <!-- TOOLBAR -->
     <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="teal darken-3" dark app fixed>
       <v-toolbar-title style="width: 300px" class="ml-0 pl-0">
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
         <span class="hidden-sm-and-down">CNC Controller</span>
       </v-toolbar-title>
-      <v-text-field
+      <!-- <v-text-field
         flat
         solo-inverted
         hide-details
         prepend-inner-icon="search"
         label="Search"
         class="hidden-sm-and-down"
-      ></v-text-field>
+      ></v-text-field> -->
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template #activator="data">
@@ -86,36 +70,26 @@
       </v-tooltip>
       <v-tooltip bottom>
         <template #activator="data">
+          <v-btn v-on="data.on" icon to="/images">
+            <v-icon>fas fa-images</v-icon>
+          </v-btn>
+        </template>
+        <span>Images page</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <template #activator="data">
           <v-btn v-on="data.on" icon color="white" @click="performLogout">
             <v-icon color="teal darken-4">fas fa-sign-out-alt</v-icon>
           </v-btn>
         </template>
         <span>logout</span>
       </v-tooltip>
-
-      <!-- USER DROPDPWN MENU goes here -->
-      <!-- 
-        <v-menu offset-y>
-        <v-btn slot="activator" icon large>
-          <v-avatar size="32px" tile>
-            <img src="https://cdn.vuetifyjs.com/images/logos/logo.svg" alt="Vuetify">
-          </v-avatar>
-        </v-btn>
-        <v-list>
-          <v-list-tile v-for="(item, index) in dropDownItems" :key="index">
-            <v-list-tile-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-          </v-list-tile>
-        </v-list>
-      </v-menu>
-      -->
     </v-toolbar>
     <!-- CONTENT OF THE PAGE -->
     <v-content>
       <v-container fluid fill-height>
-        <v-layout justify-center align-center row wrap>
+        <!--  align-center -->
+        <v-layout justify-center row wrap>
           <router-view></router-view>
         </v-layout>
       </v-container>
@@ -144,39 +118,17 @@ import AuthServices from "@/services/auth.js";
 
 export default {
   data: () => ({
+    fullName:
+      window.localStorage.getItem("first_name") +
+      " " +
+      window.localStorage.getItem("last_name"),
     dialog: false,
-    drawer: null,
-    dropDownItems: [{ title: "Logout", icon: "fas fa-sign-out-alt" }],
+    drawer: true,
     items: [
-      { icon: "contacts", text: "Contacts" },
-      { icon: "history", text: "Frequently contacted" },
-      { icon: "content_copy", text: "Duplicates" },
-      {
-        icon: "keyboard_arrow_up",
-        "icon-alt": "keyboard_arrow_down",
-        text: "Labels",
-        model: true,
-        children: [{ icon: "add", text: "Create label" }]
-      },
-      {
-        icon: "keyboard_arrow_up",
-        "icon-alt": "keyboard_arrow_down",
-        text: "More",
-        model: false,
-        children: [
-          { text: "Import" },
-          { text: "Export" },
-          { text: "Print" },
-          { text: "Undo changes" },
-          { text: "Other contacts" }
-        ]
-      },
-      { icon: "settings", text: "Settings" },
-      { icon: "chat_bubble", text: "Send feedback" },
-      { icon: "help", text: "Help" },
-      { icon: "phonelink", text: "App downloads" },
-      { icon: "keyboard", text: "Go to the old version" }
-    ]
+      { title: "Home", icon: "dashboard" },
+      { title: "About", icon: "question_answer" }
+    ],
+    right: null
   }),
   props: {
     source: String
@@ -188,7 +140,7 @@ export default {
         .then(() => {
           //? update connexion status
           window.localStorage.setItem("isConnected", false);
-          //? remove data from local storage
+          //! remove data from local storage
           window.localStorage.removeItem("id");
           window.localStorage.removeItem("first_name");
           window.localStorage.removeItem("last_name");

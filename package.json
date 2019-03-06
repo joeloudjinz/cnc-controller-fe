@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "file-save": "^0.2.0",
+    "file-saver": "^2.0.1",
     "vue": "^2.5.22",
     "vue-router": "^3.0.1",
     "vuelidate": "^0.7.4",
