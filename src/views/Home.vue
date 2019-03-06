@@ -28,21 +28,13 @@
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
-    </v-navigation-drawer> -->
+    </v-navigation-drawer>-->
     <!-- TOOLBAR -->
     <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="teal darken-3" dark app fixed>
       <v-toolbar-title style="width: 300px" class="ml-0 pl-0">
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
         <span class="hidden-sm-and-down">CNC Controller</span>
       </v-toolbar-title>
-      <!-- <v-text-field
-        flat
-        solo-inverted
-        hide-details
-        prepend-inner-icon="search"
-        label="Search"
-        class="hidden-sm-and-down"
-      ></v-text-field> -->
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template #activator="data">
@@ -60,8 +52,9 @@
         </template>
         <span>Machines page</span>
       </v-tooltip>
+      <!-- Protect it by isAdmin ! -->
       <v-tooltip bottom>
-        <template #activator="data">
+        <template v-if="isAdmin == true" #activator="data">
           <v-btn v-on="data.on" icon to="/agents">
             <v-icon>fas fa-hard-hat</v-icon>
           </v-btn>
@@ -94,6 +87,13 @@
         </v-layout>
       </v-container>
     </v-content>
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="5000"
+      :bottom="'bottom'"
+      :color="snackbarColor"
+      :multi-line="'multi-line'"
+    >{{ snackbarContent }}</v-snackbar>
     <!-- FAB button -->
     <v-btn fab bottom right color="teal darken-4" dark fixed @click="dialog = !dialog">
       <v-icon>add</v-icon>
@@ -115,6 +115,7 @@
 
 <script>
 import AuthServices from "@/services/auth.js";
+import AgentServices from "@/services/agent.js";
 
 export default {
   data: () => ({
@@ -122,16 +123,38 @@ export default {
       window.localStorage.getItem("first_name") +
       " " +
       window.localStorage.getItem("last_name"),
+    isAdmin: false,
     dialog: false,
     drawer: true,
     items: [
       { title: "Home", icon: "dashboard" },
       { title: "About", icon: "question_answer" }
     ],
-    right: null
+    right: null,
+    //? snackbar details ...
+    snackbarContent: "",
+    snackbarColor: "",
+    snackbar: false
   }),
   props: {
     source: String
+  },
+  created: function() {
+    // get the id
+    const id = window.localStorage.getItem("id");
+    // check for role of the current agent
+    AgentServices.getRole(id)
+      .then(result => {
+        console.log(typeof result.data.result);
+        // update the value isAdmin
+        this.isAdmin = result.data.result;
+        console.log(this.isAdmin);
+      })
+      .catch(error => {
+        this.snackbar = true;
+        this.snackbarColor = "error";
+        this.snackbarContent = error;
+      });
   },
   methods: {
     performLogout() {

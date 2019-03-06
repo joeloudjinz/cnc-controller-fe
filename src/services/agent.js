@@ -265,6 +265,35 @@ class AgentServices {
                 });
         });
     }
+    /**
+     * get the role (agent or admin) of the user
+     * @params id of the user
+     */
+    static getRole(id) {
+        return new Promise((resolve, reject) => {
+            axios.get(url + "role/" + id)
+                .then((result) => {
+                    resolve(result);
+                }).catch((error) => {
+                    if (error.response) {
+                        if (error.response.status == 406) {
+                            AgentServices.RefreshToken()
+                                .then(() => {
+                                    resolve(AgentServices.getRole(id));
+                                }).catch((error) => {
+                                    reject(error);
+                                });
+                        } else {
+                            reject(error.response.data.failure);
+                        }
+                    } else if (error.request) {
+                        reject("Check you internet connection!");
+                    } else {
+                        reject(error.message);
+                    }
+                });
+        });
+    }
 }
 
 export default AgentServices;
