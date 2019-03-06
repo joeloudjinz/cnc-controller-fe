@@ -1,4 +1,4 @@
-# louji
+# Client Side fo CNC Controller System
 
 ## Project setup
 ```
