@@ -251,15 +251,21 @@
                       <v-list-tile>
                         <!-- <v-list-tile-content class="font-weight-bold">file:</v-list-tile-content> -->
                         <v-list-tile-content class="align-center">
-                          <v-btn
-                            :loading="loading3"
-                            :disabled="loading3"
-                            color="teal darken-3"
-                            class="white--text"
-                            @click="downloadGCodeFile"
-                          >Download
-                            <v-icon right dark>fas fa-file-download</v-icon>
-                          </v-btn>
+                          <v-tooltip bottom>
+                            <template #activator="data">
+                              <v-btn
+                                :loading="loading3"
+                                :disabled="loading3"
+                                color="teal darken-3"
+                                class="white--text"
+                                v-on="data.on"
+                                @click="initializeDrawOperation"
+                              >
+                                <v-icon left dark>fas fa-draw-polygon</v-icon>Draw
+                              </v-btn>
+                            </template>
+                            <span>Send generated gcode to machine</span>
+                          </v-tooltip>
                         </v-list-tile-content>
                       </v-list-tile>
                     </v-list>
@@ -271,6 +277,88 @@
         </v-card>
       </v-flex>
     </v-layout>
+    <!-- Console Area -->
+    <v-layout v-if="displayConsole == true" justify-center row wrap pa-1>
+      <v-flex d-flex xs12>
+        <v-toolbar color="teal" dark>
+          <v-toolbar-title>Console</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-tooltip bottom>
+            <template #activator="data">
+              <v-btn v-on="data.on" icon @click="clearConsole()">
+                <v-icon>fas fa-eraser</v-icon>
+              </v-btn>
+            </template>
+            <span>Clear the console</span>
+          </v-tooltip>
+        </v-toolbar>
+      </v-flex>
+      <v-flex d-flex xs12>
+        <v-card color="black" height="500px" class="scroll">
+          <v-card-text class="white--text">
+            <!-- <v-layout justify-center row wrap> -->
+            <!-- The configuration -->
+            <!-- <v-flex d-flex xs12 sm12 md12 lg12 px-1 py-1> -->
+            <!-- <v-card color="teal lighten-1" class="white--text elevation-5">
+                  <v-card-title>
+                    <p class="font-weight-bold"></p>
+                  </v-card-title>
+                  <v-card-text class="d-flex">
+                  </v-card-text>
+            </v-card>-->
+            <!-- </v-flex> -->
+            <!-- </v-layout> -->
+            <!-- {{consoleTxt}} -->
+            <p
+              v-for="(line, index) in consoleTxt"
+              :key="index"
+              class="p-0 m-0 font-weight-medium"
+            >{{line}}</p>
+            <br>
+            <!-- <div >
+            </div>-->
+          </v-card-text>
+        </v-card>
+      </v-flex>
+    </v-layout>
+    <!-- Transmission 1st phase dialoge -->
+    <v-dialog v-model="transmissionDialog" persistent width="700px">
+      <v-card>
+        <v-card-title class="teal darken-4 py-4 title white--text">GCode File Transmission</v-card-title>
+        <v-card-text class="py-0 px-0">
+          <v-progress-linear v-if="portsListProgress" :indeterminate="true" color="teal"></v-progress-linear>
+          <v-container grid-list-sm>
+            <v-alert
+              :value="true"
+              type="info"
+              class="mb-2"
+            >This operation will send the generated gcode file to the machine over the selected port and it will start drawing the coordinates the process will take to much time (1s for each line of code), you can monitor the whole process and the incoming data from the console below.</v-alert>
+            <p class="title">Chose port:</p>
+            <v-list v-if="portsList.length !== 0">
+              <v-list-tile
+                v-for="(port, index) in portsList"
+                :key="index"
+                @click="startTransmitingGCode(port.comName)"
+              >
+                <v-list-tile-content>
+                  <v-list-tile-title class="font-weight-bold">{{ port.comName }}</v-list-tile-title>
+                  <v-list-tile-sub-title
+                    class="font-weight-medium font-italic"
+                  >{{ port.manufacturer }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+            <v-list v-else>
+              <v-alert :value="true" type="error">No port is active!</v-alert>
+            </v-list>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn flat color="teal" @click="transmissionDialog = false">Cancel</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <!-- Conversion Process Dialog -->
     <v-dialog v-model="dialog" persistent width="500">
       <v-card color="teal" dark>
@@ -282,9 +370,22 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- Draw Errors Dialog -->
+    <v-dialog v-model="drawErrorsDialog" width="500">
+      <v-card color="error" dark>
+        <v-card-title class="font-weight-bold">Opps Error</v-card-title>
+        <v-card-text>{{error}}</v-card-text>
+        <v-divider/>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn flat color="teal" @click="drawErrorsDialog = false">Ok</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- Snackbars -->
     <v-snackbar
       v-model="scaleAccessSnackbar"
-      :timeout=0
+      :timeout="0"
       :bottom="'bottom'"
       :color="'teal darkren-4'"
       :multi-line="'multi-line'"
@@ -300,17 +401,16 @@
   </div>
 </template>
 <script>
-// import axios from "axios";
-// import { saveAs } from "file-save";
 import ConversionServices from "@/services/conversion.js";
-
+import PortsServices from "@/services/ports.js";
+import Pusher from "pusher-js";
 export default {
   data: () => ({
     //? for download button
     loader: null,
     loading3: false,
     //? to display the results section
-    displayRsultes: false,
+    displayRsultes: true,
     //? for image file
     selectedFile: null,
     url: require("@/assets/default.png"),
@@ -331,7 +431,7 @@ export default {
     work: 1200,
     idle: 3000,
     //? for gcode file
-    fileName: "name",
+    fileName: "sm-sample",
     size: 0,
     link: null,
     //? for conversion details in results section
@@ -355,9 +455,22 @@ export default {
     snackbarContent: "",
     snackbarColor: "",
     snackbar: false,
-    //? for scale axes info 
-    scaleAccessSnackbarColor: 'info',
-    scaleAccessSnackbar: false
+    //? for scale axes info
+    scaleAccessSnackbarColor: "info",
+    scaleAccessSnackbar: false,
+    //? for transmission 1st phase
+    transmissionDialog: false,
+    displayConsole: true,
+    //? for ports list
+    portsList: [],
+    portsListProgress: true,
+    //? for console
+    consoleTxt: [],
+    //? darw operation errors dialog
+    drawErrorsDialog: false,
+    error: "",
+    //? for binding pusher channel
+    notBinded: false
   }),
   methods: {
     fileIsSelected(event) {
@@ -446,6 +559,23 @@ export default {
         }
       }
     },
+    initializeDrawOperation() {
+      this.transmissionDialog = true;
+      PortsServices.getConnectedPortsList()
+        .then(result => {
+          this.portsListProgress = false;
+          if (result.count !== 0) {
+            this.portsList = result.ports;
+          }
+        })
+        .catch(error => {
+          this.portsListProgress = false;
+          this.transmissionDialog = false;
+          this.snackbar = true;
+          this.snackbarColor = "error";
+          this.snackbarContent = error;
+        });
+    },
     downloadGCodeFile() {
       this.loader = "loading3";
       // axios
@@ -486,6 +616,59 @@ export default {
       //     }
       //     this.snackbar = true;
       //   });
+    },
+    subscribe() {
+      Pusher.logToConsole = true;
+      let pusher = new Pusher("ced4b5ad59f10ab2a746", {
+        cluster: "eu",
+        forceTLS: true
+      });
+      pusher.subscribe("ports");
+      this.isBinded = true;
+      pusher.bind("on-data", data => {
+        this.consoleTxt.push(data.data);
+      });
+    },
+    startTransmitingGCode(port) {
+      if (this.fileName !== undefined && this.fileName !== "") {
+        PortsServices.performFullDrawOperation(this.fileName, port)
+          .then(result => {
+            console.log(result);
+            this.snackbar = true;
+            this.snackbarColor = "success";
+            this.snackbarContent = result.success;
+            this.transmissionDialog = false;
+            //! if you bind multiple times, it will show data multiple time also
+            if (!this.isBinded) {
+              this.subscribe();
+            } else {
+              console.log("Already subscribed");
+            }
+          })
+          .catch(error => {
+            this.transmissionDialog = false;
+            console.log(error);
+            //TODO: display error in dialog window
+            this.consoleTxt.push("Operation: " + error.operation);
+            this.consoleTxt.push("Message: " + error.failure);
+            if (error.isPortClosed) {
+              this.consoleTxt.push(
+                "Port Status: " + error.isPortClosed === true
+                  ? " Closed"
+                  : " Opened"
+              );
+            }
+          });
+      } else {
+        this.transmissionDialog = false;
+        this.snackbar = true;
+        this.snackbarColor = "error";
+        this.snackbarContent = "Gcode file name is missing!";
+      }
+    },
+    clearConsole() {
+      this.consoleTxt = [];
+      // console.log(this.consoleTxt);
     }
   }
 };
@@ -536,5 +719,8 @@ export default {
   to {
     transform: rotate(360deg);
   }
+}
+.scroll {
+  overflow-y: auto;
 }
 </style>

@@ -82,6 +82,7 @@
     <v-content>
       <v-container fluid fill-height>
         <!--  align-center -->
+          <!-- <h1>Welcome Back {{ fullName }}</h1> -->
         <v-layout justify-center row wrap>
           <router-view></router-view>
         </v-layout>
