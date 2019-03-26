@@ -38,16 +38,16 @@
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template #activator="data">
-          <v-btn icon v-on="data.on" to="/dashboard">
-            <v-icon>fas fa-tachometer-alt</v-icon>
+          <v-btn v-on="data.on" flat to="/dashboard" class="m-0">
+            <v-icon left>fas fa-tachometer-alt</v-icon>Dashboard
           </v-btn>
         </template>
         <span>Dashboard page</span>
       </v-tooltip>
       <v-tooltip bottom>
         <template #activator="data">
-          <v-btn v-on="data.on" icon>
-            <v-icon>fas fa-cash-register</v-icon>
+          <v-btn flat v-on="data.on" class="m-0">
+            Machines
           </v-btn>
         </template>
         <span>Machines page</span>
@@ -55,24 +55,24 @@
       <!-- Protect it by isAdmin ! -->
       <v-tooltip bottom>
         <template v-if="isAdmin == true" #activator="data">
-          <v-btn v-on="data.on" icon to="/agents">
-            <v-icon>fas fa-hard-hat</v-icon>
+          <v-btn v-on="data.on" flat to="/agents" class="m-0">
+            Agents
           </v-btn>
         </template>
         <span>Agents page</span>
       </v-tooltip>
       <v-tooltip bottom>
         <template #activator="data">
-          <v-btn v-on="data.on" icon to="/images">
-            <v-icon>fas fa-images</v-icon>
+          <v-btn v-on="data.on" flat to="/images" class="m-0">
+            Converter
           </v-btn>
         </template>
         <span>Images page</span>
       </v-tooltip>
       <v-tooltip bottom>
         <template #activator="data">
-          <v-btn v-on="data.on" icon color="white" @click="performLogout">
-            <v-icon color="teal darken-4">fas fa-sign-out-alt</v-icon>
+          <v-btn v-on="data.on" flat @click="performLogout">
+            <v-icon left color="white">fas fa-sign-out-alt</v-icon>Logout
           </v-btn>
         </template>
         <span>logout</span>
@@ -82,7 +82,7 @@
     <v-content>
       <v-container fluid fill-height>
         <!--  align-center -->
-          <!-- <h1>Welcome Back {{ fullName }}</h1> -->
+        <!-- <h1>Welcome Back {{ fullName }}</h1> -->
         <v-layout justify-center row wrap>
           <router-view></router-view>
         </v-layout>

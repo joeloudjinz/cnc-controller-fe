@@ -277,52 +277,107 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <!-- Console Area -->
-    <v-layout v-if="displayConsole == true" justify-center row wrap pa-1>
-      <v-flex d-flex xs12>
-        <v-toolbar color="teal" dark>
-          <v-toolbar-title>Console</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-tooltip bottom>
-            <template #activator="data">
-              <v-btn v-on="data.on" icon @click="clearConsole()">
-                <v-icon>fas fa-eraser</v-icon>
-              </v-btn>
-            </template>
-            <span>Clear the console</span>
-          </v-tooltip>
-        </v-toolbar>
+    <v-layout v-if="consolesArea == true" justify-center row wrap pa-1>
+      <v-flex xs12 sm12 md12 lg4>
+        <!-- Transmission Console Area -->
+        <v-layout justify-center row wrap pa-1>
+          <v-flex d-flex xs12 sm12 md12 lg12>
+            <v-toolbar color="teal" dark>
+              <v-toolbar-title>Transmission Process Console</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-tooltip bottom>
+                <template #activator="data">
+                  <v-btn v-on="data.on" icon @click="clearTransmissionConsole()">
+                    <v-icon>fas fa-eraser</v-icon>
+                  </v-btn>
+                </template>
+                <span>Clear the console</span>
+              </v-tooltip>
+            </v-toolbar>
+          </v-flex>
+          <v-flex d-flex xs12 sm12 md12 lg12>
+            <v-card color="teal lighten-4" height="300px" class="scroll">
+              <v-card-text class="p-0 teal--text darken-4">
+                <table>
+                  <tr
+                    v-for="(line, index) in transmissionConsoleTxt"
+                    :key="index"
+                    class="p-0 m-0 font-weight-medium"
+                  >
+                    <td class="red--text darken-1">{{line.split("|")[0]}}</td>
+                    <td>{{"->"+line.split("|")[1]}}</td>
+                  </tr>
+                </table>
+                <br>
+              </v-card-text>
+            </v-card>
+          </v-flex>
+        </v-layout>
       </v-flex>
-      <v-flex d-flex xs12>
-        <v-card color="black" height="500px" class="scroll">
-          <v-card-text class="white--text">
-            <!-- <v-layout justify-center row wrap> -->
-            <!-- The configuration -->
-            <!-- <v-flex d-flex xs12 sm12 md12 lg12 px-1 py-1> -->
-            <!-- <v-card color="teal lighten-1" class="white--text elevation-5">
-                  <v-card-title>
-                    <p class="font-weight-bold"></p>
-                  </v-card-title>
-                  <v-card-text class="d-flex">
-                  </v-card-text>
-            </v-card>-->
-            <!-- </v-flex> -->
-            <!-- </v-layout> -->
-            <!-- {{consoleTxt}} -->
-            <p
-              v-for="(line, index) in consoleTxt"
-              :key="index"
-              class="p-0 m-0 font-weight-medium"
-            >{{line}}</p>
-            <br>
-            <!-- <div >
-            </div>-->
-          </v-card-text>
-        </v-card>
+      <v-flex xs12 sm12 md12 lg8>
+        <!-- Port Console Area -->
+        <v-layout justify-center row wrap pa-1>
+          <v-flex d-flex xs12>
+            <v-toolbar color="teal" dark>
+              <v-toolbar-title>Port Data Console</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <div v-if="port != undefined">
+                <v-tooltip bottom>
+                  <template #activator="data">
+                    <v-btn v-on="data.on" icon @click="flushPort()">
+                      <v-icon>fas fa-stop-circle</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Flush both incoming and outgoing data on the port</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template #activator="data">
+                    <v-btn v-on="data.on" icon @click="pausePort()">
+                      <v-icon>fas fa-pause-circle</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Pause all incoming data on the port</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template #activator="data">
+                    <v-btn v-on="data.on" icon @click="resumePort()">
+                      <v-icon>fas fa-play-circle</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Resume all incoming data on the port</span>
+                </v-tooltip>
+              </div>
+              <v-tooltip bottom>
+                <template #activator="data">
+                  <v-btn v-on="data.on" icon @click="clearPortConsole()">
+                    <v-icon>fas fa-eraser</v-icon>
+                  </v-btn>
+                </template>
+                <span>Clear the console</span>
+              </v-tooltip>
+            </v-toolbar>
+          </v-flex>
+          <v-flex d-flex xs12>
+            <v-card color="teal lighten-4" height="300px" class="scroll">
+              <v-card-text class="p-0 teal--text darken-4">
+                <table>
+                  <tr
+                    v-for="(line, index) in portConsoleTxt"
+                    :key="index"
+                    class="p-0 m-0 font-weight-medium"
+                  >
+                    <td class="red--text darken-1">{{line.split("|")[0]}}</td>
+                    <td>{{" "+line.split("|")[1]}}</td>
+                  </tr>
+                </table>
+              </v-card-text>
+            </v-card>
+          </v-flex>
+        </v-layout>
       </v-flex>
     </v-layout>
     <!-- Transmission 1st phase dialoge -->
-    <v-dialog v-model="transmissionDialog" persistent width="700px">
+    <v-dialog v-model="portsListDialog" persistent width="700px">
       <v-card>
         <v-card-title class="teal darken-4 py-4 title white--text">GCode File Transmission</v-card-title>
         <v-card-text class="py-0 px-0">
@@ -355,7 +410,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn flat color="teal" @click="transmissionDialog = false">Cancel</v-btn>
+          <v-btn flat color="teal" @click="portsListDialog = false">Cancel</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -404,6 +459,7 @@
 import ConversionServices from "@/services/conversion.js";
 import PortsServices from "@/services/ports.js";
 import Pusher from "pusher-js";
+import { setTimeout } from "timers";
 export default {
   data: () => ({
     //? for download button
@@ -459,18 +515,24 @@ export default {
     scaleAccessSnackbarColor: "info",
     scaleAccessSnackbar: false,
     //? for transmission 1st phase
-    transmissionDialog: false,
-    displayConsole: true,
+    portsListDialog: false,
+    displayPortConsole: true,
     //? for ports list
     portsList: [],
     portsListProgress: true,
     //? for console
-    consoleTxt: [],
+    portConsoleTxt: [],
     //? darw operation errors dialog
     drawErrorsDialog: false,
     error: "",
     //? for binding pusher channel
-    notBinded: false
+    isPortBinded: false,
+    isLogBinded: false,
+    port: undefined,
+    //? for transmission process
+    displayTransmissionConsole: true,
+    transmissionConsoleTxt: [],
+    consolesArea: true
   }),
   methods: {
     fileIsSelected(event) {
@@ -560,7 +622,7 @@ export default {
       }
     },
     initializeDrawOperation() {
-      this.transmissionDialog = true;
+      this.portsListDialog = true;
       PortsServices.getConnectedPortsList()
         .then(result => {
           this.portsListProgress = false;
@@ -570,105 +632,161 @@ export default {
         })
         .catch(error => {
           this.portsListProgress = false;
-          this.transmissionDialog = false;
+          this.portsListDialog = false;
           this.snackbar = true;
           this.snackbarColor = "error";
           this.snackbarContent = error;
         });
     },
-    downloadGCodeFile() {
-      this.loader = "loading3";
-      // axios
-      //   .post(
-      //     "http://localhost:3000/api/local/files/gcode/download",
-      //     {
-      //       name: this.fileName
-      //     },
-      //     {
-      //       responseType: "stream"
-      //     }
-      //   )
-      //   .then(result => {
-      //     let file = new Blob([result.data], { type: "text/gcode" });
-      //     saveAs(file, "file.gcode");
-      //     this.loader = null;
-      //   })
-      //   .catch(error => {
-      //     this.loader = null;
-      //     this.dialog = false;
-      //     console.log(error);
-      //     this.snackbarColor = "error";
-      //     if (error.response) {
-      //       //? The request was made and the server responded with a status code
-      //       //? that falls out of the range of 2xx
-      //       // reject(error.response.data.failure);
-      //       this.snackbarContent = error.response.data.failure;
-      //     } else if (error.request) {
-      //       // reject("Check you internet connection!");
-      //       console.log("status text " + error.request.statusText);
-      //       console.log("status " + error.request.status);
-      //       console.log("timeout " + error.request.timeout);
-      //       this.snackbarContent = error.request;
-      //     } else {
-      //       //? Something happened in setting up the request that triggered an Error
-      //       // reject(error.message);
-      //       this.snackbarContent = "error.message";
-      //     }
-      //     this.snackbar = true;
-      //   });
-    },
-    subscribe() {
+    subscribeToPorts(eventName) {
       Pusher.logToConsole = true;
       let pusher = new Pusher("ced4b5ad59f10ab2a746", {
         cluster: "eu",
         forceTLS: true
       });
       pusher.subscribe("ports");
-      this.isBinded = true;
-      pusher.bind("on-data", data => {
-        this.consoleTxt.push(data.data);
+      this.isPortsBinded = true;
+      pusher.bind(eventName, data => {
+        // console.log("data.data.length :", data.data.length);
+        if (data.data.length == 0) {
+          console.warn("data is empty!");
+        } else {
+          this.portConsoleTxt.unshift(data.data);
+        }
+      });
+    },
+    subscribeToLog(eventName) {
+      Pusher.logToConsole = true;
+      let pusher = new Pusher("ced4b5ad59f10ab2a746", {
+        cluster: "eu",
+        forceTLS: true
+      });
+      pusher.subscribe("logs");
+      this.isLogBinded = true;
+      pusher.bind(eventName, data => {
+        // console.log("data.data.length :", data.data.length);
+        if (data.data.length == 0) {
+          console.warn("data is empty!");
+        } else {
+          this.transmissionConsoleTxt.unshift(data.data);
+        }
       });
     },
     startTransmitingGCode(port) {
+      this.port = port;
       if (this.fileName !== undefined && this.fileName !== "") {
-        PortsServices.performFullDrawOperation(this.fileName, port)
-          .then(result => {
-            console.log(result);
-            this.snackbar = true;
-            this.snackbarColor = "success";
-            this.snackbarContent = result.success;
-            this.transmissionDialog = false;
-            //! if you bind multiple times, it will show data multiple time also
-            if (!this.isBinded) {
-              this.subscribe();
-            } else {
-              console.log("Already subscribed");
-            }
-          })
-          .catch(error => {
-            this.transmissionDialog = false;
-            console.log(error);
-            //TODO: display error in dialog window
-            this.consoleTxt.push("Operation: " + error.operation);
-            this.consoleTxt.push("Message: " + error.failure);
-            if (error.isPortClosed) {
-              this.consoleTxt.push(
-                "Port Status: " + error.isPortClosed === true
-                  ? " Closed"
-                  : " Opened"
-              );
-            }
-          });
+        // const splitted = this.fileName.split(".");
+        // const fileName = splitted[0] + "." + splitted[1];
+        //! if you bind multiple times, it will show data multiple time also
+        if (!this.isPortsBinded) {
+          this.subscribeToPorts("on-data");
+        } else {
+          console.log("Already subscribed");
+        }
+        if (!this.isLogBinded) {
+          this.subscribeToLog("on-log");
+        } else {
+          console.log("Already subscribed");
+        }
+        setTimeout(() => {
+          PortsServices.performFullDrawOperation(this.fileName, port)
+            .then(result => {
+              console.log(result);
+              this.snackbar = true;
+              this.snackbarColor = "success";
+              this.snackbarContent = result.success;
+              this.portsListDialog = false;
+            })
+            .catch(error => {
+              this.portsListDialog = false;
+              console.log(error);
+              this.portConsoleTxt.push("Operation: " + error.operation);
+              this.portConsoleTxt.push("Message: " + error.failure);
+              this.snackbar = true;
+              this.snackbarColor = "error";
+              this.snackbarContent = error.failure;
+              if (error.isPortClosed) {
+                this.portConsoleTxt.push(
+                  "Port Status: " + error.isPortClosed === true
+                    ? " Closed"
+                    : " Opened"
+                );
+              }
+            });
+        }, 500);
       } else {
-        this.transmissionDialog = false;
+        this.portsListDialog = false;
         this.snackbar = true;
         this.snackbarColor = "error";
         this.snackbarContent = "Gcode file name is missing!";
       }
     },
-    clearConsole() {
-      this.consoleTxt = [];
-      // console.log(this.consoleTxt);
+    selectingPort(portName, start) {
+      if (start) {
+        this.startTransmitingGCode(portName);
+      } else {
+        this.port = portName;
+      }
+    },
+    pausePort() {
+      if (this.port) {
+        console.warn("pausePort() is called, port is " + this.port);
+        PortsServices.pauseEmittingPort(this.port)
+          .then(result => {
+            this.snackbar = true;
+            this.snackbarColor = "success";
+            this.snackbarContent = result.success;
+          })
+          .catch(error => {
+            this.snackbar = true;
+            this.snackbarColor = "error";
+            this.snackbarContent = error;
+          });
+      } else {
+        console.warn("port is undefined!!");
+      }
+    },
+    resumePort() {
+      if (this.port) {
+        console.warn("resumePort() is called, port is " + this.port);
+        PortsServices.resumeEmittingPort(this.port)
+          .then(result => {
+            this.snackbar = true;
+            this.snackbarColor = "success";
+            this.snackbarContent = result.success;
+          })
+          .catch(error => {
+            this.snackbar = true;
+            this.snackbarColor = "error";
+            this.snackbarContent = error;
+          });
+      } else {
+        console.warn("port is undefined!!");
+      }
+    },
+    flushPort() {
+      if (this.port) {
+        console.warn("flushPort() is called, port is " + this.port);
+        PortsServices.flushPort(this.port)
+          .then(result => {
+            this.snackbar = true;
+            this.snackbarColor = "success";
+            this.snackbarContent = result.success;
+          })
+          .catch(error => {
+            this.snackbar = true;
+            this.snackbarColor = "error";
+            this.snackbarContent = error;
+          });
+      } else {
+        console.warn("port is undefined!!");
+      }
+    },
+    clearPortConsole() {
+      this.portConsoleTxt = [];
+    },
+    clearTransmissionConsole() {
+      this.transmissionConsoleTxt = [];
     }
   }
 };
