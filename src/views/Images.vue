@@ -28,13 +28,16 @@
             </div>
           </v-card-text>
           <v-card-actions>
-            <v-btn flat @click="clear">Clear</v-btn>
+            <v-btn flat @click="clear" color="teal darken-4">Clear</v-btn>
             <v-spacer></v-spacer>
-            <v-btn
-              color="teal"
-              v-show="selectedFile == null"
-              @click="$refs.selectImageRef.click()"
-            >Select</v-btn>
+            <v-fade-transition>
+              <v-btn
+                color="teal"
+                class="white--text"
+                v-show="selectedFile == null"
+                @click="$refs.selectImageRef.click()"
+              >Select</v-btn>
+            </v-fade-transition>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -129,253 +132,297 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <v-layout v-if="displayRsultes == true" justify-center row wrap pa-1>
-      <v-flex d-flex xs12>
-        <v-toolbar color="teal" dark>
-          <v-toolbar-title>Conversion Results</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-btn icon>
-            <v-icon>more_vert</v-icon>
-          </v-btn>
-        </v-toolbar>
-      </v-flex>
-      <v-flex d-flex xs12>
-        <v-card>
-          <v-card-text>
-            <v-layout justify-center row wrap>
-              <!-- The configuration -->
-              <v-flex d-flex xs12 sm12 md5 lg5 px-1 py-1>
-                <v-card color="teal lighten-1" class="white--text elevation-5">
-                  <v-card-title>
-                    <p class="font-weight-bold">Conversion Parameters</p>
-                  </v-card-title>
-                  <v-card-text class="d-flex">
-                    <v-list dense>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Tool Diameter:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ oldtoolDiameter }} mm</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Sensitivity:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ oldsensitivity }}</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Scale Axes:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ oldscaleAxes }} mm</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Deep Step:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ olddeepStep }} mm</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Black Z:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ oldblackZ }}</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">White Z:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ oldwhiteZ }}</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Safe Z:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ oldsafeZ }}</v-list-tile-content>
-                      </v-list-tile>
-                      <v-divider></v-divider>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Image Size:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ imegSize }}</v-list-tile-content>
-                      </v-list-tile>
-                      <v-divider></v-divider>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Started At:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ startTime }}</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Ended At:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ endTime }}</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Elapsed Time:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ elapsedTime }} s</v-list-tile-content>
-                      </v-list-tile>
-                    </v-list>
-                  </v-card-text>
-                </v-card>
-              </v-flex>
-              <!-- Error black pixel card -->
-              <v-flex d-flex xs12 sm12 md7 lg7 px-1 py-1>
-                <v-card color="teal lighten-1" class="white--text elevation-5">
-                  <v-card-title>
-                    <p class="font-weight-bold">Proccessed Plack Pixels</p>
-                  </v-card-title>
-                  <v-card-text class="d-flex align-center justify-center">
-                    <v-tooltip bottom>
-                      <template #activator="data">
-                        <v-progress-circular
-                          :rotate="360"
-                          :size="150"
-                          :width="10"
-                          :value="value"
-                          color="white"
-                          v-on="data.on"
-                        >{{ value }}</v-progress-circular>
-                      </template>
-                      <span>The percentage of the proccessed black pixels in the picture</span>
-                    </v-tooltip>
-                    <v-tooltip bottom>
-                      <template #activator="data">
-                        <v-progress-circular
-                          :rotate="360"
-                          :size="150"
-                          :width="10"
-                          :value="errorValue"
-                          color="red darken-4"
-                          v-on="data.on"
-                        >{{ errorValue }}</v-progress-circular>
-                      </template>
-                      <span>The percentage of the unproccessed black pixels in the picture</span>
-                    </v-tooltip>
-                    <!-- <p class="font-weight-medium" style="font-size: 125px">0</p>s -->
-                  </v-card-text>
-                  <v-divider></v-divider>
-                  <v-card-text>
-                    <p class="font-weight-bold">GCode File Information</p>
-                    <v-list dense>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Name:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ fileName }}</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <v-list-tile-content class="font-weight-bold">Size:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ size }} Mb</v-list-tile-content>
-                      </v-list-tile>
-                      <v-list-tile>
-                        <!-- <v-list-tile-content class="font-weight-bold">file:</v-list-tile-content> -->
-                        <v-list-tile-content class="align-center">
-                          <v-tooltip bottom>
-                            <template #activator="data">
-                              <v-btn
-                                :loading="loading3"
-                                :disabled="loading3"
-                                color="teal darken-3"
-                                class="white--text"
-                                v-on="data.on"
-                                @click="initializeDrawOperation"
-                              >
-                                <v-icon left dark>fas fa-draw-polygon</v-icon>Draw
-                              </v-btn>
-                            </template>
-                            <span>Send generated gcode to machine</span>
-                          </v-tooltip>
-                        </v-list-tile-content>
-                      </v-list-tile>
-                    </v-list>
-                  </v-card-text>
-                </v-card>
-              </v-flex>
-            </v-layout>
-          </v-card-text>
-        </v-card>
-      </v-flex>
-    </v-layout>
-    <v-layout v-if="consolesArea == true" justify-center row wrap pa-1>
-      <v-flex xs12 sm12 md12 lg4>
+    <!-- Conversion Results panel -->
+    <v-fade-transition>
+      <v-layout v-if="displayRsultes == true" justify-center row wrap pa-1>
+        <v-flex d-flex xs12>
+          <v-toolbar color="teal" dark card dense>
+            <v-toolbar-title>Conversion Results</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+              <v-icon>more_vert</v-icon>
+            </v-btn>
+            <v-btn icon @click="showResultsPanel = !showResultsPanel">
+              <v-icon>{{ showResultsPanel ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+            </v-btn>
+          </v-toolbar>
+        </v-flex>
+        <v-flex d-flex xs12>
+          <v-fade-transition>
+            <v-card v-show="showResultsPanel">
+              <v-card-text>
+                <v-layout justify-center row wrap>
+                  <!-- Old configuration -->
+                  <v-flex xs12 sm12 md3 lg3 px-1>
+                    <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
+                      <v-card-text class="d-flex">
+                        <table>
+                          <header class="font-weight-bold py-2">Conversion Prameters</header>
+                          <tr>
+                            <td class="font-weight-meduim">Tool Diameter</td>
+                            <td class="align-center">{{ oldtoolDiameter }} mm</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-meduim">Sensitivity</td>
+                            <td class="align-center">{{ oldsensitivity }} mm</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-meduim">Scale Axes</td>
+                            <td class="align-center">{{ oldscaleAxes }} mm</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-meduim">Deep Step</td>
+                            <td class="align-center">{{ olddeepStep }} mm</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-meduim">Black Z</td>
+                            <td class="align-center">{{ oldblackZ }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-meduim">White Z</td>
+                            <td class="align-center">{{ oldwhiteZ }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-meduim">Safe Z</td>
+                            <td class="align-center">{{ oldsafeZ }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-meduim">Safe Z</td>
+                            <td class="align-center">{{ oldsafeZ }}</td>
+                          </tr>
+                        </table>
+                      </v-card-text>
+                    </v-card>
+                  </v-flex>
+                  <!-- Image size & times & file information -->
+                  <v-flex xs12 sm12 md5 lg5 px-1>
+                    <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
+                      <v-card-text class="d-flex">
+                        <table>
+                          <tr>
+                            <td class="font-weight-bold">Image Size:</td>
+                            <td class="align-end">{{ imegSize }}</td>
+                          </tr>
+                        </table>
+                      </v-card-text>
+                    </v-card>
+                    <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
+                      <v-card-text class="d-flex">
+                        <table>
+                          <tr>
+                            <td class="font-weight-bold">Started at</td>
+                            <td class="align-center">{{ startTime }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold">Ended at</td>
+                            <td class="align-center">{{ endTime }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold">Elapsed Time</td>
+                            <td class="align-center">{{ elapsedTime }} seconds</td>
+                          </tr>
+                        </table>
+                      </v-card-text>
+                    </v-card>
+                    <v-card color="teal lighten-1" class="white--text elevation-5 my-1">
+                      <v-card-text class="d-flex pb-4">
+                        <!-- <p class="font-weight-bold">GCode File Information</p> -->
+                        <table>
+                          <tr>
+                            <td class="font-weight-bold">File Name</td>
+                            <td class="align-end">{{ fileName }}</td>
+                          </tr>
+                          <tr>
+                            <td class="font-weight-bold">Size</td>
+                            <td class="align-end">{{ size }} Mb</td>
+                          </tr>
+                        </table>
+                      </v-card-text>
+                    </v-card>
+                  </v-flex>
+                  <!-- Proccessed black pixels progress circle -->
+                  <v-flex xs12 sm12 md4 lg4 px-1>
+                    <v-card color="teal lighten-1" class="white--text elevation-5">
+                      <v-card-text class="d-flex">
+                        <v-tooltip bottom>
+                          <template #activator="data">
+                            <v-progress-circular
+                              :rotate="360"
+                              :size="220"
+                              :width="10"
+                              :value="value"
+                              color="white"
+                              v-on="data.on"
+                            >{{ value }}</v-progress-circular>
+                          </template>
+                          <span>The percentage of the proccessed black pixels in the picture</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                          <template #activator="data">
+                            <v-progress-circular
+                              :rotate="360"
+                              :size="150"
+                              :width="10"
+                              :value="errorValue"
+                              color="red lighten-1"
+                              v-on="data.on"
+                            >{{ errorValue }}</v-progress-circular>
+                          </template>
+                          <span>The percentage of the unproccessed black pixels in the picture</span>
+                        </v-tooltip>
+                      </v-card-text>
+                    </v-card>
+                  </v-flex>
+                </v-layout>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-tooltip bottom>
+                  <template #activator="data">
+                    <v-btn
+                      :loading="loading3"
+                      :disabled="loading3"
+                      class="teal--text"
+                      flat
+                      v-on="data.on"
+                      @click="initializeDrawOperation()"
+                    >
+                      <v-icon left dark>fas fa-draw-polygon</v-icon>Draw
+                    </v-btn>
+                  </template>
+                  <span>Send generated gcode to machine</span>
+                </v-tooltip>
+              </v-card-actions>
+            </v-card>
+          </v-fade-transition>
+        </v-flex>
+      </v-layout>
+    </v-fade-transition>
+    <v-fade-transition>
+      <v-layout v-if="consolesArea == true" justify-center row wrap pa-1>
         <!-- Transmission Console Area -->
-        <v-layout justify-center row wrap pa-1>
-          <v-flex d-flex xs12 sm12 md12 lg12>
-            <v-toolbar color="teal" dark>
-              <v-toolbar-title>Transmission Process Console</v-toolbar-title>
-              <v-spacer></v-spacer>
-              <v-tooltip bottom>
-                <template #activator="data">
-                  <v-btn v-on="data.on" icon @click="clearTransmissionConsole()">
-                    <v-icon>fas fa-eraser</v-icon>
-                  </v-btn>
-                </template>
-                <span>Clear the console</span>
-              </v-tooltip>
-            </v-toolbar>
-          </v-flex>
-          <v-flex d-flex xs12 sm12 md12 lg12>
-            <v-card color="teal lighten-4" height="300px" class="scroll">
-              <v-card-text class="p-0 teal--text darken-4">
-                <table>
-                  <tr
-                    v-for="(line, index) in transmissionConsoleTxt"
-                    :key="index"
-                    class="p-0 m-0 font-weight-medium"
-                  >
-                    <td class="red--text darken-1">{{line.split("|")[0]}}</td>
-                    <td>{{"->"+line.split("|")[1]}}</td>
-                  </tr>
-                </table>
-                <br>
-              </v-card-text>
-            </v-card>
-          </v-flex>
-        </v-layout>
-      </v-flex>
-      <v-flex xs12 sm12 md12 lg8>
+        <v-flex xs12 sm12 md12 lg12 mb-2>
+          <v-layout justify-center row wrap>
+            <v-flex d-flex xs12 sm12 md12 lg12>
+              <v-toolbar color="teal" dark dense>
+                <v-toolbar-title>Transmission Process Console</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-tooltip bottom>
+                  <template #activator="data">
+                    <v-btn v-on="data.on" icon @click="clearTransmissionConsole()">
+                      <v-icon>fas fa-eraser</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Clear the console</span>
+                </v-tooltip>
+                <v-btn icon @click="showTranmsissionConsole = !showTranmsissionConsole">
+                  <v-icon>{{ showTranmsissionConsole ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                </v-btn>
+              </v-toolbar>
+            </v-flex>
+            <v-flex d-flex xs12 sm12 md12 lg12>
+              <v-fade-transition>
+                <v-card
+                  v-show="showTranmsissionConsole"
+                  color="teal lighten-4"
+                  height="300px"
+                  class="scroll"
+                >
+                  <v-card-text class="teal--text darken-4">
+                    <table>
+                      <tr
+                        v-for="(line, index) in transmissionConsoleTxt"
+                        :key="index"
+                        class="font-weight-medium"
+                      >
+                        <v-fade-transition>
+                          <td v-show="true" class="red--text darken-1">{{line.split("|")[0]}}</td>
+                        </v-fade-transition>
+                        <v-fade-transition>
+                          <td v-show="true">{{"->"+line.split("|")[1]}}</td>
+                        </v-fade-transition>
+                      </tr>
+                    </table>
+                    <br>
+                  </v-card-text>
+                </v-card>
+              </v-fade-transition>
+            </v-flex>
+          </v-layout>
+        </v-flex>
         <!-- Port Console Area -->
-        <v-layout justify-center row wrap pa-1>
-          <v-flex d-flex xs12>
-            <v-toolbar color="teal" dark>
-              <v-toolbar-title>Port Data Console</v-toolbar-title>
-              <v-spacer></v-spacer>
-              <div v-if="port != undefined">
+        <v-flex xs12 sm12 md12 lg12>
+          <v-layout row wrap>
+            <v-flex xs12>
+              <v-toolbar color="teal" dark dense>
+                <v-toolbar-title>Port Data Console</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <div v-if="port != undefined">
+                  <v-tooltip bottom>
+                    <template #activator="data">
+                      <v-btn v-on="data.on" icon @click="flushPort()">
+                        <v-icon>fas fa-stop-circle</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Flush both incoming and outgoing data on the port</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <template #activator="data">
+                      <v-btn v-on="data.on" icon @click="pausePort()">
+                        <v-icon>fas fa-pause-circle</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Pause all incoming data on the port</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <template #activator="data">
+                      <v-btn v-on="data.on" icon @click="resumePort()">
+                        <v-icon>fas fa-play-circle</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Resume all incoming data on the port</span>
+                  </v-tooltip>
+                </div>
                 <v-tooltip bottom>
                   <template #activator="data">
-                    <v-btn v-on="data.on" icon @click="flushPort()">
-                      <v-icon>fas fa-stop-circle</v-icon>
+                    <v-btn v-on="data.on" icon @click="clearPortConsole()">
+                      <v-icon>fas fa-eraser</v-icon>
                     </v-btn>
                   </template>
-                  <span>Flush both incoming and outgoing data on the port</span>
+                  <span>Clear the console</span>
                 </v-tooltip>
-                <v-tooltip bottom>
-                  <template #activator="data">
-                    <v-btn v-on="data.on" icon @click="pausePort()">
-                      <v-icon>fas fa-pause-circle</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Pause all incoming data on the port</span>
-                </v-tooltip>
-                <v-tooltip bottom>
-                  <template #activator="data">
-                    <v-btn v-on="data.on" icon @click="resumePort()">
-                      <v-icon>fas fa-play-circle</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Resume all incoming data on the port</span>
-                </v-tooltip>
-              </div>
-              <v-tooltip bottom>
-                <template #activator="data">
-                  <v-btn v-on="data.on" icon @click="clearPortConsole()">
-                    <v-icon>fas fa-eraser</v-icon>
-                  </v-btn>
-                </template>
-                <span>Clear the console</span>
-              </v-tooltip>
-            </v-toolbar>
-          </v-flex>
-          <v-flex d-flex xs12>
-            <v-card color="teal lighten-4" height="300px" class="scroll">
-              <v-card-text class="p-0 teal--text darken-4">
-                <table>
-                  <tr
-                    v-for="(line, index) in portConsoleTxt"
-                    :key="index"
-                    class="p-0 m-0 font-weight-medium"
-                  >
-                    <td class="red--text darken-1">{{line.split("|")[0]}}</td>
-                    <td>{{" "+line.split("|")[1]}}</td>
-                  </tr>
-                </table>
-              </v-card-text>
-            </v-card>
-          </v-flex>
-        </v-layout>
-      </v-flex>
-    </v-layout>
+                <v-btn icon @click="showPortConsole = !showPortConsole">
+                  <v-icon>{{ showPortConsole ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                </v-btn>
+              </v-toolbar>
+            </v-flex>
+            <v-flex d-flex xs12 sm12 md12 lg12>
+              <v-fade-transition>
+                <v-card
+                  v-show="showPortConsole"
+                  color="teal lighten-4"
+                  height="300px"
+                  class="scroll"
+                >
+                  <v-card-text class="teal--text darken-4">
+                    <table>
+                      <tr
+                        v-for="(line, index) in portConsoleTxt"
+                        :key="index"
+                        class="font-weight-medium"
+                      >
+                        <td class="red--text darken-1">{{line.split("|")[0]}}</td>
+                        <td>{{" "+line.split("|")[1]}}</td>
+                      </tr>
+                    </table>
+                  </v-card-text>
+                </v-card>
+              </v-fade-transition>
+            </v-flex>
+          </v-layout>
+        </v-flex>
+      </v-layout>
+    </v-fade-transition>
     <!-- Transmission 1st phase dialoge -->
     <v-dialog v-model="portsListDialog" persistent width="700px">
       <v-card>
@@ -426,7 +473,7 @@
       </v-card>
     </v-dialog>
     <!-- Draw Errors Dialog -->
-    <v-dialog v-model="drawErrorsDialog" width="500">
+    <!-- <v-dialog v-model="drawErrorsDialog" width="500">
       <v-card color="error" dark>
         <v-card-title class="font-weight-bold">Opps Error</v-card-title>
         <v-card-text>{{error}}</v-card-text>
@@ -436,7 +483,7 @@
           <v-btn flat color="teal" @click="drawErrorsDialog = false">Ok</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog>-->
     <!-- Snackbars -->
     <v-snackbar
       v-model="scaleAccessSnackbar"
@@ -467,10 +514,11 @@ export default {
     loading3: false,
     //? to display the results section
     displayRsultes: true,
+    showResultsPanel: true,
     //? for image file
     selectedFile: null,
     url: require("@/assets/default.png"),
-    //? for fab button
+    //? for conversion button
     hidden: true,
     //? for dialog
     dialog: false,
@@ -500,7 +548,7 @@ export default {
     oldsafeZ: 1,
     oldwork: 1200,
     oldidle: 3000,
-    imegSize: "",
+    imegSize: "NAN",
     startTime: null,
     endTime: null,
     elapsedTime: 0,
@@ -523,8 +571,8 @@ export default {
     //? for console
     portConsoleTxt: [],
     //? darw operation errors dialog
-    drawErrorsDialog: false,
-    error: "",
+    // drawErrorsDialog: false,
+    // error: "",
     //? for binding pusher channel
     isPortBinded: false,
     isLogBinded: false,
@@ -532,7 +580,10 @@ export default {
     //? for transmission process
     displayTransmissionConsole: true,
     transmissionConsoleTxt: [],
-    consolesArea: true
+    consolesArea: true,
+    //? for card-text area of transmission console
+    showTranmsissionConsole: true,
+    showPortConsole: true
   }),
   methods: {
     fileIsSelected(event) {
@@ -647,7 +698,6 @@ export default {
       pusher.subscribe("ports");
       this.isPortsBinded = true;
       pusher.bind(eventName, data => {
-        // console.log("data.data.length :", data.data.length);
         if (data.data.length == 0) {
           console.warn("data is empty!");
         } else {
@@ -664,7 +714,6 @@ export default {
       pusher.subscribe("logs");
       this.isLogBinded = true;
       pusher.bind(eventName, data => {
-        // console.log("data.data.length :", data.data.length);
         if (data.data.length == 0) {
           console.warn("data is empty!");
         } else {
@@ -707,9 +756,7 @@ export default {
               this.snackbarContent = error.failure;
               if (error.isPortClosed) {
                 this.portConsoleTxt.push(
-                  "Port Status: " + error.isPortClosed === true
-                    ? " Closed"
-                    : " Opened"
+                  "Port Status: " + error.isPortClosed ? " Closed" : " Opened"
                 );
               }
             });
@@ -840,5 +887,12 @@ export default {
 }
 .scroll {
   overflow-y: auto;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
