@@ -506,7 +506,7 @@
 import ConversionServices from "@/services/conversion.js";
 import PortsServices from "@/services/ports.js";
 import Pusher from "pusher-js";
-import { setTimeout } from "timers";
+import { setTimeout, clearInterval } from "timers";
 export default {
   data: () => ({
     //? for download button
@@ -570,9 +570,6 @@ export default {
     portsListProgress: true,
     //? for console
     portConsoleTxt: [],
-    //? darw operation errors dialog
-    // drawErrorsDialog: false,
-    // error: "",
     //? for binding pusher channel
     isPortBinded: false,
     isLogBinded: false,
@@ -580,10 +577,12 @@ export default {
     //? for transmission process
     displayTransmissionConsole: true,
     transmissionConsoleTxt: [],
-    consolesArea: true,
-    //? for card-text area of transmission console
     showTranmsissionConsole: true,
-    showPortConsole: true
+    //? for consoles area
+    consolesArea: true,
+    showPortConsole: true,
+    //? estimated time to end the process of code transmission
+    estimatedTime: ""
   }),
   methods: {
     fileIsSelected(event) {
@@ -660,15 +659,12 @@ export default {
             })
             .catch(error => {
               this.dialog = false;
-              this.snackbar = true;
-              this.snackbarColor = "error";
-              this.snackbarContent = error;
+              this.showErrorSnackbar(error);
               this.loading = false;
             });
         } else {
-          this.snackbarColor = "error";
-          this.snackbarContent = "No Image is Selected";
-          this.snackbar = true;
+          this.showErrorSnackbar("No Image is Selected");
+
         }
       }
     },
@@ -684,9 +680,7 @@ export default {
         .catch(error => {
           this.portsListProgress = false;
           this.portsListDialog = false;
-          this.snackbar = true;
-          this.snackbarColor = "error";
-          this.snackbarContent = error;
+          this.showErrorSnackbar(error);
         });
     },
     subscribeToPorts(eventName) {
@@ -740,20 +734,18 @@ export default {
         setTimeout(() => {
           PortsServices.performFullDrawOperation(this.fileName, port)
             .then(result => {
-              console.log(result);
-              this.snackbar = true;
-              this.snackbarColor = "success";
-              this.snackbarContent = result.success;
+              // console.log(result);
               this.portsListDialog = false;
+              this.estimatedTime = result.estimated;
+              this.decrementEstimatedTime();
+              this.showSuccessSnackbar(result.success);
             })
             .catch(error => {
               this.portsListDialog = false;
               console.log(error);
+              this.showErrorSnackbar(error.failure);
               this.portConsoleTxt.push("Operation: " + error.operation);
               this.portConsoleTxt.push("Message: " + error.failure);
-              this.snackbar = true;
-              this.snackbarColor = "error";
-              this.snackbarContent = error.failure;
               if (error.isPortClosed) {
                 this.portConsoleTxt.push(
                   "Port Status: " + error.isPortClosed ? " Closed" : " Opened"
@@ -763,9 +755,7 @@ export default {
         }, 500);
       } else {
         this.portsListDialog = false;
-        this.snackbar = true;
-        this.snackbarColor = "error";
-        this.snackbarContent = "Gcode file name is missing!";
+        this.showErrorSnackbar("Gcode file name is missing!");
       }
     },
     selectingPort(portName, start) {
@@ -780,14 +770,10 @@ export default {
         console.warn("pausePort() is called, port is " + this.port);
         PortsServices.pauseEmittingPort(this.port)
           .then(result => {
-            this.snackbar = true;
-            this.snackbarColor = "success";
-            this.snackbarContent = result.success;
+            this.showSuccessSnackbar(result.success);
           })
           .catch(error => {
-            this.snackbar = true;
-            this.snackbarColor = "error";
-            this.snackbarContent = error;
+            this.showErrorSnackbar(error);
           });
       } else {
         console.warn("port is undefined!!");
@@ -798,14 +784,10 @@ export default {
         console.warn("resumePort() is called, port is " + this.port);
         PortsServices.resumeEmittingPort(this.port)
           .then(result => {
-            this.snackbar = true;
-            this.snackbarColor = "success";
-            this.snackbarContent = result.success;
+            this.showSuccessSnackbar(result.success);
           })
           .catch(error => {
-            this.snackbar = true;
-            this.snackbarColor = "error";
-            this.snackbarContent = error;
+            this.showErrorSnackbar(error);
           });
       } else {
         console.warn("port is undefined!!");
@@ -816,14 +798,10 @@ export default {
         console.warn("flushPort() is called, port is " + this.port);
         PortsServices.flushPort(this.port)
           .then(result => {
-            this.snackbar = true;
-            this.snackbarColor = "success";
-            this.snackbarContent = result.success;
+            this.showSuccessSnackbar(result.success);
           })
           .catch(error => {
-            this.snackbar = true;
-            this.snackbarColor = "error";
-            this.snackbarContent = error;
+            this.showErrorSnackbar(error);
           });
       } else {
         console.warn("port is undefined!!");
@@ -834,6 +812,22 @@ export default {
     },
     clearTransmissionConsole() {
       this.transmissionConsoleTxt = [];
+    },
+    decrementEstimatedTime() {
+      let decrementEstimatedTime = setInterval(() => {
+        if (this.estimatedTime == 0) clearInterval(decrementEstimatedTime);
+        else this.estimatedTime--;
+      }, 60000);
+    },
+    showSuccessSnackbar(content) {
+      this.snackbar = true;
+      this.snackbarColor = "success";
+      this.snackbarContent = content;
+    },
+    showErrorSnackbar(content) {
+      this.snackbar = true;
+      this.snackbarColor = "error";
+      this.snackbarContent = content;
     }
   }
 };
