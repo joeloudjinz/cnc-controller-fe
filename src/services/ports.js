@@ -157,5 +157,155 @@ class PortServices {
             });
         });
     }
+    static pauseSendOperation(portName) {
+        return new Promise((resolve, reject) => {
+            axios.post(url + "/draw/pause", {
+                portName
+            }).then((result) => {
+                resolve(result.data);
+            }).catch((error) => {
+                if (error.response) {
+                    if (error.response.status == 406) {
+                        AgentServices.RefreshToken()
+                            .then(() => {
+                                resolve(PortServices.pauseSendOperation(portName));
+                            })
+                            .catch(error => {
+                                reject(error);
+                            });
+                    } else {
+                        //? The request was made and the server responded with a status code
+                        //? that falls out of the range of 2xx
+                        reject(error.response.data.failure);
+                    }
+                } else if (error.request) {
+                    reject("Check you internet connection!");
+                } else {
+                    //? Something happened in setting up the request that triggered an Error
+                    reject(error.message);
+                }
+            });
+        });
+    }
+    static resumeSendOperation(portName) {
+        return new Promise((resolve, reject) => {
+            axios.post(url + "/draw/resume", {
+                portName
+            }).then((result) => {
+                resolve(result.data);
+            }).catch((error) => {
+                if (error.response) {
+                    if (error.response.status == 406) {
+                        AgentServices.RefreshToken()
+                            .then(() => {
+                                resolve(PortServices.resumeSendOperation(portName));
+                            })
+                            .catch(error => {
+                                reject(error);
+                            });
+                    } else {
+                        //? The request was made and the server responded with a status code
+                        //? that falls out of the range of 2xx
+                        reject(error.response.data.failure);
+                    }
+                } else if (error.request) {
+                    reject("Check you internet connection!");
+                } else {
+                    //? Something happened in setting up the request that triggered an Error
+                    reject(error.message);
+                }
+            });
+        });
+    }
+    static stopSendOperation(portName) {
+        return new Promise((resolve, reject) => {
+            axios.post(url + "/draw/stop", {
+                portName
+            }).then((result) => {
+                resolve(result.data);
+            }).catch((error) => {
+                if (error.response) {
+                    if (error.response.status == 406) {
+                        AgentServices.RefreshToken()
+                            .then(() => {
+                                resolve(PortServices.stopSendOperation(portName));
+                            })
+                            .catch(error => {
+                                reject(error);
+                            });
+                    } else {
+                        //? The request was made and the server responded with a status code
+                        //? that falls out of the range of 2xx
+                        reject(error.response.data.failure);
+                    }
+                } else if (error.request) {
+                    reject("Check you internet connection!");
+                } else {
+                    //? Something happened in setting up the request that triggered an Error
+                    reject(error.message);
+                }
+            });
+        });
+    }
+    static openPort(portName){
+        return new Promise((resolve, reject) => {
+            axios.post(url + "/open", {
+                portName
+            }).then((result) => {
+                resolve(result.data);
+            }).catch((error) => {
+                if (error.response) {
+                    if (error.response.status == 406) {
+                        AgentServices.RefreshToken()
+                            .then(() => {
+                                resolve(PortServices.openPort(portName));
+                            })
+                            .catch(error => {
+                                reject(error);
+                            });
+                    } else {
+                        //? The request was made and the server responded with a status code
+                        //? that falls out of the range of 2xx
+                        reject(error.response.data.failure);
+                    }
+                } else if (error.request) {
+                    reject("Check you internet connection!");
+                } else {
+                    //? Something happened in setting up the request that triggered an Error
+                    reject(error.message);
+                }
+            });
+        });
+    }
+    static closePort(portName){
+        return new Promise((resolve, reject) => {
+            axios.post(url + "/close", {
+                portName
+            }).then((result) => {
+                resolve(result.data);
+            }).catch((error) => {
+                if (error.response) {
+                    if (error.response.status == 406) {
+                        AgentServices.RefreshToken()
+                            .then(() => {
+                                resolve(PortServices.closePort(portName));
+                            })
+                            .catch(error => {
+                                reject(error);
+                            });
+                    } else {
+                        //? The request was made and the server responded with a status code
+                        //? that falls out of the range of 2xx
+                        reject(error.response.data.failure);
+                    }
+                } else if (error.request) {
+                    reject("Check you internet connection!");
+                } else {
+                    //? Something happened in setting up the request that triggered an Error
+                    reject(error.message);
+                }
+            });
+        });
+    }
 }
 export default PortServices;
