@@ -247,12 +247,12 @@ class PortServices {
             });
         });
     }
-    static openPort(portName){
+    static openPort(portName) {
         return new Promise((resolve, reject) => {
             axios.post(url + "/open", {
                 portName
             }).then((result) => {
-                resolve(result.data);
+                resolve(result.data.success);
             }).catch((error) => {
                 if (error.response) {
                     if (error.response.status == 406) {
@@ -277,18 +277,49 @@ class PortServices {
             });
         });
     }
-    static closePort(portName){
+    static closePort(portName) {
         return new Promise((resolve, reject) => {
             axios.post(url + "/close", {
                 portName
             }).then((result) => {
-                resolve(result.data);
+                resolve(result.data.success);
             }).catch((error) => {
                 if (error.response) {
                     if (error.response.status == 406) {
                         AgentServices.RefreshToken()
                             .then(() => {
                                 resolve(PortServices.closePort(portName));
+                            })
+                            .catch(error => {
+                                reject(error);
+                            });
+                    } else {
+                        //? The request was made and the server responded with a status code
+                        //? that falls out of the range of 2xx
+                        reject(error.response.data.failure);
+                    }
+                } else if (error.request) {
+                    reject("Check you internet connection!");
+                } else {
+                    //? Something happened in setting up the request that triggered an Error
+                    reject(error.message);
+                }
+            });
+        });
+    }
+    static writeToPort(portName, data) {
+        return new Promise((resolve, reject) => {
+            axios.post(url + "/write", {
+                portName,
+                data
+            }).then((result) => {
+                resolve(result.data.success);
+            }).catch((error) => {
+                if (error.response) {
+                    if (error.response.status == 406) {
+                        AgentServices.RefreshToken()
+                            .then(() => {
+                                resolve(PortServices.writeToPort(portName));
                             })
                             .catch(error => {
                                 reject(error);

@@ -13,6 +13,7 @@
           </v-list-tile>
         </v-list>
       </v-toolbar>
+      <v-divider></v-divider>
       <v-list class="pt-0" dense>
         <v-list-group v-if="portsList.length != 0" prepend-icon="fas fa-parking" value="true">
           <template v-slot:activator>
@@ -156,8 +157,13 @@
               </v-btn>
             </v-toolbar-items>
           </v-toolbar>
+          <v-alert
+            :value="true"
+            type="info"
+            transition="fade-transition"
+            class="mx-3"
+          >Only "Port Name" is guaranteed 100%, other information is related to the connected device of the current port.</v-alert>
           <v-list v-if="selectedPortObject != undefined">
-            <!-- <v-subheader>Port Infromation</v-subheader> -->
             <v-list-tile avatar>
               <v-list-tile-content>
                 <v-list-tile-title>Port Name</v-list-tile-title>
@@ -196,21 +202,38 @@
             </v-list-tile>
           </v-list>
           <v-divider></v-divider>
-          <!-- <v-flex xs12 class="mt-1">
-          </v-flex>-->
-          <v-card height="400px" color="teal darken-4" class="ma-3">
+          <v-card height="300px" color="teal darken-4" class="ma-3">
             <v-toolbar color="teal" card>
               <v-text-field
+                dark
                 v-model="writeToPortTextField"
-                color="white"
-                label="To send to port"
-                class="mt-3"
+                color="teal darken-4"
+                label="Commands"
+                single-line
+                class="pt-2"
+                solo-inverted
               ></v-text-field>
-              <v-btn icon>
-                <v-icon color="white">fas fa-paper-plane</v-icon>
+              <v-fade-transition>
+                <v-btn
+                  v-if="writeToPortTextField != ''"
+                  icon
+                  @click="sendCommandToPort(selectedPortObject.comName)"
+                >
+                  <v-icon color="white">fas fa-paper-plane</v-icon>
+                </v-btn>
+              </v-fade-transition>
+              <v-btn icon @click="clearPortConsole()">
+                <v-icon color="white">fas fa-eraser</v-icon>
               </v-btn>
             </v-toolbar>
-            <v-card-text class="white--text">helo</v-card-text>
+            <v-card-text class="white--text">
+              <table>
+                <tr v-for="(line, index) in portConsoleTxt" :key="index">
+                  <td v-if="line.charAt(1) == '>'" class="font-weight-light">{{line}}</td>
+                  <td v-else class="red--text darken-1 font-weight-meduim">{{line}}</td>
+                </tr>
+              </table>
+            </v-card-text>
           </v-card>
         </v-card>
       </v-dialog>
@@ -282,52 +305,40 @@ export default {
     writeToPortProgress: false,
     writeToPortProgressValue: "",
     //? for pusher channels
-    isPortsBinded: false,
-    pusher: undefined
+    isOnActiveBinded: false,
+    isOnPortDataBinded: false,
+    // isOn
+    pusher: undefined,
+    portConsoleTxt: []
   }),
-  //! DON'T use arrow functions here
-  created: function() {
-    // get the id
-    const id = window.localStorage.getItem("id");
-    // check for role of the current agent
-    AgentServices.getRole(id)
-      .then(result => {
-        this.isAdmin = result.data.result;
-      })
-      .catch(error => {
-        this.showErrorSnackbar(error);
-      });
-    Pusher.logToConsole = true;
-    this.pusher = new Pusher("ced4b5ad59f10ab2a746", {
-      cluster: "eu",
-      forceTLS: true
-    });
-    this.pusher.subscribe("ports");
-    PortsServices.getConnectedPortsList()
-      .then(result => {
-        this.portsCount = result.count;
-        if (result.count !== 0) {
-          this.portsList = result.ports;
-          if (!this.isPortsBinded) {
-            this.subscribeToPorts("on-active");
-          } else {
-            console.log("already binded to on-active");
-          }
-        }
-      })
-      .catch(error => {
-        this.showErrorSnackbar(error);
-      });
-  },
   methods: {
-    subscribeToPorts(eventName) {
-      this.isPortsBinded = true;
-      this.pusher.bind(eventName, data => {
+    bindOnPortData() {
+      if (!this.isOnPortDataBinded) {
+        this.pusher.bind("on-port-data", data => {
+          this.portConsoleTxt.unshift("-> data received: " + data.data);
+        });
+      } else {
+        console.log("Already binded to on-port-data");
+      }
+    },
+    bindOnActive() {
+      this.isOnActiveBinded = true;
+      this.pusher.bind("on-active", data => {
         const portsList = data.portsList;
         const count = Object.keys(portsList).length;
         let newList = [];
         for (let i = 0; i < count; i++) {
           newList.push(portsList[i + 1]);
+        }
+        if (
+          this.selectedPortObject != undefined &&
+          !newList.includes(this.selectedPortObject)
+        ) {
+          this.showErrorSnackbar(
+            `${this.selectedPortObject.comName} is not active anymore`
+          );
+          this.doShowPortDialog = false;
+          this.selectedPortObject = undefined;
         }
         this.portsList = newList;
       });
@@ -355,43 +366,59 @@ export default {
         });
     },
     pausePort(portName) {
-      console.warn("pausePort() is called, port is " + portName);
+      // console.warn("pausePort() is called, port is " + portName);
+      this.portConsoleTxt.unshift(
+        "-> Pause emitting data on port: " + portName
+      );
       PortsServices.pauseEmittingPort(portName)
         .then(result => {
+          this.portConsoleTxt.unshift("-> Emitting data on port is paused");
           this.resumePortDis = false; //! means enable btn
           this.pausePortDis = true; //! means disable btn
           this.showSuccessSnackbar(result.success);
         })
         .catch(error => {
+          this.portConsoleTxt.unshift("Error occurred: " + error);
           this.showErrorSnackbar(error);
         });
     },
     resumePort(portName) {
-      console.warn("resumePort() is called, port is " + portName);
+      // console.warn("resumePort() is called, port is " + portName);
+      this.portConsoleTxt.unshift(
+        "-> Resume emitting data on port: " + portName
+      );
       PortsServices.resumeEmittingPort(portName)
         .then(result => {
+          this.portConsoleTxt.unshift("-> Emitting data on port is resumed");
           this.pausePortDis = false;
           this.resumePortDis = true;
           this.showSuccessSnackbar(result.success);
         })
         .catch(error => {
+          this.portConsoleTxt.unshift("Error occurred: " + error);
           this.showErrorSnackbar(error);
         });
     },
     flushPort(portName) {
-      console.warn("flushPort() is called, port is " + portName);
+      // console.warn("flushPort() is called, port is " + portName);
+      this.portConsoleTxt.unshift("-> Flushing data on port: " + portName);
       PortsServices.flushPort(portName)
         .then(result => {
+          this.portConsoleTxt.unshift("-> Data is flushed");
           this.showSuccessSnackbar(result.success);
         })
         .catch(error => {
+          this.portConsoleTxt.unshift("Error occurred: " + error);
           this.showErrorSnackbar(error);
         });
     },
     openPort(portName) {
+      this.portConsoleTxt.unshift("-> Opening port: " + portName);
       PortsServices.openPort(portName)
         .then(result => {
+          this.portConsoleTxt.unshift("-> Port is opened");
           this.showSuccessSnackbar(result);
+          this.bindOnPortData();
           this.openPortDis = true;
           this.resumePortDis = true;
           this.closePortDis = false;
@@ -399,12 +426,16 @@ export default {
           this.flushPortDis = false;
         })
         .catch(error => {
+          console.warn(error);
+          this.portConsoleTxt.unshift("Error occurred: " + error);
           this.showErrorSnackbar(error);
         });
     },
     closePort(portName) {
+      this.portConsoleTxt.unshift("-> Closing port: " + portName);
       PortsServices.closePort(portName)
         .then(result => {
+          this.portConsoleTxt.unshift("-> Port is closed");
           this.showSuccessSnackbar(result);
           this.openPortDis = false;
           this.resumePortDis = true;
@@ -413,13 +444,36 @@ export default {
           this.flushPortDis = true;
         })
         .catch(error => {
+          this.portConsoleTxt.unshift("Error occurred: " + error);
           this.showErrorSnackbar(error);
         });
+    },
+    sendCommandToPort(portName) {
+      if (
+        this.writeToPortTextField != "" &&
+        this.writeToPortTextField != undefined
+      ) {
+        this.portConsoleTxt.unshift("Writing: " + this.writeToPortTextField);
+        PortsServices.writeToPort(portName, this.writeToPortTextField + "\r")
+          .then(result => {
+            this.writeToPortTextField = "";
+            this.showSuccessSnackbar(result);
+          })
+          .catch(error => {
+            this.portConsoleTxt.unshift("Error occurred: " + error);
+            this.showErrorSnackbar(error);
+          });
+      } else {
+        this.showErrorSnackbar("Can NOT send empty data!!");
+      }
     },
     showPortBottomSheet(portObject) {
       console.log(portObject);
       this.selectedPortObject = portObject;
       this.doShowPortDialog = true;
+    },
+    clearPortConsole() {
+      this.portConsoleTxt = [];
     },
     showSuccessSnackbar(content) {
       this.snackbar = true;
@@ -431,6 +485,39 @@ export default {
       this.snackbarColor = "error";
       this.snackbarContent = content;
     }
+  },
+  //! DON'T use arrow functions here
+  created() {
+    const id = window.localStorage.getItem("id");
+    AgentServices.getRole(id)
+      .then(result => {
+        this.isAdmin = result.data.result;
+      })
+      .catch(error => {
+        this.showErrorSnackbar(error);
+      });
+    Pusher.logToConsole = true;
+    this.pusher = new Pusher("ced4b5ad59f10ab2a746", {
+      cluster: "eu",
+      forceTLS: true
+    });
+    this.pusher.subscribe("ports");
+    PortsServices.getConnectedPortsList()
+      .then(result => {
+        this.portsCount = result.count;
+        console.log("result.count :", result.count);
+        if (result.count != 0) {
+          this.portsList = result.ports;
+        }
+        if (!this.isOnActiveBinded) {
+          this.bindOnActive();
+        } else {
+          console.log("Already binded to on-active");
+        }
+      })
+      .catch(error => {
+        this.showErrorSnackbar(error);
+      });
   }
 };
 </script>
