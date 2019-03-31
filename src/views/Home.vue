@@ -1,5 +1,6 @@
 <template>
   <v-app id="inspire">
+    <!-- Navigation Drawer -->
     <v-navigation-drawer v-model="drawer" :clipped="$vuetify.breakpoint.lgAndUp" fixed app absolute>
       <v-toolbar flat class="transparent">
         <v-list class="pa-0">
@@ -20,12 +21,50 @@
                     <v-icon small color="grey">fas fa-user-edit</v-icon>
                   </v-btn>
                 </template>
-                <span>Edit personal data of the profile</span>
+                <span>Edit profile data</span>
               </v-tooltip>
             </v-list-tile-action>
           </v-list-tile>
         </v-list>
       </v-toolbar>
+      <v-divider></v-divider>
+      <div class="hidden-md-and-up">
+        <v-list dense class="pt-0">
+          <v-list-tile to="/dashboard">
+            <v-list-tile-action>
+              <v-icon left>fas fa-tachometer-alt</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Dashboard</v-list-tile-title>
+            </v-list-tile-content>
+            <!-- Protect it by isAdmin ! -->
+          </v-list-tile>
+          <v-list-tile v-if="isAdmin == true" to="/agents">
+            <v-list-tile-action>
+              <v-icon left>fas fa-hard-hat</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Agents</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile to="/images">
+            <v-list-tile-action>
+              <v-icon left>fas fa-recycle</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Converter</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile @click="performLogout()">
+            <v-list-tile-action>
+              <v-icon left>fas fa-sign-out-alt</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Logout</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+      </div>
       <v-divider></v-divider>
       <v-list class="pt-0" dense>
         <v-list-group v-if="portsList.length != 0" prepend-icon="fas fa-parking" value="true">
@@ -55,46 +94,48 @@
     </v-navigation-drawer>
     <!-- TOOLBAR -->
     <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="teal darken-3" dark app fixed>
-      <v-toolbar-title style="width: 300px" class="ml-0 pl-0">
+      <v-toolbar-title  class="ml-0 pl-0">
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-        <span class="hidden-sm-and-down">CNC Controller</span>
+        <span class="center">CNC System</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-tooltip bottom>
-        <template #activator="data">
-          <v-btn v-on="data.on" flat to="/dashboard" class="m-0">
-            <v-icon left>fas fa-tachometer-alt</v-icon>Dashboard
-          </v-btn>
-        </template>
-        <span>Dashboard page</span>
-      </v-tooltip>
-      <v-tooltip bottom>
-        <template #activator="data">
-          <v-btn flat v-on="data.on" class="m-0">Machines</v-btn>
-        </template>
-        <span>Machines page</span>
-      </v-tooltip>
-      <!-- Protect it by isAdmin ! -->
-      <v-tooltip bottom>
-        <template v-if="isAdmin == true" #activator="data">
-          <v-btn v-on="data.on" flat to="/agents" class="m-0">Agents</v-btn>
-        </template>
-        <span>Agents page</span>
-      </v-tooltip>
-      <v-tooltip bottom>
-        <template #activator="data">
-          <v-btn v-on="data.on" flat to="/images" class="m-0">Converter</v-btn>
-        </template>
-        <span>Images page</span>
-      </v-tooltip>
-      <v-tooltip bottom>
-        <template #activator="data">
-          <v-btn v-on="data.on" flat @click="performLogout">
-            <v-icon left color="white">fas fa-sign-out-alt</v-icon>Logout
-          </v-btn>
-        </template>
-        <span>logout</span>
-      </v-tooltip>
+      <v-toolbar-items class="hidden-sm-and-down">
+        <v-tooltip bottom>
+          <template #activator="data">
+            <v-btn v-on="data.on" flat to="/dashboard" class="m-0">
+              <v-icon left>fas fa-tachometer-alt</v-icon>Dashboard
+            </v-btn>
+          </template>
+          <span>Moniter the system and control it's data</span>
+        </v-tooltip>
+        <!-- <v-tooltip bottom>
+          <template #activator="data">
+            <v-btn flat v-on="data.on" class="m-0">Machines</v-btn>
+          </template>
+          <span>Machines page</span>
+        </v-tooltip> -->
+        <!-- Protect it by isAdmin ! -->
+        <v-tooltip bottom>
+          <template v-if="isAdmin == true" #activator="data">
+            <v-btn v-on="data.on" flat to="/agents" class="m-0">Agents</v-btn>
+          </template>
+          <span>Consult agents list and perform same agent account operations</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template #activator="data">
+            <v-btn v-on="data.on" flat to="/images" class="m-0">Converter</v-btn>
+          </template>
+          <span>Convert image into gcode and transmit the file to machine</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template #activator="data">
+            <v-btn v-on="data.on" flat @click="performLogout">
+              <v-icon left color="white">fas fa-sign-out-alt</v-icon>Logout
+            </v-btn>
+          </template>
+          <span>logout</span>
+        </v-tooltip>
+      </v-toolbar-items>
     </v-toolbar>
     <!-- CONTENT OF THE PAGE -->
     <v-content>
@@ -256,15 +297,15 @@
           <span class="headline">Agent Profile</span>
         </v-card-title>
         <v-card-text>
-          <InfoFormVue/>
+          <InfoFormVue ref="infoFormRef"/>
           <v-divider></v-divider>
-          <PassFormVue/>
+          <PassFormVue ref="passFormRef"/>
           <v-divider></v-divider>
           <small class="text--red">All fields are required if they are empty</small>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="teal" class="text--teal" @click="closeEditInfoDialog()">Close</v-btn>
+          <v-btn color="teal" class="white--text" @click="closeEditInfoDialog()">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -505,6 +546,8 @@ export default {
     closeEditInfoDialog() {
       this.editProfileDialog = false;
       // this.$v.reset();
+      this.$refs.passFormRef.$v.$reset();
+      this.$refs.infoFormRef.$v.$reset();
     },
     //? form methods
     launcheEditProfile() {

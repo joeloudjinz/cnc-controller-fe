@@ -13,6 +13,7 @@
                 :type="'password'"
                 label="Password"
                 required
+                color="teal"
                 @input="$v.password.$touch()"
                 @blur="$v.password.$touch()"
               ></v-text-field>
@@ -25,6 +26,7 @@
                 :type="'password'"
                 label="Confirm Password"
                 required
+                color="teal"
                 @input="$v.password.$touch()"
                 @blur="$v.password.$touch()"
               ></v-text-field>

@@ -12,6 +12,7 @@
                 :counter="50"
                 label="First Name"
                 required
+                color="teal"
                 @input="$v.firstName.$touch()"
                 @blur="$v.firstName.$touch()"
               ></v-text-field>
@@ -23,6 +24,7 @@
                 :counter="50"
                 label="Last Name"
                 required
+                color="teal"
                 @input="$v.lastName.$touch()"
                 @blur="$v.lastName.$touch()"
               ></v-text-field>
@@ -33,6 +35,7 @@
                 :error-messages="emailErrors"
                 label="E-mail"
                 required
+                color="teal"
                 @input="$v.email.$touch()"
                 @blur="$v.email.$touch()"
               ></v-text-field>

@@ -121,14 +121,14 @@
             </v-tooltip>
             <v-spacer></v-spacer>
             <v-fade-transition>
-            <v-tooltip top>
-              <template #activator="data">
-                <v-btn v-show="!showConversionBtn" flat v-on="data.on" @click="performConversion">
-                  <v-icon color="teal">fas fa-sync</v-icon>
-                </v-btn>
-              </template>
-              <span>Start conversion process</span>
-            </v-tooltip>
+              <v-tooltip top>
+                <template #activator="data">
+                  <v-btn v-show="!showConversionBtn" flat v-on="data.on" @click="performConversion">
+                    <v-icon color="teal">fas fa-sync</v-icon>
+                  </v-btn>
+                </template>
+                <span>Start conversion process</span>
+              </v-tooltip>
             </v-fade-transition>
           </v-card-actions>
         </v-card>
@@ -753,8 +753,8 @@ export default {
       this.consolesArea = true;
       this.port = port;
       if (this.fileName !== undefined && this.fileName !== "") {
-        // const splitted = this.fileName.split(".");
-        // const fileName = splitted[0] + "." + splitted[1];
+        const splitted = this.fileName.split(".");
+        const fileName = splitted[0] + "." + splitted[1];
         //! if you bind multiple times, it will show data multiple time also
         if (!this.isPortsBinded) {
           this.subscribeToPorts("on-data");
@@ -768,11 +768,13 @@ export default {
         }
         setTimeout(() => {
           this.consolesArea = true;
-          PortsServices.performFullDrawOperation(this.fileName, port)
+          PortsServices.performFullDrawOperation(fileName, port)
             .then(result => {
               this.pauseSendDis = false;
               this.stopSendDis = false;
               this.portsListDialog = false;
+              this.pausePortDis = false;
+              this.flushPortDis = false;
               this.estimatedTime = result.estimated;
               // this.decrementEstimatedTime();
               console.log(this.estimatedTime);
@@ -780,10 +782,13 @@ export default {
             })
             .catch(error => {
               this.portsListDialog = false;
+              this.port = undefined;
+              this.pausePortDis = true;
+              this.flushPortDis = true;
               console.log(error);
-              this.showErrorSnackbar(error.failure.split(':')[1]);
-              this.portConsoleTxt.push("Operation: " + error.operation+"|");
-              this.portConsoleTxt.push("Message: " + error.failure+"|");
+              this.showErrorSnackbar(error.failure.split(":")[1]);
+              this.portConsoleTxt.push("Operation: " + error.operation + "|");
+              this.portConsoleTxt.push("Message: " + error.failure + "|");
               if (error.isPortClosed) {
                 this.portConsoleTxt.push(
                   "Port Status: " + error.isPortClosed ? " Closed|" : " Opened|"
