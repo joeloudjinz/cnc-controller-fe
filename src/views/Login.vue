@@ -1,14 +1,15 @@
 <template>
   <v-app id="inspire">
     <v-content>
-      <v-container fluid fill-height>
+      <v-container fluid fill-height class="teal lighten-5">
         <v-layout align-center justify-center>
-          <v-flex xs12 sm8 md6>
-            <v-card class="elevation-12">
-              <v-toolbar dark color="teal">
+          <v-flex xs11 sm8 md5>
+            <v-card class="teal lighten-4 elevation-8">
+              <!-- <v-toolbar dark height="150" color="teal">
                 <v-toolbar-title>Login form</v-toolbar-title>
                 <v-spacer></v-spacer>
-              </v-toolbar>
+              </v-toolbar>-->
+              <v-img :aspect-ratio="16/9" :src="url"></v-img>
               <v-card-text>
                 <v-form>
                   <v-text-field
@@ -16,7 +17,10 @@
                     :error-messages="emailErrors"
                     label="E-mail"
                     required
-                    solo-inverted
+                    color="teal darken-5"
+                    outline
+                    clearable
+                    prepend-inner-icon="fas fa-at"
                     @input="$v.email.$touch()"
                     @blur="$v.email.$touch()"
                   ></v-text-field>
@@ -26,8 +30,11 @@
                     :counter="0"
                     :type="'password'"
                     label="Password"
+                    clearable
                     required
-                    solo-inverted
+                    color="teal darken-5"
+                    prepend-inner-icon="fas fa-lock"
+                    outline
                     @input="$v.password.$touch()"
                     @blur="$v.password.$touch()"
                   ></v-text-field>
@@ -35,7 +42,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="teal" @click="submit">Login</v-btn>
+                <v-btn color="white" class="teal--text" @click="submit">Login</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
@@ -63,6 +70,7 @@ export default {
     password: { required, minLength: minLength(6) }
   },
   data: () => ({
+    url: require("@/assets/machine.jpg"),
     drawer: null,
     email: "",
     password: "",
