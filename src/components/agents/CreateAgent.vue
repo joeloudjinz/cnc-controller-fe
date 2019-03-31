@@ -1,52 +1,95 @@
 <template>
   <v-card ref="form">
-    <v-card-text>
-      <v-text-field
-        v-model="firstName"
-        :error-messages="firstNameErrors"
-        :counter="50"
-        label="First Name"
-        required
-        solo-inverted
-        @input="$v.firstName.$touch()"
-        @blur="$v.firstName.$touch()"
-      ></v-text-field>
-      <v-text-field
-        v-model="lastName"
-        :error-messages="lastNameErrors"
-        :counter="50"
-        label="Last Name"
-        required
-        solo-inverted
-        @input="$v.lastName.$touch()"
-        @blur="$v.lastName.$touch()"
-      ></v-text-field>
-      <v-text-field
-        v-model="email"
-        :error-messages="emailErrors"
-        label="E-mail"
-        required
-        solo-inverted
-        @input="$v.email.$touch()"
-        @blur="$v.email.$touch()"
-      ></v-text-field>
-      <v-text-field
-        v-model="password"
-        :error-messages="passwordErrors"
-        :counter="0"
-        :type="'password'"
-        label="Password"
-        required
-        solo-inverted
-        @input="$v.password.$touch()"
-        @blur="$v.password.$touch()"
-      ></v-text-field>
+    <v-card-text class="mt-0 pt-3">
+      <v-alert
+        :value="true"
+        color="teal darken-1"
+        icon="check_circle"
+        class="mx-3"
+      >You can create a new agnets and assign admin priviliges to them by checking the box "Add as admin"</v-alert>
+      <v-container grid-list-md>
+        <v-layout wrap>
+          <v-flex xs12 sm6 md6>
+            <v-text-field
+              v-model="firstName"
+              :error-messages="firstNameErrors"
+              :counter="50"
+              label="First Name"
+              required
+              @input="$v.firstName.$touch()"
+              @blur="$v.firstName.$touch()"
+              color="teal darken-1"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12 sm6 md6>
+            <v-text-field
+              v-model="lastName"
+              :error-messages="lastNameErrors"
+              :counter="50"
+              label="Last Name"
+              required
+              @input="$v.lastName.$touch()"
+              @blur="$v.lastName.$touch()"
+              color="teal darken-1"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12>
+            <v-text-field
+              v-model="email"
+              :error-messages="emailErrors"
+              label="E-mail"
+              required
+              @input="$v.email.$touch()"
+              @blur="$v.email.$touch()"
+              color="teal darken-1"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12 sm6 md6>
+            <v-text-field
+              v-model="password"
+              :error-messages="passwordErrors"
+              :counter="0"
+              :type="'password'"
+              label="Password"
+              required
+              @input="$v.password.$touch()"
+              @blur="$v.password.$touch()"
+              color="teal darken-1"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12 sm6 md6>
+            <v-text-field
+              v-model="passwordConfirmation"
+              :error-messages="passwordConfirmationErrors"
+              :counter="0"
+              :type="'password'"
+              label="Confirm Password"
+              required
+              @input="$v.password.$touch()"
+              @blur="$v.password.$touch()"
+              color="teal darken-1"
+            ></v-text-field>
+          </v-flex>
+          <v-flex sm12 md12 lg7>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-checkbox v-model="isAdminCheckbox" v-on="on" color="teal darken-3">
+                  <template v-slot:label>
+                    <div>Add as admin</div>
+                  </template>
+                </v-checkbox>
+              </template>
+              Give admin priviliges to the newly created agent
+            </v-tooltip>
+          </v-flex>
+        </v-layout>
+      </v-container>
     </v-card-text>
     <v-divider></v-divider>
     <v-card-actions>
-      <v-btn flat @click="clear">Clear</v-btn>
+      <v-btn class="text--teal" color="teal" flat @click="clear">Clear</v-btn>
       <v-spacer></v-spacer>
-      <v-btn color="teal" @click="submit">Submit</v-btn>
+      <v-btn class="white--text" color="teal" @click="submit">Submit</v-btn>
     </v-card-actions>
     <v-snackbar
       v-model="snackbar"
@@ -82,7 +125,9 @@ export default {
     lastName: "",
     email: "",
     password: "",
+    passwordConfirmation: "",
     snackbarContent: "",
+    isAdminCheckbox: false,
     snackbarColor: "",
     snackbar: false
   }),
@@ -117,6 +162,12 @@ export default {
         errors.push("Password must be at least 6 caracters");
       !this.$v.password.required && errors.push("Password is required");
       return errors;
+    },
+    passwordConfirmationErrors() {
+      const errors = [];
+      if (this.password != this.passwordConfirmation)
+        errors.push("Passwords do not matche");
+      return errors;
     }
   },
   methods: {
@@ -127,7 +178,8 @@ export default {
           firstName: this.firstName,
           lastName: this.lastName,
           email: this.email,
-          password: this.password
+          password: this.password,
+          is_admin: this.isAdminCheckbox
         })
           .then(result => {
             this.snackbar = true;
@@ -149,6 +201,8 @@ export default {
       this.lastName = "";
       this.email = "";
       this.password = "";
+      this.passwordConfirmation = "";
+      this.isAdminCheckbox = false;
     }
   }
 };

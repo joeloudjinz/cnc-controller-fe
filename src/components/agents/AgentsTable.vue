@@ -1,5 +1,11 @@
 <template>
-  <v-card>
+  <v-card class="pt-3">
+    <v-alert
+      :value="true"
+      color="teal darken-1"
+      icon="check_circle"
+      class="mx-3"
+    >Here you can find the list of all the users of the system, both agnets and admins, with there status of activeness</v-alert>
     <v-card-title>
       <v-spacer></v-spacer>
       <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
@@ -13,43 +19,59 @@
     >
       <v-progress-linear slot="progress" color="teal" indeterminate></v-progress-linear>
       <template slot="items" slot-scope="props">
-        <!-- <td>
-          <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
-        </td>-->
-        <td>{{ props.item.index }}</td>
-        <td>{{ props.item.first_name }}</td>
-        <td>{{ props.item.last_name }}</td>
-        <td>{{ props.item.email }}</td>
+        <td>
+          <v-badge right color="transparent">
+            <template v-slot:badge>
+              <span v-if="props.item.is_admin == true">
+                <v-icon x-small color="teal darken-3">fas fa-crown</v-icon>
+              </span>
+              <span v-else>
+                <v-icon x-small color="teal">fas fa-hard-hat</v-icon>
+              </span>
+            </template>
+            {{ props.item.index }}
+          </v-badge>
+        </td>
+        <!-- <td>{{props.item.is_admin}}</td> -->
         <td class="text-lg-center" v-if="props.item.is_active">
-          <v-chip small color="teal" text-color="white">
-            <v-avatar>
-              <v-icon>fas fa-eye</v-icon>
-            </v-avatar>Active
-          </v-chip>
+          <v-tooltip bottom>
+            <template #activator="data">
+              <v-chip small text-color="teal darken-2" v-on="data.on">
+                <v-icon small>fas fa-eye</v-icon>
+              </v-chip>
+            </template>
+            <span>Agent is active</span>
+          </v-tooltip>
         </td>
         <td class="text-lg-center" v-else>
-          <v-chip small color="warning" text-color="white">
-            <v-avatar>
-              <v-icon>fas fa-eye-slash</v-icon>
-            </v-avatar>Idle
-          </v-chip>
+          <v-tooltip bottom>
+            <template #activator="data">
+              <v-chip small text-color="grey darken-2" v-on="data.on">
+                <v-icon small>fas fa-eye-slash</v-icon>
+              </v-chip>
+            </template>
+            <span>Agent is not active</span>
+          </v-tooltip>
         </td>
+        <td>{{ props.item.first_name }}</td>
+        <td>{{ props.item.last_name.toUpperCase() }}</td>
+        <td>{{ props.item.email }}</td>
         <td>
           <v-tooltip bottom>
             <template #activator="data">
-              <v-btn icon @click="deleteAgent(props.item.id)" v-on="data.on">
-                <v-icon color="error">fas fa-user-minus</v-icon>
-              </v-btn>
-            </template>
-            <span>Delete This User Account</span>
-          </v-tooltip>
-          <v-tooltip bottom>
-            <template #activator="data">
               <v-btn icon @click="resetPassword(props.item.id)" v-on="data.on">
-                <v-icon color="red darken-2">fas fa-power-off</v-icon>
+                <v-icon small color="teal darken-2">fas fa-power-off</v-icon>
               </v-btn>
             </template>
             <span>Reset The Password Of This User Account</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template #activator="data">
+              <v-btn icon @click="showConfirmDeleteDialog(props.item.id)" v-on="data.on">
+                <v-icon small color="red darken-2">fas fa-user-minus</v-icon>
+              </v-btn>
+            </template>
+            <span>Delete This User Account</span>
           </v-tooltip>
         </td>
       </template>
@@ -60,18 +82,31 @@
         icon="warning"
       >Your search for "{{ search }}" found no results.</v-alert>
     </v-data-table>
-    <!-- dialog tag u ididot -->
-    <v-dialog v-model="dialog" persistent width="300">
-      <v-card color="teal" dark>
-        <v-card-text>
+    <!-- Agent delete confirmation dialog -->
+    <v-dialog v-model="confirmeDeleteDialog" persistent width="500">
+      <v-card color="white" dark>
+        <v-card-title class="error white--text headline">Agent Delete Confirmation</v-card-title>
+        <v-divider></v-divider>
+        <v-card-text class="font-weight-bold black--text">Are you sure you want to delete agent?</v-card-text>
+        <v-card-actions>
+          <v-btn flat @click="cancelConfirmDeleteDialog()" class="grey--text lighten-1">Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn @click="deleteAgent()" color="red lighten-1" class="white--text">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- New password after reset -->
+    <v-dialog v-model="dialog" persistent width="500">
+      <v-card color="white" dark>
+        <v-card-title class="teal white--text headline">Reset Agent Password</v-card-title>
+        <v-divider></v-divider>
+        <v-card-text class="font-weight-bold teal--text">
           {{dialogContent}}
           <v-progress-linear indeterminate color="white" class="mb-0" :active="loadingPass"></v-progress-linear>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn flat @click="dialog = false" class="align-self-center">
-            Ok
-          </v-btn>
+          <v-btn flat @click="dialog = false" class="teal--text">Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -95,20 +130,23 @@ export default {
       dialogContent: "Please stand by",
       loadingPass: true,
       loading: true,
+      confirmeDeleteDialog: false,
       // the selected items ....
       // selected: [],
       headers: [
         { text: "#", value: "index" },
+        // { text: "Priviliges", value: "is_admin" },
+        { text: "Activeness", value: "is_active" },
         {
           text: "First Name",
           value: "first_name"
         },
         { text: "Last Name", value: "last_name" },
         { text: "Email", value: "email" },
-        { text: "Activeness", value: "is_active" },
         { text: "Operations", value: "delete" }
       ],
       agents: [],
+      selectedAgentId: -1,
       snackbarContent: "",
       snackbarColor: "",
       snackbar: false
@@ -131,21 +169,32 @@ export default {
           this.loading = false;
         });
     },
-    async deleteAgent(id) {
-      await AgentServices.deleteAgentById(id)
-        .then(result => {
-          this.agents = [];
-          this.snackbar = true;
-          this.snackbarColor = "success";
-          this.snackbarContent = result;
-          this.refrechAgentsList();
-        })
-        .catch(error => {
-          this.snackbar = true;
-          this.snackbarColor = "error";
-          this.snackbarContent = error;
-          this.loading = false;
-        });
+    showConfirmDeleteDialog(id) {
+      this.confirmeDeleteDialog = true;
+      this.selectedAgentId = id;
+      console.log("selectedAgentId :", this.selectedAgentId);
+    },
+    cancelConfirmDeleteDialog() {
+      this.confirmeDeleteDialog = false;
+      this.selectedAgentId = -1;
+      console.log("selectedAgentId :", this.selectedAgentId);
+    },
+    deleteAgent() {
+      if (this.selectedAgentId == -1) {
+        this.showErrorSnackbar("Invalide agent id!");
+      } else {
+        AgentServices.deleteAgentById(this.selectedAgentId)
+          .then(result => {
+            this.cancelConfirmDeleteDialog(); //! judt to hide it
+            this.agents = [];
+            this.showSuccessSnackbar(result);
+            this.refrechAgentsList();
+          })
+          .catch(error => {
+            this.showErrorSnackbar(error);
+            this.loading = false;
+          });
+      }
     },
     resetPassword(id) {
       console.log(id);
@@ -163,6 +212,16 @@ export default {
           this.snackbarColor = "error";
           this.snackbarContent = error;
         });
+    },
+    showSuccessSnackbar(content) {
+      this.snackbar = true;
+      this.snackbarColor = "success";
+      this.snackbarContent = content;
+    },
+    showErrorSnackbar(content) {
+      this.snackbar = true;
+      this.snackbarColor = "error";
+      this.snackbarContent = content;
     }
   }
 };

@@ -19,14 +19,6 @@
         </template>
         <span>add new agnet</span>
       </v-tooltip>
-       <v-tooltip bottom>
-        <template #activator="data">
-          <v-btn icon v-on="data.on" @click="mounteEditInfosComponent">
-            <v-icon>fas fa-user-edit</v-icon>
-          </v-btn>
-        </template>
-        <span>Edit personal information</span>
-      </v-tooltip>
     </v-toolbar>
     <v-card :is="currentComponent"></v-card>
   </v-flex>
@@ -34,7 +26,6 @@
 <script>
 import AgentsTableVue from "@/components/agents/AgentsTable.vue";
 import CreateAgent from "@/components/agents/CreateAgent.vue";
-import EditInfo from "@/components/agents/EditInfos.vue";
 export default {
   data: () => {
     return {
@@ -51,10 +42,6 @@ export default {
     mounteAgentsTableComponent() {
       this.title = "Agents List";
       this.currentComponent = AgentsTableVue;
-    },
-    mounteEditInfosComponent(){
-      this.title = "Edit Personal Information";
-      this.currentComponent = EditInfo;
     }
   }
 };

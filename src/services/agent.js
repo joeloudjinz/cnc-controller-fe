@@ -57,7 +57,8 @@ class AgentServices {
                             first_name: currentItem.first_name,
                             last_name: currentItem.last_name,
                             email: currentItem.email,
-                            is_active: currentItem.is_active ? true : false
+                            is_active: currentItem.is_active ? true : false,
+                            is_admin: currentItem.is_admin ? true : false
                         })));
                 })
                 .catch(error => {
