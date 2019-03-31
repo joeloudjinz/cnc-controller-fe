@@ -4,12 +4,25 @@
       <v-toolbar flat class="transparent">
         <v-list class="pa-0">
           <v-list-tile avatar>
-            <v-list-tile-avatar>
-              <img src="https://randomuser.me/api/portraits/men/85.jpg">
+            <v-list-tile-avatar v-if="isAdmin">
+              <v-icon color="teal darker-2" x-large>fas fa-crown</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-avatar v-else>
+              <v-icon color="teal darker-2" x-large>fas fa-hard-hat</v-icon>
             </v-list-tile-avatar>
             <v-list-tile-content>
               <v-list-tile-title>{{ fullName }}</v-list-tile-title>
             </v-list-tile-content>
+            <v-list-tile-action>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                  <v-btn icon ripple small v-on="on" @click="launcheEditProfile()">
+                    <v-icon small color="grey">fas fa-user-edit</v-icon>
+                  </v-btn>
+                </template>
+                <span>Edit personal data of the profile</span>
+              </v-tooltip>
+            </v-list-tile-action>
           </v-list-tile>
         </v-list>
       </v-toolbar>
@@ -211,7 +224,6 @@
                 label="Commands"
                 single-line
                 class="pt-2"
-                solo-inverted
               ></v-text-field>
               <v-fade-transition>
                 <v-btn
@@ -238,6 +250,24 @@
         </v-card>
       </v-dialog>
     </v-layout>
+    <v-dialog v-model="editProfileDialog" persistent max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Agent Profile</span>
+        </v-card-title>
+        <v-card-text>
+          <InfoFormVue/>
+          <v-divider></v-divider>
+          <PassFormVue/>
+          <v-divider></v-divider>
+          <small class="text--red">All fields are required if they are empty</small>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="teal" class="text--teal" @click="closeEditInfoDialog()">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <!-- Snackbar -->
     <v-snackbar
       v-model="snackbar"
@@ -246,22 +276,6 @@
       :color="snackbarColor"
       :multi-line="'multi-line'"
     >{{ snackbarContent }}</v-snackbar>
-    <!-- FAB button -->
-    <v-btn fab bottom right color="teal darken-4" dark fixed @click="dialog = !dialog">
-      <v-icon>add</v-icon>
-    </v-btn>
-    <v-dialog v-model="dialog" width="800px">
-      <v-card>
-        <v-card-title class="grey lighten-4 py-4 title">Create contact</v-card-title>
-        <v-container grid-list-sm class="pa-4"></v-container>
-        <v-card-actions>
-          <v-btn flat color="primary">More</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn flat color="primary" @click="dialog = false">Cancel</v-btn>
-          <v-btn flat @click="dialog = false">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-app>
 </template>
 
@@ -271,7 +285,14 @@ import AgentServices from "@/services/agent.js";
 import PortsServices from "@/services/ports.js";
 import Pusher from "pusher-js";
 
+import InfoFormVue from "../components/agents/InfoForm.vue";
+import PassFormVue from "../components/agents/PassForm.vue";
+
 export default {
+  components: {
+    InfoFormVue,
+    PassFormVue
+  },
   data: () => ({
     portsList: [],
     portsCount: 0,
@@ -280,12 +301,8 @@ export default {
       " " +
       window.localStorage.getItem("first_name"),
     isAdmin: false,
-    dialog: false,
+    editProfileDialog: false,
     drawer: true,
-    items: [
-      { title: "Home", icon: "dashboard" },
-      { title: "About", icon: "question_answer" }
-    ],
     right: null,
     //? snackbar details ...
     snackbarContent: "",
@@ -484,6 +501,14 @@ export default {
       this.snackbar = true;
       this.snackbarColor = "error";
       this.snackbarContent = content;
+    },
+    closeEditInfoDialog() {
+      this.editProfileDialog = false;
+      // this.$v.reset();
+    },
+    //? form methods
+    launcheEditProfile() {
+      this.editProfileDialog = true;
     }
   },
   //! DON'T use arrow functions here
