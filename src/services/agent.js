@@ -41,9 +41,10 @@ class AgentServices {
      * protected by auth middleware
      */
     static getAgents() {
+        const id = window.localStorage.getItem("id");
         return new Promise(async (resolve, reject) => {
             await axios
-                .get(url, {
+                .get(url + id, {
                     headers: {
                         Authorization: "Bearer " + window.localStorage.token
                     }

@@ -43,7 +43,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          :disabled="this.$v.$invalid"
+          :disabled="!isSameData"
           color="teal"
           flat
           class="text--teal"
@@ -103,28 +103,31 @@ export default {
   },
   methods: {
     submitInfosUpdateForm() {
-      this.$v.$touch();
-      if (!this.$v.$invalid) {
-        AgentServices.UpdateInformation({
-          last_name: this.lastName,
-          first_name: this.firstName,
-          email: this.email
-        })
-          .then(result => {
-            window.localStorage.setItem("first_name", this.firstName);
-            window.localStorage.setItem("last_name", this.lastName);
-            window.localStorage.setItem("email", this.email);
-            this.clear();
-            this.disableAlert();
-            this.showSuccessAlert(result);
+      if (!this.isSameData()) {
+        this.$v.$touch();
+        if (!this.$v.$invalid) {
+          AgentServices.UpdateInformation({
+            last_name: this.lastName,
+            first_name: this.firstName,
+            email: this.email,
+            id: window.localStorage.getItem('id')
           })
-          .catch(error => {
-            this.showErrorAlert(error);
-            this.disableAlert();
-          });
-        console.log("Is valid");
-      } else {
-        console.warn("Is NOT valid");
+            .then(result => {
+              window.localStorage.setItem("first_name", this.firstName);
+              window.localStorage.setItem("last_name", this.lastName);
+              window.localStorage.setItem("email", this.email);
+              this.clear();
+              this.disableAlert();
+              this.showSuccessAlert(result);
+            })
+            .catch(error => {
+              this.showErrorAlert(error);
+              this.disableAlert();
+            });
+          console.log("Is valid");
+        } else {
+          console.warn("Is NOT valid");
+        }
       }
     },
     showSuccessAlert(content) {
@@ -149,6 +152,13 @@ export default {
         this.alertContent = "";
         this.alertColor = "";
       }, 5000);
+    },
+    isSameData() {
+      return (
+        this.firstName === window.localStorage.getItem("first_name") &&
+        this.lastName === window.localStorage.getItem("last_name") &&
+        this.email === window.localStorage.getItem("email")
+      );
     }
   }
 };

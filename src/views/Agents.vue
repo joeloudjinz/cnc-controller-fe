@@ -1,5 +1,5 @@
 <template>
-  <v-flex xs12 sm12 md10 lg10>
+  <v-flex xs12 sm12 md12 lg12>
     <v-toolbar color="teal lighten-1" dark>
       <v-toolbar-title>{{ title }}</v-toolbar-title>
       <v-spacer></v-spacer>
