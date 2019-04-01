@@ -40,6 +40,41 @@ class ConversionServices {
         });
     });
   }
+  static getConversionsCount() {
+    return new Promise(async (resolve, reject) => {
+      await axios
+        .get(url + "/count", {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.token
+          }
+        })
+        .then(result => {
+          resolve(result.data.count);
+        })
+        .catch(error => {
+          if (error.response) {
+            if (error.response.status == 406) {
+              AgentServices.RefreshToken()
+                .then(() => {
+                  resolve(ConversionServices.getConversionsCount());
+                })
+                .catch(error => {
+                  reject(error);
+                });
+            } else {
+              //? The request was made and the server responded with a status code
+              //? that falls out of the range of 2xx
+              reject(error.response.data.failure);
+            }
+          } else if (error.request) {
+            reject("Check you internet connection!");
+          } else {
+            //? Something happened in setting up the request that triggered an Error
+            reject(error.message);
+          }
+        });
+    });
+  }
 }
 
 export default ConversionServices;

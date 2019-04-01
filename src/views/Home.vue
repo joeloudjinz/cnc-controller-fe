@@ -384,6 +384,7 @@ export default {
       this.pusher.bind("on-active", data => {
         const portsList = data.portsList;
         const count = Object.keys(portsList).length;
+        window.localStorage.setItem("portsCount", count);
         let newList = [];
         for (let i = 0; i < count; i++) {
           newList.push(portsList[i + 1]);
@@ -573,6 +574,7 @@ export default {
     PortsServices.getConnectedPortsList()
       .then(result => {
         this.portsCount = result.count;
+        window.localStorage.setItem("portsCount", result.count);
         console.log("result.count :", result.count);
         if (result.count != 0) {
           this.portsList = result.ports;

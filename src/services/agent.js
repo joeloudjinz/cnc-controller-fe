@@ -1,6 +1,6 @@
 import axios from 'axios';
 const url = "api/local/agents/";
-
+const authURL = 'api/local/auth/';
 //! console.log(error.response.status == 406); true
 //! console.log(error.response.status === '406'); false
 //! console.log(error.response.status === 406); true
@@ -15,7 +15,7 @@ class AgentServices {
             const email = window.localStorage.getItem('email');
             const id = window.localStorage.getItem('id');
             const refresh_token = window.localStorage.getItem('refresh_token');
-            axios.post('http://localhost:3000/api/local/auth/token', {
+            axios.post(authURL + 'token', {
                 email,
                 id,
                 refresh_token
@@ -291,6 +291,73 @@ class AgentServices {
                     } else if (error.request) {
                         reject("Check you internet connection!");
                     } else {
+                        reject(error.message);
+                    }
+                });
+        });
+    }
+    static getAgentsCount() {
+        return new Promise(async (resolve, reject) => {
+            await axios
+                .post(url + "count")
+                .then(result => {
+                    // console.log('result.data :', result.data);
+                    resolve(result.data.count);
+                })
+                .catch(error => {
+                    if (error.response) {
+                        if (error.response.status == 406) {
+                            AgentServices.RefreshToken()
+                                .then(() => {
+                                    resolve(AgentServices.getAgentsCount());
+                                })
+                                .catch(error => {
+                                    reject(error);
+                                });
+                        } else {
+                            //? The request was made and the server responded with a status code
+                            //? that falls out of the range of 2xx
+                            reject(error.response.data.failure);
+                        }
+                    } else if (error.request) {
+                        reject("Check you internet connection!");
+                    } else {
+                        //? Something happened in setting up the request that triggered an Error
+                        reject(error.message);
+                    }
+                });
+        });
+    }
+    static getAdminsCount() {
+        return new Promise(async (resolve, reject) => {
+            await axios
+                .get(url + "admins/count", {
+                    headers: {
+                        Authorization: "Bearer " + window.localStorage.token
+                    }
+                })
+                .then(result => {
+                    resolve(result.data.count);
+                })
+                .catch(error => {
+                    if (error.response) {
+                        if (error.response.status == 406) {
+                            AgentServices.RefreshToken()
+                                .then(() => {
+                                    resolve(AgentServices.getAdminsCount());
+                                })
+                                .catch(error => {
+                                    reject(error);
+                                });
+                        } else {
+                            //? The request was made and the server responded with a status code
+                            //? that falls out of the range of 2xx
+                            reject(error.response.data.failure);
+                        }
+                    } else if (error.request) {
+                        reject("Check you internet connection!");
+                    } else {
+                        //? Something happened in setting up the request that triggered an Error
                         reject(error.message);
                     }
                 });

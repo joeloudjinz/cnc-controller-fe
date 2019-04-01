@@ -1,50 +1,129 @@
-
 <template>
-  <div>
-    <v-layout row wrap>
-      <v-flex d-flex xs12>
-        <v-toolbar>
-          <v-toolbar-side-icon></v-toolbar-side-icon>
-          <v-toolbar-title>Dasboard</v-toolbar-title>
+  <v-layout justify-center row wrap>
+    <v-flex xs12 sm12 md3 lg3 class="pb-1 mb-0">
+      <v-card class="teal lighten-5 mx-1">
+        <v-card-text class="pt-2 pb-0">
+          <v-layout align-center justify-center row fill-height py-2>
+            <v-badge color="transparent">
+              <template v-slot:badge>
+                <v-icon large color="teal darken-5">fas fa-crown</v-icon>
+              </template>
+              <h1 class="j-count-style teal--text">{{adminsCount}}</h1>
+            </v-badge>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions class="pt-0 pb-1">
           <v-spacer></v-spacer>
-          <v-btn icon>
-            <v-icon>search</v-icon>
-          </v-btn>
-          <v-btn icon>
-            <v-icon>more_vert</v-icon>
-          </v-btn>
-        </v-toolbar>
-      </v-flex>
-    </v-layout>
-    <v-layout justify-center row wrap>
-      <v-flex d-flex xs12>
-        <v-card>
-          <v-card-title>Sensors Data Chart</v-card-title>
-          <v-card-text></v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn>Stop Machine</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-flex>
-    </v-layout>
-  </div>
+          <h1 class="font-weight-meduim green--text text--lighten-2">Administrators</h1>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+    <v-flex xs12 sm12 md3 lg3 class="pb-1 mb-0">
+      <v-card class="teal lighten-5 mx-1">
+        <v-card-text class="pt-2 pb-0">
+          <v-layout align-center justify-center row fill-height py-2>
+            <v-badge color="transparent">
+              <template v-slot:badge>
+                <v-icon large color="teal darken-5">fas fa-hard-hat</v-icon>
+              </template>
+              <h1 class="j-count-style teal--text">{{agentsCount}}</h1>
+            </v-badge>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions class="pt-0 pb-1">
+          <v-spacer></v-spacer>
+          <h1 class="font-weight-meduim green--text text--lighten-2">Agents</h1>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+    <v-flex xs12 sm12 md3 lg3 class="pb-1 mb-0">
+      <v-card class="teal lighten-5 mx-1">
+        <v-card-text class="pt-2 pb-0">
+          <v-layout align-center justify-center row fill-height py-2>
+            <v-badge color="transparent">
+              <template v-slot:badge>
+                <v-icon large color="teal darken-5">fas fa-recycle</v-icon>
+              </template>
+              <h1 class="j-count-style teal--text">{{conversionsCount}}</h1>
+            </v-badge>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions class="pt-0 pb-1">
+          <v-spacer></v-spacer>
+          <h1 class="font-weight-meduim green--text text--lighten-2">Conversions</h1>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+    <v-flex xs12 sm12 md3 lg3 class="pb-1 mb-0">
+      <v-card class="teal lighten-5 mx-1">
+        <v-card-text class="pt-2 pb-0">
+          <v-layout align-center justify-center row fill-height py-2>
+            <v-badge color="transparent">
+              <template v-slot:badge>
+                <v-icon
+                  large
+                  :color="activePortsCount != 0 ? 'teal darken-5' : 'red lighten-2'"
+                >fas fa-parking</v-icon>
+              </template>
+              <h1 class="j-count-style teal--text">{{activePortsCount}}</h1>
+            </v-badge>
+          </v-layout>
+        </v-card-text>
+        <v-card-actions class="pt-0 pb-1">
+          <v-spacer></v-spacer>
+          <h1 class="font-weight-meduim green--text text--lighten-2">Active Ports</h1>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
-// import SensorsData from "@/components/dashboard/SensorsData.vue";
-// import SensorOne from "@/components/dashboard/SensorOne.vue";
-// import SensorTwo from "@/components/dashboard/SensorTwo.vue";
+import ConversionServices from "@/services/conversion.js";
+import AgentsServices from "@/services/agent.js";
 export default {
   name: "dashboard",
-  components: {
-    // SensorsData
-    // SensorOne,
-    // SensorTwo
-  },
   data() {
     return {
+      adminsCount: 0,
+      agentsCount: 0,
+      conversionsCount: 0,
+      activePortsCount: window.localStorage.getItem("portsCount") | 0
     };
+  },
+  created: function() {
+    ConversionServices.getConversionsCount()
+      .then(conversionsCount => {
+        this.conversionsCount = conversionsCount;
+      })
+      .catch(error => {
+        console.warn("in getConversionsCount(),error :", error);
+      });
+    AgentsServices.getAdminsCount()
+      .then(adminsCount => {
+        this.adminsCount = adminsCount;
+      })
+      .catch(error => {
+        console.warn("in getAdminsCount(),error :", error);
+      });
+    AgentsServices.getAgentsCount()
+      .then(result => {
+        // console.log('agentsCount :', result);
+        this.agentsCount = result;
+      })
+      .catch(error => {
+        this.agentsCount = '?';
+        console.warn("in getAgentsCount(),error :", error);
+      });
   }
 };
 </script>
+<style>
+.j-count-style {
+  font-size: 50pt;
+}
+</style>
