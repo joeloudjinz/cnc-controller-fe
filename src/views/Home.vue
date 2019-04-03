@@ -94,7 +94,7 @@
     </v-navigation-drawer>
     <!-- TOOLBAR -->
     <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="teal darken-3" dark app fixed>
-      <v-toolbar-title  class="ml-0 pl-0">
+      <v-toolbar-title class="ml-0 pl-0">
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
         <span class="center">CNC System</span>
       </v-toolbar-title>
@@ -113,7 +113,7 @@
             <v-btn flat v-on="data.on" class="m-0">Machines</v-btn>
           </template>
           <span>Machines page</span>
-        </v-tooltip> -->
+        </v-tooltip>-->
         <!-- Protect it by isAdmin ! -->
         <v-tooltip bottom>
           <template v-if="isAdmin == true" #activator="data">
@@ -365,7 +365,6 @@ export default {
     //? for pusher channels
     isOnActiveBinded: false,
     isOnPortDataBinded: false,
-    // isOn
     pusher: undefined,
     portConsoleTxt: []
   }),
