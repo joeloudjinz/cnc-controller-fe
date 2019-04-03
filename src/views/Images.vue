@@ -472,11 +472,13 @@
               class="mb-2"
             >This operation will send the generated gcode file to the machine over the selected port and it will start drawing the coordinates the process will take to much time (1s for each line of code), you can monitor the whole process and the incoming data from the console below.</v-alert>
             <p class="title">Chose port:</p>
+            <v-alert :value="isTransmissionProcessActive" type="warning">There is already a transmission process going on</v-alert>
             <v-fade-transition>
               <v-list v-if="portsList.length !== 0">
                 <v-list-tile
                   v-for="(port, index) in portsList"
                   :key="index"
+                  :disabled="isTransmissionProcessActive"
                   @click="startTransmitingGCode(port.comName)"
                 >
                   <v-list-tile-content>
@@ -536,7 +538,7 @@ import { setTimeout, clearInterval } from "timers";
 export default {
   data: () => ({
     //? to display the results section
-    displayRsultes: false,
+    displayRsultes: true,
     //? ro expand the result panel
     showResultsPanel: true,
     //? for image file
@@ -559,7 +561,7 @@ export default {
     work: 1200,
     idle: 3000,
     //? for gcode file
-    fileName: "sm-sample",
+    fileName: "sm-samlpe",
     size: 0,
     link: null,
     //? for conversion details in results section
@@ -603,11 +605,10 @@ export default {
     displayTransmissionConsole: true,
     transmissionConsoleTxt: [],
     showTranmsissionConsole: true,
+    isTransmissionProcessActive: false,
     //? for consoles area
     consolesArea: false,
     showPortConsole: true,
-    //? estimated time to end the process of code transmission
-    estimatedTime: "",
     //? to enable and disable control btns of transmission console panel
     stopSendDis: true,
     pauseSendDis: true,
@@ -654,10 +655,9 @@ export default {
     },
     performConversion() {
       if (this.scaleAxes == 0) {
-        this.snackbarColor = "error";
-        this.snackbarContent =
-          "Scale Axes Should Not Be Equale to Zero (0), Use Image Height";
-        this.snackbar = true;
+        this.showErrorSnackbar(
+          "Scale Axes Should Not Be Equale to Zero (0), Use Image Height"
+        );
       } else {
         if (this.selectedFile != null) {
           this.dialog = true;
@@ -715,6 +715,7 @@ export default {
       PortsServices.getConnectedPortsList()
         .then(result => {
           this.portsListProgress = false;
+          this.isTransmissionProcessActive = result.isServerActive;
           if (result.count !== 0) {
             this.portsList = result.ports;
           }
@@ -742,10 +743,12 @@ export default {
           console.warn("data is empty!");
         } else {
           this.transmissionConsoleTxt.unshift(data.data);
-          if (data.data.includes("All lines has been sent"))
+          if (data.data.includes("All lines has been sent")) {
             this.showSuccessSnackbar(
               "Transmission of file " + this.fileName + " Has been completed"
             );
+            this.isTransmissionProcessActive = false;
+          }
         }
       });
     },
@@ -753,8 +756,8 @@ export default {
       this.consolesArea = true;
       this.port = port;
       if (this.fileName !== undefined && this.fileName !== "") {
-        const splitted = this.fileName.split(".");
-        const fileName = splitted[0] + "." + splitted[1];
+        // const splitted = this.fileName.split(".");
+        // const fileName = splitted[0] + "." + splitted[1];
         //! if you bind multiple times, it will show data multiple time also
         if (!this.isPortsBinded) {
           this.subscribeToPorts("on-data");
@@ -768,16 +771,14 @@ export default {
         }
         setTimeout(() => {
           this.consolesArea = true;
-          PortsServices.performFullDrawOperation(fileName, port)
+          PortsServices.performFullDrawOperation(this.fileName, port)
             .then(result => {
               this.pauseSendDis = false;
               this.stopSendDis = false;
               this.portsListDialog = false;
               this.pausePortDis = false;
               this.flushPortDis = false;
-              this.estimatedTime = result.estimated;
-              // this.decrementEstimatedTime();
-              console.log(this.estimatedTime);
+              this.isTransmissionProcessActive = true;
               this.showSuccessSnackbar(result.success);
             })
             .catch(error => {
@@ -902,12 +903,6 @@ export default {
     },
     clearTransmissionConsole() {
       this.transmissionConsoleTxt = [];
-    },
-    decrementEstimatedTime() {
-      let decrementEstimatedTime = setInterval(() => {
-        if (this.estimatedTime == 0) clearInterval(decrementEstimatedTime);
-        else this.estimatedTime--;
-      }, 60000);
     },
     showSuccessSnackbar(content) {
       this.snackbar = true;
