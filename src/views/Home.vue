@@ -73,7 +73,7 @@
               <v-list-tile-title>Ports</v-list-tile-title>
             </v-list-tile>
           </template>
-          <v-list-tile v-for="(port, i) in portsList" :key="i" @click="showPortBottomSheet(port)">
+          <v-list-tile v-for="(port, i) in portsList" :key="i" @click="showPortPanel(port)">
             <v-list-tile-avatar>
               <h6 class="text--teal">{{i}}</h6>
             </v-list-tile-avatar>
@@ -148,14 +148,14 @@
     <!-- Port dialog -->
     <v-layout row justify-center>
       <v-dialog
-        v-model="doShowPortDialog"
+        v-model="doShowPortPanel"
         fullscreen
         hide-overlay
         transition="dialog-bottom-transition"
       >
         <v-card>
           <v-toolbar dark color="teal lighten-1">
-            <v-btn icon dark @click="doShowPortDialog = false">
+            <v-btn icon dark @click="doShowPortPanel = false">
               <v-icon>close</v-icon>
             </v-btn>
             <v-toolbar-title>Port Panel</v-toolbar-title>
@@ -350,7 +350,7 @@ export default {
     snackbarColor: "",
     snackbar: false,
     //? to show or hide ports console bottom sheet
-    doShowPortDialog: false,
+    doShowPortPanel: false,
     selectedPortObject: undefined,
     //? to enable and disable control btns of port console panel
     flushPortDis: true,
@@ -395,7 +395,7 @@ export default {
           this.showErrorSnackbar(
             `${this.selectedPortObject.comName} is not active anymore`
           );
-          this.doShowPortDialog = false;
+          this.doShowPortPanel = false;
           this.selectedPortObject = undefined;
         }
         this.portsList = newList;
@@ -525,10 +525,39 @@ export default {
         this.showErrorSnackbar("Can NOT send empty data!!");
       }
     },
-    showPortBottomSheet(portObject) {
-      console.log(portObject);
+    showPortPanel(portObject) {
       this.selectedPortObject = portObject;
-      this.doShowPortDialog = true;
+      PortsServices.isPortOpen(portObject.comName)
+        .then(isOpen => {
+          this.isSelectedPortOpened = isOpen;
+          PortsServices.isPortActive(portObject.comName)
+            .then(isPortActive => {
+              console.log('isPortActive :', isPortActive);
+              if (isPortActive) {
+                this.flushPortDis = true;
+                this.pausePortDis = true;
+                this.resumePortDis = true;
+                this.openPortDis = true;
+                this.closePortDis = true;
+              } 
+            })
+            .catch(error => {
+              console.warn(error);
+              this.showErrorSnackbar("Error while checking port activeness status!");
+            });
+          if (isOpen) {
+            this.openPortDis = true;
+            this.closePortDis = false;
+          } else {
+            this.openPortDis = false;
+            this.closePortDis = true;
+          }
+        })
+        .catch(error => {
+          console.warn(error);
+          this.showErrorSnackbar("Error while checking port open status!");
+        });
+      this.doShowPortPanel = true;
     },
     clearPortConsole() {
       this.portConsoleTxt = [];

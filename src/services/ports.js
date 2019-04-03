@@ -36,6 +36,76 @@ class PortServices {
             });
         });
     }
+    static isPortOpen(portName) {
+        return new Promise(async (resolve, reject) => {
+            await axios.get(url + '/isOpen', {
+                    params: {
+                        portName: portName
+                    }
+                })
+                .then((result) => {
+                    console.log(result.data.isOpen);
+                    resolve(result.data.isOpen);
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        if (error.response.status == 406) {
+                            AgentServices.RefreshToken()
+                                .then(() => {
+                                    resolve(PortServices.isPortOpen(portName));
+                                })
+                                .catch(error => {
+                                    reject(error);
+                                });
+                        } else {
+                            //? The request was made and the server responded with a status code
+                            //? that falls out of the range of 2xx
+                            reject(error.response.data.failure);
+                        }
+                    } else if (error.request) {
+                        reject("Check you internet connection!");
+                    } else {
+                        //? Something happened in setting up the request that triggered an Error
+                        reject(error.message);
+                    }
+                });
+        });
+    }
+    static isPortActive(portName) {
+        return new Promise(async (resolve, reject) => {
+            await axios.get(url + '/isActive', {
+                    params: {
+                        portName: portName
+                    }
+                })
+                .then((result) => {
+                    console.log(result.data.status);
+                    resolve(result.data.status);
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        if (error.response.status == 406) {
+                            AgentServices.RefreshToken()
+                                .then(() => {
+                                    resolve(PortServices.isPortActive(portName));
+                                })
+                                .catch(error => {
+                                    reject(error);
+                                });
+                        } else {
+                            //? The request was made and the server responded with a status code
+                            //? that falls out of the range of 2xx
+                            reject(error.response.data.failure);
+                        }
+                    } else if (error.request) {
+                        reject("Check you internet connection!");
+                    } else {
+                        //? Something happened in setting up the request that triggered an Error
+                        reject(error.message);
+                    }
+                });
+        });
+    }
     static performFullDrawOperation(fileName, portName) {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw", {

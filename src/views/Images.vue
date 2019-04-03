@@ -533,7 +533,7 @@
 import ConversionServices from "@/services/conversion.js";
 import PortsServices from "@/services/ports.js";
 import Pusher from "pusher-js";
-import { setTimeout, clearInterval } from "timers";
+import { setTimeout } from "timers";
 // import { fileURLToPath } from "url";
 export default {
   data: () => ({
