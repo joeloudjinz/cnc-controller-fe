@@ -149,8 +149,8 @@
     <v-layout row justify-center>
       <v-dialog
         v-model="doShowPortPanel"
+        persistent
         fullscreen
-        hide-overlay
         transition="dialog-bottom-transition"
       >
         <v-card>
@@ -256,45 +256,51 @@
             </v-list-tile>
           </v-list>
           <v-divider></v-divider>
-          <v-card height="300px" color="teal darken-4" class="ma-3">
-            <v-toolbar color="teal" card>
-              <v-text-field
-                dark
-                v-model="writeToPortTextField"
-                color="teal darken-4"
-                label="Commands"
-                single-line
-                class="pt-2"
-              ></v-text-field>
-              <v-fade-transition>
-                <v-btn
-                  v-if="writeToPortTextField != ''"
-                  icon
-                  @click="sendCommandToPort(selectedPortObject.comName)"
-                >
-                  <v-icon color="white">fas fa-paper-plane</v-icon>
+          <v-layout row wrap>
+            <v-flex xs12 px-3>
+              <v-toolbar color="teal" card dark class="mt-2">
+                <v-text-field
+                  dark
+                  v-model="writeToPortTextField"
+                  label="Commands"
+                  solo-inverted
+                  class="pt-2"
+                ></v-text-field>
+                <v-fade-transition>
+                  <v-btn
+                    v-if="writeToPortTextField != ''"
+                    icon
+                    @click="sendCommandToPort(selectedPortObject.comName)"
+                  >
+                    <v-icon color="white">fas fa-paper-plane</v-icon>
+                  </v-btn>
+                </v-fade-transition>
+                <v-btn icon @click="clearPortConsole()">
+                  <v-icon color="white">fas fa-eraser</v-icon>
                 </v-btn>
-              </v-fade-transition>
-              <v-btn icon @click="clearPortConsole()">
-                <v-icon color="white">fas fa-eraser</v-icon>
-              </v-btn>
-            </v-toolbar>
-            <v-card-text class="white--text">
-              <table>
-                <tr v-for="(line, index) in portConsoleTxt" :key="index">
-                  <td v-if="line.charAt(1) == '>'" class="font-weight-light">{{line}}</td>
-                  <td v-else class="red--text darken-1 font-weight-meduim">{{line}}</td>
-                </tr>
-              </table>
-            </v-card-text>
-          </v-card>
+              </v-toolbar>
+            </v-flex>
+            <v-flex xs12>
+              <v-card height="300px" color="teal lighten-4" class="mx-3 scroll">
+                <v-card-text class="black--text text-darken-4">
+                  <table>
+                    <tr v-for="(line, index) in portConsoleTxt" :key="index">
+                      <td v-if="line.charAt(1) == '>'" class="font-weight-meduim">{{line}}</td>
+                      <td v-else class="red--text text-darken-1 font-weight-meduim">{{line}}</td>
+                    </tr>
+                  </table>
+                </v-card-text>
+              </v-card>
+            </v-flex>
+          </v-layout>
         </v-card>
       </v-dialog>
     </v-layout>
+    <!-- Edit Profile Data Dialog -->
     <v-dialog v-model="editProfileDialog" persistent max-width="600px">
       <v-card>
-        <v-card-title>
-          <span class="headline">Agent Profile</span>
+        <v-card-title class="teal darken-2 white--text">
+          <span class="headline">Edit Profile Data</span>
         </v-card-title>
         <v-card-text>
           <InfoFormVue ref="infoFormRef"/>
@@ -366,40 +372,60 @@ export default {
     isOnActiveBinded: false,
     isOnPortDataBinded: false,
     pusher: undefined,
+    portsChannel: undefined,
     portConsoleTxt: []
   }),
   methods: {
     bindOnPortData() {
       if (!this.isOnPortDataBinded) {
-        this.pusher.bind("on-port-data", data => {
-          this.portConsoleTxt.unshift("-> data received: " + data.data);
-        });
+        this.portsChannel.bind("on-port-data", data =>
+          this.onPortDataCallback(data)
+        );
+        this.isOnPortDataBinded = true;
       } else {
         console.log("Already binded to on-port-data");
       }
     },
+    unbindOnPortData() {
+      if (this.isOnPortDataBinded) {
+        this.portsChannel.unbind("on-port-data", data =>
+          this.onPortDataCallback(data)
+        );
+        this.isOnPortDataBinded = false;
+      }
+    },
+    onPortDataCallback(data) {
+      this.portConsoleTxt.unshift("-> data received: " + data.data);
+    },
     bindOnActive() {
       this.isOnActiveBinded = true;
-      this.pusher.bind("on-active", data => {
-        const portsList = data.portsList;
-        const count = Object.keys(portsList).length;
-        window.localStorage.setItem("portsCount", count);
-        let newList = [];
-        for (let i = 0; i < count; i++) {
-          newList.push(portsList[i + 1]);
-        }
-        if (
-          this.selectedPortObject != undefined &&
-          !newList.includes(this.selectedPortObject)
-        ) {
-          this.showErrorSnackbar(
-            `${this.selectedPortObject.comName} is not active anymore`
-          );
-          this.doShowPortPanel = false;
-          this.selectedPortObject = undefined;
-        }
-        this.portsList = newList;
-      });
+      this.portsChannel.bind("on-active", data => this.onActiveCallback(data));
+    },
+    unbindOnActive() {
+      this.portsChannel.unbind("on-active", data =>
+        this.onActiveCallback(data)
+      );
+      this.isOnActiveBinded = false;
+    },
+    onActiveCallback(data) {
+      const portsList = data.portsList;
+      const count = Object.keys(portsList).length;
+      window.localStorage.setItem("portsCount", count);
+      let newList = [];
+      for (let i = 0; i < count; i++) {
+        newList.push(portsList[i + 1]);
+      }
+      if (
+        this.selectedPortObject != undefined &&
+        !newList.includes(this.selectedPortObject)
+      ) {
+        this.showErrorSnackbar(
+          `${this.selectedPortObject.comName} is not active anymore`
+        );
+        this.doShowPortPanel = false;
+        this.selectedPortObject = undefined;
+      }
+      this.portsList = newList;
     },
     performLogout() {
       let id = localStorage.getItem("id");
@@ -416,6 +442,8 @@ export default {
           window.localStorage.removeItem("refresh_token");
           //? update local variable isConnected
           this.isConnected = false;
+          this.unbindOnPortData();
+          this.unbindOnActive();
           //? display login component
           this.$router.replace("/login");
         })
@@ -495,6 +523,7 @@ export default {
         .then(result => {
           this.portConsoleTxt.unshift("-> Port is closed");
           this.showSuccessSnackbar(result);
+          this.unbindOnPortData();
           this.openPortDis = false;
           this.resumePortDis = true;
           this.closePortDis = true;
@@ -532,18 +561,20 @@ export default {
           this.isSelectedPortOpened = isOpen;
           PortsServices.isPortActive(portObject.comName)
             .then(isPortActive => {
-              console.log('isPortActive :', isPortActive);
+              console.log("isPortActive :", isPortActive);
               if (isPortActive) {
                 this.flushPortDis = true;
                 this.pausePortDis = true;
                 this.resumePortDis = true;
                 this.openPortDis = true;
                 this.closePortDis = true;
-              } 
+              }
             })
             .catch(error => {
               console.warn(error);
-              this.showErrorSnackbar("Error while checking port activeness status!");
+              this.showErrorSnackbar(
+                "Error while checking port activeness status!"
+              );
             });
           if (isOpen) {
             this.openPortDis = true;
@@ -598,12 +629,12 @@ export default {
       cluster: "eu",
       forceTLS: true
     });
-    this.pusher.subscribe("ports");
+    this.portsChannel = this.pusher.subscribe("ports");
     PortsServices.getConnectedPortsList()
       .then(result => {
         this.portsCount = result.count;
         window.localStorage.setItem("portsCount", result.count);
-        console.log("result.count :", result.count);
+        // console.log("result.count :", result.count);
         if (result.count != 0) {
           this.portsList = result.ports;
         }
@@ -619,3 +650,8 @@ export default {
   }
 };
 </script>
+<style>
+.scroll {
+  overflow-y: auto;
+}
+</style>

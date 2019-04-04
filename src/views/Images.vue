@@ -11,6 +11,10 @@
       </v-toolbar>
     </v-flex>-->
     <!-- Content -->
+    <v-alert
+      :value="isTransmissionProcessActive"
+      type="error"
+    >There is already a process going on, so you can't use this page again until that process is finished</v-alert>
     <v-layout justify-center row wrap>
       <!-- Image Upload and display Section -->
       <v-flex d-flex xs12 sm12 md12 lg8 pa-1>
@@ -28,12 +32,18 @@
             </div>
           </v-card-text>
           <v-card-actions>
-            <v-btn flat @click="clear" color="teal darken-4">Clear</v-btn>
+            <v-btn
+              flat
+              @click="clear"
+              :disabled="isConversionActive || isTransmissionProcessActive"
+              color="teal darken-4"
+            >Clear</v-btn>
             <v-spacer></v-spacer>
             <v-fade-transition>
               <v-btn
                 color="teal"
                 class="white--text"
+                :disabled="isTransmissionProcessActive || isConversionActive"
                 v-show="selectedFile == null"
                 @click="$refs.selectImageRef.click()"
               >Select</v-btn>
@@ -123,7 +133,13 @@
             <v-fade-transition>
               <v-tooltip top>
                 <template #activator="data">
-                  <v-btn v-show="!showConversionBtn" flat v-on="data.on" @click="performConversion">
+                  <v-btn
+                    v-show="!showConversionBtn"
+                    :disabled="isTransmissionProcessActive || isConversionActive"
+                    flat
+                    v-on="data.on"
+                    @click="performConversion"
+                  >
                     <v-icon color="teal">fas fa-sync</v-icon>
                   </v-btn>
                 </template>
@@ -135,331 +151,319 @@
       </v-flex>
     </v-layout>
     <!-- Conversion Results panel -->
-    <v-fade-transition>
-      <v-layout v-if="displayRsultes == true" v-show="displayRsultes" justify-center row wrap pa-1>
-        <v-flex d-flex xs12>
-          <v-toolbar color="teal" dark card dense>
-            <v-toolbar-title>Conversion Results</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-btn icon>
-              <v-icon>more_vert</v-icon>
-            </v-btn>
-            <v-btn icon @click="showResultsPanel = !showResultsPanel">
-              <v-icon>{{ showResultsPanel ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
-            </v-btn>
-          </v-toolbar>
-        </v-flex>
-        <v-flex d-flex xs12>
-          <v-fade-transition>
-            <v-card v-show="showResultsPanel">
-              <v-card-text>
-                <v-layout justify-center row wrap>
-                  <!-- Old configuration -->
-                  <v-flex xs12 sm12 md3 lg3 px-1>
-                    <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
-                      <v-card-text class="d-flex">
-                        <table>
-                          <header class="font-weight-bold py-2">Conversion Prameters</header>
-                          <tr>
-                            <td class="font-weight-meduim">Tool Diameter</td>
-                            <td class="align-center">{{ oldtoolDiameter }} mm</td>
-                          </tr>
-                          <tr>
-                            <td class="font-weight-meduim">Sensitivity</td>
-                            <td class="align-center">{{ oldsensitivity }} mm</td>
-                          </tr>
-                          <tr>
-                            <td class="font-weight-meduim">Scale Axes</td>
-                            <td class="align-center">{{ oldscaleAxes }} mm</td>
-                          </tr>
-                          <tr>
-                            <td class="font-weight-meduim">Deep Step</td>
-                            <td class="align-center">{{ olddeepStep }} mm</td>
-                          </tr>
-                          <tr>
-                            <td class="font-weight-meduim">Black Z</td>
-                            <td class="align-center">{{ oldblackZ }}</td>
-                          </tr>
-                          <tr>
-                            <td class="font-weight-meduim">White Z</td>
-                            <td class="align-center">{{ oldwhiteZ }}</td>
-                          </tr>
-                          <tr>
-                            <td class="font-weight-meduim">Safe Z</td>
-                            <td class="align-center">{{ oldsafeZ }}</td>
-                          </tr>
-                          <tr>
-                            <td class="font-weight-meduim">Safe Z</td>
-                            <td class="align-center">{{ oldsafeZ }}</td>
-                          </tr>
-                        </table>
-                      </v-card-text>
-                    </v-card>
-                  </v-flex>
-                  <!-- Image size & times & file information -->
-                  <v-flex xs12 sm12 md5 lg5 px-1>
-                    <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
-                      <v-card-text class="d-flex">
-                        <table>
-                          <tr>
-                            <td class="font-weight-bold">Image Size:</td>
-                            <td class="align-end">{{ imegSize }}</td>
-                          </tr>
-                        </table>
-                      </v-card-text>
-                    </v-card>
-                    <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
-                      <v-card-text class="d-flex">
-                        <table>
-                          <tr>
-                            <td class="font-weight-bold">Started at</td>
-                            <td class="align-center">{{ startTime }}</td>
-                          </tr>
-                          <tr>
-                            <td class="font-weight-bold">Ended at</td>
-                            <td class="align-center">{{ endTime }}</td>
-                          </tr>
-                          <tr>
-                            <td class="font-weight-bold">Elapsed Time</td>
-                            <td class="align-center">{{ elapsedTime }} seconds</td>
-                          </tr>
-                        </table>
-                      </v-card-text>
-                    </v-card>
-                    <v-card color="teal lighten-1" class="white--text elevation-5 my-1">
-                      <v-card-text class="d-flex pb-4">
-                        <!-- <p class="font-weight-bold">GCode File Information</p> -->
-                        <table>
-                          <tr>
-                            <td class="font-weight-bold">File Name</td>
-                            <td class="align-end">{{ fileName }}</td>
-                          </tr>
-                          <tr>
-                            <td class="font-weight-bold">Size</td>
-                            <td class="align-end">{{ size }} Mb</td>
-                          </tr>
-                        </table>
-                      </v-card-text>
-                    </v-card>
-                  </v-flex>
-                  <!-- Proccessed black pixels progress circle -->
-                  <v-flex xs12 sm12 md4 lg4 px-1>
-                    <v-card color="teal lighten-1" class="white--text elevation-5">
-                      <v-card-text class="d-flex">
-                        <v-tooltip bottom>
-                          <template #activator="data">
-                            <v-progress-circular
-                              :rotate="360"
-                              :size="220"
-                              :width="10"
-                              :value="value"
-                              color="white"
-                              v-on="data.on"
-                            >{{ value }}</v-progress-circular>
-                          </template>
-                          <span>The percentage of the proccessed black pixels in the picture</span>
-                        </v-tooltip>
-                        <v-tooltip bottom>
-                          <template #activator="data">
-                            <v-progress-circular
-                              :rotate="360"
-                              :size="150"
-                              :width="10"
-                              :value="errorValue"
-                              color="red lighten-1"
-                              v-on="data.on"
-                            >{{ errorValue }}</v-progress-circular>
-                          </template>
-                          <span>The percentage of the unproccessed black pixels in the picture</span>
-                        </v-tooltip>
-                      </v-card-text>
-                    </v-card>
-                  </v-flex>
-                </v-layout>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
+    <v-layout v-if="displayRsultes == true" v-show="displayRsultes" justify-center row wrap pa-1>
+      <v-flex d-flex xs12>
+        <v-toolbar color="teal" dark card dense>
+          <v-toolbar-title>Conversion Results</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon>
+            <v-icon>more_vert</v-icon>
+          </v-btn>
+          <v-btn icon @click="showResultsPanel = !showResultsPanel">
+            <v-icon>{{ showResultsPanel ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </v-flex>
+      <v-flex d-flex xs12>
+        <v-fade-transition>
+          <v-card v-show="showResultsPanel">
+            <v-card-text>
+              <v-layout justify-center row wrap>
+                <!-- Old configuration -->
+                <v-flex xs12 sm12 md3 lg3 px-1>
+                  <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
+                    <v-card-text class="d-flex">
+                      <table>
+                        <header class="font-weight-bold py-2">Conversion Prameters</header>
+                        <tr>
+                          <td class="font-weight-meduim">Tool Diameter</td>
+                          <td class="align-center">{{ oldtoolDiameter }} mm</td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-meduim">Sensitivity</td>
+                          <td class="align-center">{{ oldsensitivity }} mm</td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-meduim">Scale Axes</td>
+                          <td class="align-center">{{ oldscaleAxes }} mm</td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-meduim">Deep Step</td>
+                          <td class="align-center">{{ olddeepStep }} mm</td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-meduim">Black Z</td>
+                          <td class="align-center">{{ oldblackZ }}</td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-meduim">White Z</td>
+                          <td class="align-center">{{ oldwhiteZ }}</td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-meduim">Safe Z</td>
+                          <td class="align-center">{{ oldsafeZ }}</td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-meduim">Safe Z</td>
+                          <td class="align-center">{{ oldsafeZ }}</td>
+                        </tr>
+                      </table>
+                    </v-card-text>
+                  </v-card>
+                </v-flex>
+                <!-- Image size & times & file information -->
+                <v-flex xs12 sm12 md5 lg5 px-1>
+                  <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
+                    <v-card-text class="d-flex">
+                      <table>
+                        <tr>
+                          <td class="font-weight-bold">Image Size:</td>
+                          <td class="align-end">{{ imegSize }}</td>
+                        </tr>
+                      </table>
+                    </v-card-text>
+                  </v-card>
+                  <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
+                    <v-card-text class="d-flex">
+                      <table>
+                        <tr>
+                          <td class="font-weight-bold">Started at</td>
+                          <td class="align-center">{{ startTime }}</td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-bold">Ended at</td>
+                          <td class="align-center">{{ endTime }}</td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-bold">Elapsed Time</td>
+                          <td class="align-center">{{ elapsedTime }} seconds</td>
+                        </tr>
+                      </table>
+                    </v-card-text>
+                  </v-card>
+                  <v-card color="teal lighten-1" class="white--text elevation-5 my-1">
+                    <v-card-text class="d-flex pb-4">
+                      <!-- <p class="font-weight-bold">GCode File Information</p> -->
+                      <table>
+                        <tr>
+                          <td class="font-weight-bold">File Name</td>
+                          <td class="align-end">{{ fileName }}</td>
+                        </tr>
+                        <tr>
+                          <td class="font-weight-bold">Size</td>
+                          <td class="align-end">{{ size }} Mb</td>
+                        </tr>
+                      </table>
+                    </v-card-text>
+                  </v-card>
+                </v-flex>
+                <!-- Proccessed black pixels progress circle -->
+                <v-flex xs12 sm12 md4 lg4 px-1>
+                  <v-card color="teal lighten-1" class="white--text elevation-5">
+                    <v-card-text class="d-flex">
+                      <v-tooltip bottom>
+                        <template #activator="data">
+                          <v-progress-circular
+                            :rotate="360"
+                            :size="220"
+                            :width="10"
+                            :value="value"
+                            color="white"
+                            v-on="data.on"
+                          >{{ value }}</v-progress-circular>
+                        </template>
+                        <span>The percentage of the proccessed black pixels in the picture</span>
+                      </v-tooltip>
+                      <v-tooltip bottom>
+                        <template #activator="data">
+                          <v-progress-circular
+                            :rotate="360"
+                            :size="150"
+                            :width="10"
+                            :value="errorValue"
+                            color="red lighten-1"
+                            v-on="data.on"
+                          >{{ errorValue }}</v-progress-circular>
+                        </template>
+                        <span>The percentage of the unproccessed black pixels in the picture</span>
+                      </v-tooltip>
+                    </v-card-text>
+                  </v-card>
+                </v-flex>
+              </v-layout>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-tooltip bottom>
+                <template #activator="data">
+                  <v-btn
+                    class="teal--text"
+                    flat
+                    v-on="data.on"
+                    @click="initializeDrawOperation()"
+                    :disabled="isTransmissionProcessActive"
+                  >
+                    <v-icon left dark>fas fa-draw-polygon</v-icon>Draw
+                  </v-btn>
+                </template>
+                <span>Send generated gcode to machine</span>
+              </v-tooltip>
+            </v-card-actions>
+          </v-card>
+        </v-fade-transition>
+      </v-flex>
+    </v-layout>
+    <!-- Consoles Area -->
+    <v-layout v-if="consolesArea == true" justify-center row wrap pa-1>
+      <!-- Transmission Console Area -->
+      <v-flex xs12 sm12 md12 lg12 mb-2>
+        <v-layout justify-center row wrap>
+          <v-flex d-flex xs12 sm12 md12 lg12>
+            <v-toolbar color="teal" dark dense>
+              <v-toolbar-title>Transmission Process Console</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <div v-if="port != undefined">
+                <v-tooltip bottom>
+                  <template #activator="data">
+                    <v-btn :disabled="stopSendDis" v-on="data.on" icon @click="stopSendOperation()">
+                      <v-icon>fas fa-stop-circle</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Stop sending gcode lines to port</span>
+                </v-tooltip>
                 <v-tooltip bottom>
                   <template #activator="data">
                     <v-btn
-                      class="teal--text"
-                      flat
+                      :disabled="resumeSendDis"
                       v-on="data.on"
-                      @click="initializeDrawOperation()"
+                      icon
+                      @click="resumeSendOperation()"
                     >
-                      <v-icon left dark>fas fa-draw-polygon</v-icon>Draw
+                      <v-icon>fas fa-play-circle</v-icon>
                     </v-btn>
                   </template>
-                  <span>Send generated gcode to machine</span>
+                  <span>Resume sending gcode lines to port</span>
                 </v-tooltip>
-              </v-card-actions>
-            </v-card>
-          </v-fade-transition>
-        </v-flex>
-      </v-layout>
-    </v-fade-transition>
-    <v-fade-transition>
-      <v-layout v-if="consolesArea == true" justify-center row wrap pa-1>
-        <!-- Transmission Console Area -->
-        <v-flex xs12 sm12 md12 lg12 mb-2>
-          <v-layout justify-center row wrap>
-            <v-flex d-flex xs12 sm12 md12 lg12>
-              <v-toolbar color="teal" dark dense>
-                <v-toolbar-title>Transmission Process Console</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <div v-if="port != undefined">
-                  <v-tooltip bottom>
-                    <template #activator="data">
-                      <v-btn
-                        :disabled="stopSendDis"
-                        v-on="data.on"
-                        icon
-                        @click="stopSendOperation()"
-                      >
-                        <v-icon>fas fa-stop-circle</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Stop sending gcode lines to port</span>
-                  </v-tooltip>
-                  <v-tooltip bottom>
-                    <template #activator="data">
-                      <v-btn
-                        :disabled="resumeSendDis"
-                        v-on="data.on"
-                        icon
-                        @click="resumeSendOperation()"
-                      >
-                        <v-icon>fas fa-play-circle</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Resume sending gcode lines to port</span>
-                  </v-tooltip>
-                  <v-tooltip bottom>
-                    <template #activator="data">
-                      <v-btn
-                        :disabled="pauseSendDis"
-                        v-on="data.on"
-                        icon
-                        @click="pauseSendOperation()"
-                      >
-                        <v-icon>fas fa-pause-circle</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Pause sending gcode lines port</span>
-                  </v-tooltip>
-                </div>
                 <v-tooltip bottom>
                   <template #activator="data">
-                    <v-btn v-on="data.on" icon @click="clearTransmissionConsole()">
-                      <v-icon>fas fa-eraser</v-icon>
+                    <v-btn
+                      :disabled="pauseSendDis"
+                      v-on="data.on"
+                      icon
+                      @click="pauseSendOperation()"
+                    >
+                      <v-icon>fas fa-pause-circle</v-icon>
                     </v-btn>
                   </template>
-                  <span>Clear the console</span>
+                  <span>Pause sending gcode lines port</span>
                 </v-tooltip>
-                <v-btn icon @click="showTranmsissionConsole = !showTranmsissionConsole">
-                  <v-icon>{{ showTranmsissionConsole ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
-                </v-btn>
-              </v-toolbar>
-            </v-flex>
-            <v-flex d-flex xs12 sm12 md12 lg12>
-              <v-fade-transition>
-                <v-card
-                  v-show="showTranmsissionConsole"
-                  color="teal lighten-4"
-                  height="300px"
-                  class="scroll"
-                >
-                  <v-card-text class="teal--text darken-4">
-                    <table>
-                      <tr
-                        v-for="(line, index) in transmissionConsoleTxt"
-                        :key="index"
-                        class="font-weight-medium"
-                      >
-                        <td class="red--text darken-1">{{line.split("|")[0]}}</td>
-                        <td>{{"->"+line.split("|")[1]}}</td>
-                      </tr>
-                    </table>
-                  </v-card-text>
-                </v-card>
-              </v-fade-transition>
-            </v-flex>
-          </v-layout>
-        </v-flex>
-        <!-- Port Console Area -->
-        <v-flex xs12 sm12 md12 lg12>
-          <v-layout row wrap>
-            <v-flex xs12>
-              <v-toolbar color="teal" dark dense>
-                <v-toolbar-title>Port Data Console</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <div v-if="port != undefined">
-                  <v-tooltip bottom>
-                    <template #activator="data">
-                      <v-btn :disabled="flushPortDis" v-on="data.on" icon @click="flushPort()">
-                        <v-icon>fas fa-times-circle</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Flush both incoming and outgoing data on the port</span>
-                  </v-tooltip>
-                  <v-tooltip bottom>
-                    <template #activator="data">
-                      <v-btn :disabled="resumePortDis" v-on="data.on" icon @click="resumePort()">
-                        <v-icon>fas fa-play-circle</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Resume all incoming data on the port</span>
-                  </v-tooltip>
-                  <v-tooltip bottom>
-                    <template #activator="data">
-                      <v-btn :disabled="pausePortDis" v-on="data.on" icon @click="pausePort()">
-                        <v-icon>fas fa-pause-circle</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Pause all incoming data on the port</span>
-                  </v-tooltip>
-                </div>
+              </div>
+              <v-tooltip bottom>
+                <template #activator="data">
+                  <v-btn v-on="data.on" icon @click="clearTransmissionConsole()">
+                    <v-icon>fas fa-eraser</v-icon>
+                  </v-btn>
+                </template>
+                <span>Clear the console</span>
+              </v-tooltip>
+              <v-btn icon @click="showTranmsissionConsole = !showTranmsissionConsole">
+                <v-icon>{{ showTranmsissionConsole ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+              </v-btn>
+            </v-toolbar>
+          </v-flex>
+          <v-flex d-flex xs12 sm12 md12 lg12>
+            <v-fade-transition>
+              <v-card
+                v-show="showTranmsissionConsole"
+                color="teal lighten-4"
+                height="300px"
+                class="scroll"
+              >
+                <v-card-text class="teal--text darken-4">
+                  <table>
+                    <tr
+                      v-for="(line, index) in transmissionConsoleTxt"
+                      :key="index"
+                      class="font-weight-medium"
+                    >
+                      <td class="red--text darken-1">{{line.split("|")[0]}}</td>
+                      <td>{{"->"+line.split("|")[1]}}</td>
+                    </tr>
+                  </table>
+                </v-card-text>
+              </v-card>
+            </v-fade-transition>
+          </v-flex>
+        </v-layout>
+      </v-flex>
+      <!-- Port Console Area -->
+      <v-flex xs12 sm12 md12 lg12>
+        <v-layout row wrap>
+          <v-flex xs12>
+            <v-toolbar color="teal" dark dense>
+              <v-toolbar-title>Port Data Console</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <div v-if="port != undefined">
                 <v-tooltip bottom>
                   <template #activator="data">
-                    <v-btn v-on="data.on" icon @click="clearPortConsole()">
-                      <v-icon>fas fa-eraser</v-icon>
+                    <v-btn :disabled="flushPortDis" v-on="data.on" icon @click="flushPort()">
+                      <v-icon>fas fa-times-circle</v-icon>
                     </v-btn>
                   </template>
-                  <span>Clear the console</span>
+                  <span>Flush both incoming and outgoing data on the port</span>
                 </v-tooltip>
-                <v-btn icon @click="showPortConsole = !showPortConsole">
-                  <v-icon>{{ showPortConsole ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
-                </v-btn>
-              </v-toolbar>
-            </v-flex>
-            <v-flex d-flex xs12 sm12 md12 lg12>
-              <v-fade-transition>
-                <v-card
-                  v-show="showPortConsole"
-                  color="teal lighten-4"
-                  height="300px"
-                  class="scroll"
-                >
-                  <v-card-text class="teal--text darken-4">
-                    <table>
-                      <tr
-                        v-for="(line, index) in portConsoleTxt"
-                        :key="index"
-                        class="font-weight-medium"
-                      >
-                        <td class="red--text darken-1">{{line.split("|")[0]}}</td>
-                        <td>{{" "+line.split("|")[1]}}</td>
-                      </tr>
-                    </table>
-                  </v-card-text>
-                </v-card>
-              </v-fade-transition>
-            </v-flex>
-          </v-layout>
-        </v-flex>
-      </v-layout>
-    </v-fade-transition>
-    <!-- Transmission 1st phase dialoge -->
+                <v-tooltip bottom>
+                  <template #activator="data">
+                    <v-btn :disabled="resumePortDis" v-on="data.on" icon @click="resumePort()">
+                      <v-icon>fas fa-play-circle</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Resume all incoming data on the port</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template #activator="data">
+                    <v-btn :disabled="pausePortDis" v-on="data.on" icon @click="pausePort()">
+                      <v-icon>fas fa-pause-circle</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Pause all incoming data on the port</span>
+                </v-tooltip>
+              </div>
+              <v-tooltip bottom>
+                <template #activator="data">
+                  <v-btn v-on="data.on" icon @click="clearPortConsole()">
+                    <v-icon>fas fa-eraser</v-icon>
+                  </v-btn>
+                </template>
+                <span>Clear the console</span>
+              </v-tooltip>
+              <v-btn icon @click="showPortConsole = !showPortConsole">
+                <v-icon>{{ showPortConsole ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+              </v-btn>
+            </v-toolbar>
+          </v-flex>
+          <v-flex d-flex xs12 sm12 md12 lg12>
+            <v-fade-transition>
+              <v-card v-show="showPortConsole" color="teal lighten-4" height="300px" class="scroll">
+                <v-card-text class="teal--text darken-4">
+                  <table>
+                    <tr
+                      v-for="(line, index) in portConsoleTxt"
+                      :key="index"
+                      class="font-weight-medium"
+                    >
+                      <td class="red--text darken-1">{{line.split("|")[0]}}</td>
+                      <td>{{" "+line.split("|")[1]}}</td>
+                    </tr>
+                  </table>
+                </v-card-text>
+              </v-card>
+            </v-fade-transition>
+          </v-flex>
+        </v-layout>
+      </v-flex>
+    </v-layout>
+    <!-- Ports List dialoge -->
     <v-dialog v-model="portsListDialog" persistent width="700px">
       <v-card>
         <v-card-title class="teal darken-4 py-4 title white--text">GCode File Transmission</v-card-title>
@@ -472,7 +476,10 @@
               class="mb-2"
             >This operation will send the generated gcode file to the machine over the selected port and it will start drawing the coordinates the process will take to much time (1s for each line of code), you can monitor the whole process and the incoming data from the console below.</v-alert>
             <p class="title">Chose port:</p>
-            <v-alert :value="isTransmissionProcessActive" type="warning">There is already a transmission process going on</v-alert>
+            <v-alert
+              :value="isTransmissionProcessActive"
+              type="warning"
+            >There is already a transmission process going on</v-alert>
             <v-fade-transition>
               <v-list v-if="portsList.length !== 0">
                 <v-list-tile
@@ -490,7 +497,7 @@
                 </v-list-tile>
               </v-list>
               <v-list v-else>
-                <v-alert :value="true" type="error">No port is active!</v-alert>
+                <v-alert :value="true" type="error">No port is connected!</v-alert>
               </v-list>
             </v-fade-transition>
           </v-container>
@@ -534,7 +541,6 @@ import ConversionServices from "@/services/conversion.js";
 import PortsServices from "@/services/ports.js";
 import Pusher from "pusher-js";
 import { setTimeout } from "timers";
-// import { fileURLToPath } from "url";
 export default {
   data: () => ({
     //? to display the results section
@@ -546,6 +552,7 @@ export default {
     url: require("@/assets/default.png"),
     //? for conversion button
     showConversionBtn: true,
+    isConversionActive: false,
     //? for dialog
     dialog: false,
     //? for progress in dialog window
@@ -619,6 +626,7 @@ export default {
     resumePortDis: true
   }),
   created() {
+    window.addEventListener("beforeunload", event => this.handleOnBeforeUnload(event));
     Pusher.logToConsole = true;
     this.pusher = new Pusher("ced4b5ad59f10ab2a746", {
       cluster: "eu",
@@ -626,8 +634,25 @@ export default {
     });
     this.pusher.subscribe("ports");
     this.pusher.subscribe("logs");
+    // see if there is a transmission process going on
+    PortsServices.isServerActive()
+      .then(status => {
+        // console.log('status :', status);
+        this.isTransmissionProcessActive = status;
+      })
+      .catch(error => {
+        this.showErrorSnackbar(error);
+      });
   },
   methods: {
+    handleOnBeforeUnload(event) {
+      if (this.isTransmissionProcessActive || this.isConversionActive) {
+        // Cancel the event as stated by the standard.
+        event.preventDefault();
+        // Chrome requires returnValue to be set.
+        event.returnValue = "";
+      }
+    },
     fileIsSelected(event) {
       this.selectedFile = event.target.files[0];
       this.url = URL.createObjectURL(this.selectedFile);
@@ -678,8 +703,10 @@ export default {
               idle: this.idle
             })
           );
+          this.isConversionActive = true;
           ConversionServices.ConvertImage(fd)
             .then(result => {
+              this.isConversionActive = false;
               this.displayRsultes = true;
               this.dialog = false;
               this.oldtoolDiameter = result.toolDiameter;
@@ -701,6 +728,7 @@ export default {
               this.size = result.size.toFixed(2);
             })
             .catch(error => {
+              this.isConversionActive = false;
               this.dialog = false;
               this.showErrorSnackbar(error);
               this.loading = false;
