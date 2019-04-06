@@ -389,6 +389,12 @@ export default {
     portsChannel: undefined,
     portConsoleTxt: []
   }),
+  beforeDestroy() {
+    // Clean up.
+    this.unbindOnActive();
+    this.unbindOnPortData();
+    this.pusher.unsubscribe("ports");
+  },
   methods: {
     bindOnPortData() {
       if (!this.isOnPortDataBinded) {

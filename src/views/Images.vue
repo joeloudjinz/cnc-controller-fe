@@ -626,7 +626,9 @@ export default {
     resumePortDis: true
   }),
   created() {
-    window.addEventListener("beforeunload", event => this.handleOnBeforeUnload(event));
+    window.addEventListener("beforeunload", event =>
+      this.handleOnBeforeUnload(event)
+    );
     Pusher.logToConsole = true;
     this.pusher = new Pusher("ced4b5ad59f10ab2a746", {
       cluster: "eu",
@@ -643,6 +645,11 @@ export default {
       .catch(error => {
         this.showErrorSnackbar(error);
       });
+  },
+  beforeDestroy() {
+    // Clean up.
+    this.pusher.unsubscribe("ports");
+    this.pusher.unsubscribe("logs");
   },
   methods: {
     handleOnBeforeUnload(event) {
@@ -947,8 +954,8 @@ export default {
 };
 </script>
 <style scopped>
-.fix-tooltip-hover{
-  pointer-events: auto
+.fix-tooltip-hover {
+  pointer-events: auto;
 }
 #preview {
   display: flex;
