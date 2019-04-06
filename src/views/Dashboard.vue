@@ -1,5 +1,6 @@
 <template>
   <v-layout justify-center row wrap>
+    <!-- Simple Statistics -->
     <v-flex xs12 sm12 md3 lg3 class="pb-1 mb-0">
       <v-card class="teal lighten-5 mx-1">
         <v-card-text class="pt-2 pb-0">
@@ -74,19 +75,25 @@
         </v-card-text>
         <v-card-actions class="pt-0 pb-1">
           <v-spacer></v-spacer>
-          <h1 class="font-weight-meduim green--text text--lighten-2">Active Ports</h1>
+          <h1 class="font-weight-meduim green--text text--lighten-2">Connected Ports</h1>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
     </v-flex>
+    <!-- Images Directory Component
+    <v-flex xs12>
+      <ImagesDirVue/>
+    </v-flex> -->
   </v-layout>
 </template>
 
 <script>
 import ConversionServices from "@/services/conversion.js";
 import AgentsServices from "@/services/agent.js";
+// import ImagesDirVue from "../components/dashboard/ImagesDir.vue";
 export default {
   name: "dashboard",
+  // components: { ImagesDirVue },
   data() {
     return {
       adminsCount: 0,
@@ -116,7 +123,7 @@ export default {
         this.agentsCount = result;
       })
       .catch(error => {
-        this.agentsCount = '?';
+        this.agentsCount = "?";
         console.warn("in getAgentsCount(),error :", error);
       });
   }

@@ -323,7 +323,7 @@
               <v-toolbar-title>Transmission Process Console</v-toolbar-title>
               <v-spacer></v-spacer>
               <div v-if="port != undefined">
-                <v-tooltip bottom>
+                <v-tooltip :disabled="stopSendDis" bottom>
                   <template #activator="data">
                     <v-btn :disabled="stopSendDis" v-on="data.on" icon @click="stopSendOperation()">
                       <v-icon>fas fa-stop-circle</v-icon>
@@ -331,7 +331,7 @@
                   </template>
                   <span>Stop sending gcode lines to port</span>
                 </v-tooltip>
-                <v-tooltip bottom>
+                <v-tooltip :disabled="resumeSendDis" bottom>
                   <template #activator="data">
                     <v-btn
                       :disabled="resumeSendDis"
@@ -344,7 +344,7 @@
                   </template>
                   <span>Resume sending gcode lines to port</span>
                 </v-tooltip>
-                <v-tooltip bottom>
+                <v-tooltip :disabled="pauseSendDis" bottom>
                   <template #activator="data">
                     <v-btn
                       :disabled="pauseSendDis"
@@ -404,7 +404,7 @@
               <v-toolbar-title>Port Data Console</v-toolbar-title>
               <v-spacer></v-spacer>
               <div v-if="port != undefined">
-                <v-tooltip bottom>
+                <v-tooltip :disabled="flushPortDis" bottom>
                   <template #activator="data">
                     <v-btn :disabled="flushPortDis" v-on="data.on" icon @click="flushPort()">
                       <v-icon>fas fa-times-circle</v-icon>
@@ -412,7 +412,7 @@
                   </template>
                   <span>Flush both incoming and outgoing data on the port</span>
                 </v-tooltip>
-                <v-tooltip bottom>
+                <v-tooltip :disabled="resumePortDis" bottom>
                   <template #activator="data">
                     <v-btn :disabled="resumePortDis" v-on="data.on" icon @click="resumePort()">
                       <v-icon>fas fa-play-circle</v-icon>
@@ -420,7 +420,7 @@
                   </template>
                   <span>Resume all incoming data on the port</span>
                 </v-tooltip>
-                <v-tooltip bottom>
+                <v-tooltip :disabled="pausePortDis" bottom>
                   <template #activator="data">
                     <v-btn :disabled="pausePortDis" v-on="data.on" icon @click="pausePort()">
                       <v-icon>fas fa-pause-circle</v-icon>
@@ -544,7 +544,7 @@ import { setTimeout } from "timers";
 export default {
   data: () => ({
     //? to display the results section
-    displayRsultes: true,
+    displayRsultes: false,
     //? ro expand the result panel
     showResultsPanel: true,
     //? for image file
@@ -568,7 +568,7 @@ export default {
     work: 1200,
     idle: 3000,
     //? for gcode file
-    fileName: "sm-samlpe",
+    fileName: "sm-sample",
     size: 0,
     link: null,
     //? for conversion details in results section
@@ -883,10 +883,11 @@ export default {
       if (this.port) {
         PortsServices.stopSendOperation(this.port)
           .then(result => {
-            //? diable all btns
+            //? disable all btns
             this.pauseSendDis = true;
             this.resumeSendDis = true;
             this.stopSendDis = true;
+            this.isTransmissionProcessActive = false;
             this.showSuccessSnackbar(result.success);
           })
           .catch(error => {
@@ -946,6 +947,9 @@ export default {
 };
 </script>
 <style scopped>
+.fix-tooltip-hover{
+  pointer-events: auto
+}
 #preview {
   display: flex;
   justify-content: center;

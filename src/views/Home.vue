@@ -55,6 +55,14 @@
               <v-list-tile-title>Converter</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
+          <v-list-tile to="/resources">
+            <v-list-tile-action>
+              <v-icon left>fas fa-boxes</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Resources</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
           <v-list-tile @click="performLogout()">
             <v-list-tile-action>
               <v-icon left>fas fa-sign-out-alt</v-icon>
@@ -126,6 +134,12 @@
             <v-btn v-on="data.on" flat to="/images" class="m-0">Converter</v-btn>
           </template>
           <span>Convert image into gcode and transmit the file to machine</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template #activator="data">
+            <v-btn v-on="data.on" flat to="/resources">Resources</v-btn>
+          </template>
+          <span>Consult directory tree of all the resources in the server</span>
         </v-tooltip>
         <v-tooltip bottom>
           <template #activator="data">
