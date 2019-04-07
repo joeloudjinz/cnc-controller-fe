@@ -539,12 +539,11 @@
 <script>
 import ConversionServices from "@/services/conversion.js";
 import PortsServices from "@/services/ports.js";
-import Pusher from "pusher-js";
 import { setTimeout } from "timers";
 export default {
   data: () => ({
     //? to display the results section
-    displayRsultes: false,
+    displayRsultes: true,
     //? ro expand the result panel
     showResultsPanel: true,
     //? for image file
@@ -603,10 +602,6 @@ export default {
     portsListProgress: true,
     //? for console
     portConsoleTxt: [],
-    //? for binding pusher channel
-    pusher: undefined,
-    isPortBinded: false,
-    isLogBinded: false,
     port: undefined,
     //? for transmission process
     displayTransmissionConsole: true,
@@ -625,33 +620,52 @@ export default {
     pausePortDis: false,
     resumePortDis: true
   }),
+  sockets: {
+    connect() {
+      console.log("socket connected");
+    },
+    onPortData(data) {
+      console.log("data :", data);
+      this.onPortDataCallback(data.data);
+    },
+    onTransmissionLog(data) {
+      this.onTransmissionLogCallback(data.data);
+    }
+  },
   created() {
     window.addEventListener("beforeunload", event =>
       this.handleOnBeforeUnload(event)
     );
-    Pusher.logToConsole = true;
-    this.pusher = new Pusher("ced4b5ad59f10ab2a746", {
-      cluster: "eu",
-      forceTLS: true
-    });
-    this.pusher.subscribe("ports");
-    this.pusher.subscribe("logs");
     // see if there is a transmission process going on
     PortsServices.isServerActive()
       .then(status => {
-        // console.log('status :', status);
         this.isTransmissionProcessActive = status;
       })
       .catch(error => {
         this.showErrorSnackbar(error);
       });
   },
-  beforeDestroy() {
-    // Clean up.
-    this.pusher.unsubscribe("ports");
-    this.pusher.unsubscribe("logs");
-  },
   methods: {
+    onPortDataCallback(content) {
+      if (content.length == 0) {
+        console.warn("data is empty!");
+      } else {
+        this.portConsoleTxt.unshift(content);
+      }
+    },
+    onTransmissionLogCallback(data) {
+      if (data.length == 0) {
+        console.warn("data is empty!");
+      } else {
+        this.transmissionConsoleTxt.unshift(data);
+        if (data.includes("All lines has been sent")) {
+          this.showSuccessSnackbar(
+            "Transmission of file " + this.fileName + " Has been completed"
+          );
+          this.isTransmissionProcessActive = false;
+        }
+      }
+    },
     handleOnBeforeUnload(event) {
       if (this.isTransmissionProcessActive || this.isConversionActive) {
         // Cancel the event as stated by the standard.
@@ -761,52 +775,15 @@ export default {
           this.showErrorSnackbar(error);
         });
     },
-    subscribeToPorts(eventName) {
-      this.isPortsBinded = true;
-      this.pusher.bind(eventName, data => {
-        if (data.data.length == 0) {
-          console.warn("data is empty!");
-        } else {
-          this.portConsoleTxt.unshift(data.data);
-        }
-      });
-    },
-    subscribeToLog(eventName) {
-      this.isLogBinded = true;
-      this.pusher.bind(eventName, data => {
-        if (data.data.length == 0) {
-          console.warn("data is empty!");
-        } else {
-          this.transmissionConsoleTxt.unshift(data.data);
-          if (data.data.includes("All lines has been sent")) {
-            this.showSuccessSnackbar(
-              "Transmission of file " + this.fileName + " Has been completed"
-            );
-            this.isTransmissionProcessActive = false;
-          }
-        }
-      });
-    },
     startTransmitingGCode(port) {
       this.consolesArea = true;
       this.port = port;
       if (this.fileName !== undefined && this.fileName !== "") {
         // const splitted = this.fileName.split(".");
         // const fileName = splitted[0] + "." + splitted[1];
-        //! if you bind multiple times, it will show data multiple time also
-        if (!this.isPortsBinded) {
-          this.subscribeToPorts("on-data");
-        } else {
-          console.log("Already subscribed");
-        }
-        if (!this.isLogBinded) {
-          this.subscribeToLog("on-log");
-        } else {
-          console.log("Already subscribed");
-        }
         setTimeout(() => {
           this.consolesArea = true;
-          PortsServices.performFullDrawOperation(this.fileName, port)
+          PortsServices.performFullDrawOperation("sm-sample", port)
             .then(result => {
               this.pauseSendDis = false;
               this.stopSendDis = false;

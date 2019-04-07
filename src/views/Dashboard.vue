@@ -90,55 +90,30 @@
 <script>
 import ConversionServices from "@/services/conversion.js";
 import AgentsServices from "@/services/agent.js";
-import Pusher from "pusher-js";
-
-// import ImagesDirVue from "../components/dashboard/ImagesDir.vue";
 export default {
   name: "dashboard",
-  // components: { ImagesDirVue },
   data() {
     return {
-      pusher: undefined,
-      portsChannel: undefined,
-      isOnActiveBinded: false,
       adminsCount: 0,
       agentsCount: 0,
       conversionsCount: 0,
-      activePortsCount: window.localStorage.getItem("portsCount") | 0
+      activePortsCount: 0
     };
   },
-  beforeDestroy() {
-    // Clean up.
-    this.unbindOnActive();
-    this.pusher.unsubscribe("ports");
+  sockets: {
+    connect() {
+      console.log("socket connected");
+    },
+    onPortsListChanged(newListObject) {
+      this.onPortsListChangedCallback(newListObject);
+    }
   },
   methods: {
-    bindOnActive() {
-      this.isOnActiveBinded = true;
-      this.portsChannel.bind("on-active", data => this.onActiveCallback(data));
-    },
-    unbindOnActive() {
-      this.portsChannel.unbind("on-active", data =>
-        this.onActiveCallback(data)
-      );
-      this.isOnActiveBinded = false;
-    },
-    onActiveCallback(data) {
-      this.activePortsCount = Object.keys(data.portsList).length;
+    onPortsListChangedCallback(data) {
+      this.activePortsCount = Object.keys(data).length;
     }
   },
   created: function() {
-    Pusher.logToConsole = true;
-    this.pusher = new Pusher("ced4b5ad59f10ab2a746", {
-      cluster: "eu",
-      forceTLS: true
-    });
-    this.portsChannel = this.pusher.subscribe("ports");
-    if (!this.isOnActiveBinded) {
-      this.bindOnActive();
-    } else {
-      console.log("Already binded to on-active");
-    }
     ConversionServices.getConversionsCount()
       .then(conversionsCount => {
         this.conversionsCount = conversionsCount;
