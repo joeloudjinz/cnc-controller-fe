@@ -294,7 +294,7 @@
                 </v-btn>
               </v-toolbar>
             </v-flex>
-            <v-flex xs12>
+            <v-flex xs12 pb-3>
               <v-card height="300px" color="teal lighten-4" class="mx-3 scroll">
                 <v-card-text class="black--text text-darken-4">
                   <table>
@@ -344,7 +344,6 @@
 import AuthServices from "@/services/auth.js";
 import AgentServices from "@/services/agent.js";
 import PortsServices from "@/services/ports.js";
-import Pusher from "pusher-js";
 
 import InfoFormVue from "../components/agents/InfoForm.vue";
 import PassFormVue from "../components/agents/PassForm.vue";
@@ -389,51 +388,31 @@ export default {
     portsChannel: undefined,
     portConsoleTxt: []
   }),
-  beforeDestroy() {
-    // Clean up.
-    this.unbindOnActive();
-    this.unbindOnPortData();
-    this.pusher.unsubscribe("ports");
+  sockets: {
+    connect() {
+      console.log("socket connected");
+    },
+    onPortsListChanged(newListObject) {
+      console.log("newListObject :", newListObject);
+      this.onActiveCallback(newListObject);
+    },
+    onSinglePortData(data) {
+      console.log("data :", data);
+      this.onSinglePortDataCallback(data);
+    }
   },
+  // mounted() {},
+  // beforeDestroy() {},
   methods: {
-    bindOnPortData() {
-      if (!this.isOnPortDataBinded) {
-        this.portsChannel.bind("on-port-data", data =>
-          this.onPortDataCallback(data)
-        );
-        this.isOnPortDataBinded = true;
-      } else {
-        console.log("Already binded to on-port-data");
-      }
-    },
-    unbindOnPortData() {
-      if (this.isOnPortDataBinded) {
-        this.portsChannel.unbind("on-port-data", data =>
-          this.onPortDataCallback(data)
-        );
-        this.isOnPortDataBinded = false;
-      }
-    },
-    onPortDataCallback(data) {
+    onSinglePortDataCallback(data) {
       this.portConsoleTxt.unshift("-> data received: " + data.data);
     },
-    bindOnActive() {
-      this.isOnActiveBinded = true;
-      this.portsChannel.bind("on-active", data => this.onActiveCallback(data));
-    },
-    unbindOnActive() {
-      this.portsChannel.unbind("on-active", data =>
-        this.onActiveCallback(data)
-      );
-      this.isOnActiveBinded = false;
-    },
     onActiveCallback(data) {
-      const portsList = data.portsList;
-      const count = Object.keys(portsList).length;
+      const count = Object.keys(data).length;
       window.localStorage.setItem("portsCount", count);
       let newList = [];
       for (let i = 0; i < count; i++) {
-        newList.push(portsList[i + 1]);
+        newList.push(data[i + 1]);
       }
       if (
         this.selectedPortObject != undefined &&
@@ -462,8 +441,6 @@ export default {
           window.localStorage.removeItem("refresh_token");
           //? update local variable isConnected
           this.isConnected = false;
-          this.unbindOnPortData();
-          this.unbindOnActive();
           //? display login component
           this.$router.replace("/login");
         })
@@ -472,7 +449,6 @@ export default {
         });
     },
     pausePort(portName) {
-      // console.warn("pausePort() is called, port is " + portName);
       this.portConsoleTxt.unshift(
         "-> Pause emitting data on port: " + portName
       );
@@ -489,7 +465,6 @@ export default {
         });
     },
     resumePort(portName) {
-      // console.warn("resumePort() is called, port is " + portName);
       this.portConsoleTxt.unshift(
         "-> Resume emitting data on port: " + portName
       );
@@ -506,7 +481,6 @@ export default {
         });
     },
     flushPort(portName) {
-      // console.warn("flushPort() is called, port is " + portName);
       this.portConsoleTxt.unshift("-> Flushing data on port: " + portName);
       PortsServices.flushPort(portName)
         .then(result => {
@@ -524,7 +498,6 @@ export default {
         .then(result => {
           this.portConsoleTxt.unshift("-> Port is opened");
           this.showSuccessSnackbar(result);
-          this.bindOnPortData();
           this.openPortDis = true;
           this.resumePortDis = true;
           this.closePortDis = false;
@@ -543,7 +516,6 @@ export default {
         .then(result => {
           this.portConsoleTxt.unshift("-> Port is closed");
           this.showSuccessSnackbar(result);
-          this.unbindOnPortData();
           this.openPortDis = false;
           this.resumePortDis = true;
           this.closePortDis = true;
@@ -625,7 +597,6 @@ export default {
     },
     closeEditInfoDialog() {
       this.editProfileDialog = false;
-      // this.$v.reset();
       this.$refs.passFormRef.$v.$reset();
       this.$refs.infoFormRef.$v.$reset();
     },
@@ -644,25 +615,10 @@ export default {
       .catch(error => {
         this.showErrorSnackbar(error);
       });
-    Pusher.logToConsole = true;
-    this.pusher = new Pusher("ced4b5ad59f10ab2a746", {
-      cluster: "eu",
-      forceTLS: true
-    });
-    this.portsChannel = this.pusher.subscribe("ports");
     PortsServices.getConnectedPortsList()
       .then(result => {
         this.portsCount = result.count;
-        window.localStorage.setItem("portsCount", result.count);
-        // console.log("result.count :", result.count);
-        if (result.count != 0) {
-          this.portsList = result.ports;
-        }
-        if (!this.isOnActiveBinded) {
-          this.bindOnActive();
-        } else {
-          console.log("Already binded to on-active");
-        }
+        this.portsList = result.ports;
       })
       .catch(error => {
         this.showErrorSnackbar(error);
