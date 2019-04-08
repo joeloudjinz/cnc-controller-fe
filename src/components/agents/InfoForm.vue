@@ -127,9 +127,9 @@ export default {
               this.showErrorAlert(error);
               this.disableAlert();
             });
-          console.log("Is valid");
+          // console.log("Is valid");
         } else {
-          console.warn("Is NOT valid");
+          // console.warn("Is NOT valid");
         }
       }
     },

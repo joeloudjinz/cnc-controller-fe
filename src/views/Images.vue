@@ -622,10 +622,10 @@ export default {
   }),
   sockets: {
     connect() {
-      console.log("socket connected");
+      // console.log("socket connected");
     },
     onPortData(data) {
-      console.log("data :", data);
+      // console.log("data :", data);
       this.onPortDataCallback(data.data);
     },
     onTransmissionLog(data) {
@@ -648,14 +648,14 @@ export default {
   methods: {
     onPortDataCallback(content) {
       if (content.length == 0) {
-        console.warn("data is empty!");
+        // console.warn("data is empty!");
       } else {
         this.portConsoleTxt.unshift(content);
       }
     },
     onTransmissionLogCallback(data) {
       if (data.length == 0) {
-        console.warn("data is empty!");
+        // console.warn("data is empty!");
       } else {
         this.transmissionConsoleTxt.unshift(data);
         if (data.includes("All lines has been sent")) {
@@ -798,7 +798,7 @@ export default {
               this.port = undefined;
               this.pausePortDis = true;
               this.flushPortDis = true;
-              console.log(error);
+              // console.log(error);
               this.showErrorSnackbar(error.failure.split(":")[1]);
               this.portConsoleTxt.push("Operation: " + error.operation + "|");
               this.portConsoleTxt.push("Message: " + error.failure + "|");
@@ -816,7 +816,7 @@ export default {
     },
     pausePort() {
       if (this.port) {
-        console.warn("pausePort() is called, port is " + this.port);
+        // console.warn("pausePort() is called, port is " + this.port);
         PortsServices.pauseEmittingPort(this.port)
           .then(result => {
             this.resumePortDis = false; //! means enable btn
@@ -827,13 +827,13 @@ export default {
             this.showErrorSnackbar(error);
           });
       } else {
-        console.warn("port is undefined!!");
+        // console.warn("port is undefined!!");
         this.showErrorSnackbar("No port is defined");
       }
     },
     resumePort() {
       if (this.port) {
-        console.warn("resumePort() is called, port is " + this.port);
+        // console.warn("resumePort() is called, port is " + this.port);
         PortsServices.resumeEmittingPort(this.port)
           .then(result => {
             this.pausePortDis = false;
@@ -844,13 +844,13 @@ export default {
             this.showErrorSnackbar(error);
           });
       } else {
-        console.warn("port is undefined!!");
+        // console.warn("port is undefined!!");
         this.showErrorSnackbar("No port is defined");
       }
     },
     flushPort() {
       if (this.port) {
-        console.warn("flushPort() is called, port is " + this.port);
+        // console.warn("flushPort() is called, port is " + this.port);
         PortsServices.flushPort(this.port)
           .then(result => {
             this.showSuccessSnackbar(result.success);
@@ -859,7 +859,7 @@ export default {
             this.showErrorSnackbar(error);
           });
       } else {
-        console.warn("port is undefined!!");
+        // console.warn("port is undefined!!");
         this.showErrorSnackbar("No port is defined");
       }
     },

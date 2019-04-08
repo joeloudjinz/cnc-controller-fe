@@ -21,7 +21,7 @@ class AgentServices {
                 refresh_token
             }).then((result) => {
                 //? result.data holds refresh_token and token
-                console.log(result.data)
+                // console.log(result.data)
                 window.localStorage.setItem('refresh_token', result.data.refresh_token);
                 window.localStorage.setItem('token', result.data.token);
                 resolve(true);

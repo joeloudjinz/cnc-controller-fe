@@ -172,12 +172,12 @@ export default {
     showConfirmDeleteDialog(id) {
       this.confirmeDeleteDialog = true;
       this.selectedAgentId = id;
-      console.log("selectedAgentId :", this.selectedAgentId);
+      // console.log("selectedAgentId :", this.selectedAgentId);
     },
     cancelConfirmDeleteDialog() {
       this.confirmeDeleteDialog = false;
       this.selectedAgentId = -1;
-      console.log("selectedAgentId :", this.selectedAgentId);
+      // console.log("selectedAgentId :", this.selectedAgentId);
     },
     deleteAgent() {
       if (this.selectedAgentId == -1) {
@@ -197,7 +197,7 @@ export default {
       }
     },
     resetPassword(id) {
-      console.log(id);
+      // console.log(id);
       this.dialog = true;
       AgentServices.resetAgentPassword(id)
         .then(result => {

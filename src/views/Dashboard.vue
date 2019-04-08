@@ -97,12 +97,16 @@ export default {
       adminsCount: 0,
       agentsCount: 0,
       conversionsCount: 0,
-      activePortsCount: 0
+      activePortsCount: 0,
+      //? snackbar details ...
+      snackbarContent: "",
+      snackbarColor: "",
+      snackbar: false
     };
   },
   sockets: {
     connect() {
-      console.log("socket connected");
+      // console.log("socket connected");
     },
     onPortsListChanged(newListObject) {
       this.onPortsListChangedCallback(newListObject);
@@ -111,6 +115,16 @@ export default {
   methods: {
     onPortsListChangedCallback(data) {
       this.activePortsCount = Object.keys(data).length;
+    },
+    showSuccessSnackbar(content) {
+      this.snackbar = true;
+      this.snackbarColor = "success";
+      this.snackbarContent = content;
+    },
+    showErrorSnackbar(content) {
+      this.snackbar = true;
+      this.snackbarColor = "error";
+      this.snackbarContent = content;
     }
   },
   created: function() {
@@ -122,7 +136,9 @@ export default {
             this.adminsCount = adminsCount;
           })
           .catch(error => {
-            console.warn("in getAdminsCount(),error :", error);
+            this.adminsCount = "NaN";
+            this.showErrorSnackbar(error);
+            // console.warn("in getAdminsCount(),error :", error);
           });
         AgentsServices.getAgentsCount()
           .then(result => {
@@ -130,12 +146,15 @@ export default {
             this.agentsCount = result;
           })
           .catch(error => {
-            this.agentsCount = "?";
-            console.warn("in getAgentsCount(),error :", error);
+            this.agentsCount = "NaN";
+            this.showErrorSnackbar(error);
+            // console.warn("in getAgentsCount(),error :", error);
           });
       })
       .catch(error => {
-        console.warn("in getConversionsCount(),error :", error);
+        this.conversionsCount = "NaN";
+        this.showErrorSnackbar(error);
+        // console.warn("in getConversionsCount(),error :", error);
       });
   }
 };

@@ -201,7 +201,8 @@ export default {
           this.items[2].children = temp;
         })
         .catch(error => {
-          console.warn(error);
+          // console.warn(error);
+          this.showErrorSnackbar(error);
         });
     },
     displayImage(name, path) {

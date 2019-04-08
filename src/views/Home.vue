@@ -75,7 +75,7 @@
       </div>
       <v-divider></v-divider>
       <v-list class="pt-0" dense>
-        <v-list-group v-if="portsList.length != 0" prepend-icon="fas fa-parking" value="true">
+        <v-list-group v-if="portsCount != 0" prepend-icon="fas fa-parking" value="true">
           <template v-slot:activator>
             <v-list-tile>
               <v-list-tile-title>Ports</v-list-tile-title>
@@ -390,14 +390,14 @@ export default {
   }),
   sockets: {
     connect() {
-      console.log("socket connected");
+      // console.log("socket connected");
     },
     onPortsListChanged(newListObject) {
-      console.log("newListObject :", newListObject);
+      // console.log("newListObject :", newListObject);
       this.onActiveCallback(newListObject);
     },
     onSinglePortData(data) {
-      console.log("data :", data);
+      // console.log("data :", data);
       this.onSinglePortDataCallback(data);
     }
   },
@@ -408,10 +408,10 @@ export default {
       this.portConsoleTxt.unshift("-> data received: " + data.data);
     },
     onActiveCallback(data) {
-      const count = Object.keys(data).length;
-      window.localStorage.setItem("portsCount", count);
+      this.portsCount = Object.keys(data).length;
+      // window.localStorage.setItem("portsCount", count);
       let newList = [];
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < this.portsCount; i++) {
         newList.push(data[i + 1]);
       }
       if (
@@ -505,7 +505,7 @@ export default {
           this.flushPortDis = false;
         })
         .catch(error => {
-          console.warn(error);
+          // console.warn(error);
           this.portConsoleTxt.unshift("Error occurred: " + error);
           this.showErrorSnackbar(error);
         });
@@ -553,7 +553,7 @@ export default {
           this.isSelectedPortOpened = isOpen;
           PortsServices.isPortActive(portObject.comName)
             .then(isPortActive => {
-              console.log("isPortActive :", isPortActive);
+              // console.log("isPortActive :", isPortActive);
               if (isPortActive) {
                 this.flushPortDis = true;
                 this.pausePortDis = true;
@@ -563,9 +563,9 @@ export default {
               }
             })
             .catch(error => {
-              console.warn(error);
+              // console.warn(error);
               this.showErrorSnackbar(
-                "Error while checking port activeness status!"
+                "Error while checking port activeness status!" + error
               );
             });
           if (isOpen) {
@@ -577,8 +577,10 @@ export default {
           }
         })
         .catch(error => {
-          console.warn(error);
-          this.showErrorSnackbar("Error while checking port open status!");
+          // console.warn(error);
+          this.showErrorSnackbar(
+            "Error while checking port open status!" + error
+          );
         });
       this.doShowPortPanel = true;
     },
@@ -618,7 +620,7 @@ export default {
     PortsServices.getConnectedPortsList()
       .then(result => {
         this.portsCount = result.count;
-        this.portsList = result.ports;
+        if (result.count != 0) this.portsList = result.ports;
       })
       .catch(error => {
         this.showErrorSnackbar(error);
