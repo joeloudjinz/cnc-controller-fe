@@ -4,7 +4,7 @@ import Home from './views/Home.vue';
 import Login from "./views/Login.vue";
 import Dashboard from "./views/Dashboard.vue";
 import Agents from "./views/Agents.vue";
-import Images from './views/Images.vue';
+import Images from './views/Images.vue'; //? for converter page
 import Resources from './views/Resources.vue';
 
 
@@ -28,7 +28,7 @@ const router = new Router({
           component: Agents
         },
         {
-          path: 'images',
+          path: 'converter',
           component: Images
         },
         {

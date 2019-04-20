@@ -47,7 +47,7 @@
               <v-list-tile-title>Agents</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
-          <v-list-tile to="/images">
+          <v-list-tile to="/converter">
             <v-list-tile-action>
               <v-icon left>fas fa-recycle</v-icon>
             </v-list-tile-action>
@@ -131,7 +131,7 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template #activator="data">
-            <v-btn v-on="data.on" flat to="/images" class="m-0">Converter</v-btn>
+            <v-btn v-on="data.on" flat to="/converter" class="m-0">Converter</v-btn>
           </template>
           <span>Convert image into gcode and transmit the file to machine</span>
         </v-tooltip>
