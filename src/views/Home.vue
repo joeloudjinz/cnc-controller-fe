@@ -359,7 +359,6 @@
     >{{ snackbarContent }}</v-snackbar>
   </v-app>
 </template>
-
 <script>
 import AuthServices from "@/services/auth.js";
 import AgentServices from "@/services/agent.js";
@@ -417,8 +416,6 @@ export default {
       this.onSinglePortDataCallback(data);
     }
   },
-  // mounted() {},
-  // beforeDestroy() {},
   methods: {
     onSinglePortDataCallback(data) {
       this.portConsoleTxt.unshift("-> data received: " + data.data);
@@ -579,24 +576,25 @@ export default {
       }
     },
     showPortPanel(portObject) {
-      //TODO: check if the port is active or not before opening the Panel
       this.selectedPortObject = portObject;
       PortsServices.isPortOpen(portObject.comName)
         .then(isOpen => {
           this.isSelectedPortOpened = isOpen;
           PortsServices.isPortActive(portObject.comName)
             .then(isPortActive => {
-              // console.log("isPortActive :", isPortActive);
               if (isPortActive) {
-                this.flushPortDis = true;
-                this.pausePortDis = true;
-                this.resumePortDis = true;
-                this.openPortDis = true;
-                this.closePortDis = true;
+                this.doShowPortPanel = false;
+                this.showErrorSnackbar("The port is already active, you can't use the panel");
+                // this.flushPortDis = true;
+                // this.pausePortDis = true;
+                // this.resumePortDis = true;
+                // this.openPortDis = true;
+                // this.closePortDis = true;
+              }else{
+                this.doShowPortPanel = true;
               }
             })
             .catch(error => {
-              // console.warn(error);
               this.showErrorSnackbar(
                 "Error while checking port activeness status!" + error
               );
@@ -615,7 +613,7 @@ export default {
             "Error while checking port open status!" + error
           );
         });
-      this.doShowPortPanel = true;
+      // this.doShowPortPanel = true;
     },
     clearPortConsole() {
       this.portConsoleTxt = [];
