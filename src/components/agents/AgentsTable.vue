@@ -120,7 +120,6 @@
   </v-card>
 </template>
 <script>
-// import axios from "axios";
 import AgentServices from "@/services/agent.js";
 export default {
   data() {
@@ -131,8 +130,6 @@ export default {
       loadingPass: true,
       loading: true,
       confirmeDeleteDialog: false,
-      // the selected items ....
-      // selected: [],
       headers: [
         { text: "#", value: "index" },
         // { text: "Priviliges", value: "is_admin" },
@@ -172,12 +169,10 @@ export default {
     showConfirmDeleteDialog(id) {
       this.confirmeDeleteDialog = true;
       this.selectedAgentId = id;
-      // console.log("selectedAgentId :", this.selectedAgentId);
     },
     cancelConfirmDeleteDialog() {
       this.confirmeDeleteDialog = false;
       this.selectedAgentId = -1;
-      // console.log("selectedAgentId :", this.selectedAgentId);
     },
     deleteAgent() {
       if (this.selectedAgentId == -1) {
@@ -185,10 +180,14 @@ export default {
       } else {
         AgentServices.deleteAgentById(this.selectedAgentId)
           .then(result => {
-            this.cancelConfirmDeleteDialog(); //! judt to hide it
-            this.agents = [];
+            console.log(this.selectedAgentId);
+            for (let i = 0; i < this.agents.length; i++) {
+              if (this.agents[i].id == this.selectedAgentId) {
+                this.agents.splice(i, 1);
+              }
+            }
+            this.cancelConfirmDeleteDialog(); //! just to hide it
             this.showSuccessSnackbar(result);
-            this.refrechAgentsList();
           })
           .catch(error => {
             this.showErrorSnackbar(error);
@@ -197,7 +196,6 @@ export default {
       }
     },
     resetPassword(id) {
-      // console.log(id);
       this.dialog = true;
       AgentServices.resetAgentPassword(id)
         .then(result => {
