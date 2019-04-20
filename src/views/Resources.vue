@@ -53,6 +53,27 @@
       <v-flex xs12 sm12 md8 lg8 v-show="doShowDisplayCard" pa-2>
         <v-toolbar card class="teal white--text">
           <h2>{{currentFileName}}</h2>
+          <v-spacer></v-spacer>
+          <div v-if="doShowDeleteDirectoryBtn">
+            <v-tooltip bottom>
+              <template #activator="data">
+                <v-btn v-on="data.on" icon @click="deleteOutputDirectory()">
+                  <v-icon color="white">fas fa-folder-minus</v-icon>
+                </v-btn>
+              </template>
+              <span>Delete the current directory</span>
+            </v-tooltip>
+          </div>
+          <div v-if="doShowDeleteFileBtn">
+            <v-tooltip bottom>
+              <template #activator="data">
+                <v-btn v-on="data.on" icon @click="deleteSelectedFile()">
+                  <v-icon color="white">fas fa-trash-alt</v-icon>
+                </v-btn>
+              </template>
+              <span>Delete the current file</span>
+            </v-tooltip>
+          </div>
         </v-toolbar>
         <v-card height="842" color="teal lighten-5" class="scroll">
           <!-- To display gcode file content -->
@@ -90,18 +111,26 @@
             flat
             class="teal--text text--darken-2"
             :disabled="!doShowLoadingBtns"
-            @click="loadMoreLines()"
-          >Load more lines</v-btn>
+            @click="loadAllLines()"
+          >Load All</v-btn>
           <v-spacer></v-spacer>
           <v-btn
             color="teal"
             class="white--text"
             :disabled="!doShowLoadingBtns"
-            @click="loadAllLines()"
-          >Load All</v-btn>
+            @click="loadMoreLines()"
+          >Load more lines</v-btn>
         </v-card-actions>
       </v-flex>
     </v-fade-transition>
+    <!-- Main Snackbar -->
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="5000"
+      :bottom="'bottom'"
+      :color="snackbarColor"
+      :multi-line="'multi-line'"
+    >{{ snackbarContent }}</v-snackbar>
   </v-layout>
 </template>
 <script>
@@ -141,6 +170,18 @@ export default {
     snackbar: false
   }),
   computed: {
+    doShowDeleteFileBtn() {
+      return (
+        this.currentFileName != undefined &&
+        this.currentFileName.includes(".gcode")
+      );
+    },
+    doShowDeleteDirectoryBtn() {
+      return (
+        this.currentFileName != undefined &&
+        this.currentFileName.includes(".log")
+      );
+    },
     doShowDisplayCard() {
       return this.gcodeData.length != 0 || this.logData.length != 0;
     },
@@ -273,6 +314,52 @@ export default {
         this.gcodeData.push(...newLines);
         this.stoppedIn = this.fullGcodeData.length;
       }
+    },
+    deleteSelectedFile() {
+      if (this.currentFileName) {
+        if (this.currentFileName.includes(".gcode")) {
+          if (this.currentFileName.includes("clean")) {
+            // delete from output directory
+          } else {
+            FileServices.deleteGcodeFile(this.currentFileName)
+              .then(() => {
+                console.log("File deleted");
+                for (let i = 0; i < this.items[1].children.length; i++) {
+                  if (this.items[1].children[i].name == this.currentFileName) {
+                    this.items[1].children.splice(i, 1);
+                    break;
+                  }
+                }
+                this.gcodeData = [];
+                this.showSuccessSnackbar("File was deleted successfully");
+              })
+              .catch(error => {
+                this.showErrorSnackbar(error);
+              });
+          }
+        } else {
+          console.log("it's log file", this.currentFileName);
+        }
+      } else {
+        this.showErrorSnackbar("File name is undefined");
+      }
+    },
+    deleteOutputDirectory() {
+      const dirName = this.currentFileName.split(".")[0];
+      FileServices.deleteOutputDirectory(dirName)
+        .then(() => {
+          for (let i = 0; i < this.items[2].children.length; i++) {
+            if (this.items[2].children[i].name == dirName) {
+              this.items[2].children.splice(i, 1);
+              break;
+            }
+          }
+          this.logData = [];
+          this.showSuccessSnackbar("Directory deleted successfully");
+        })
+        .catch(error => {
+          this.showErrorSnackbar(error);
+        });
     },
     showSuccessSnackbar(content) {
       this.snackbar = true;

@@ -96,6 +96,70 @@ class FileServices {
             });
         });
     }
+    static deleteGcodeFile(fileName) {
+        return new Promise((resolve, reject) => {
+            axios.delete(url + "/gcodes", {
+                params: {
+                    fileName
+                }
+            }).then((result) => {
+                resolve(result.data);
+            }).catch((error) => {
+                if (error.response) {
+                    if (error.response.status == 406) {
+                        AgentServices.RefreshToken()
+                            .then(() => {
+                                resolve(AgentServices.deleteGcodeFile(fileName));
+                            })
+                            .catch(error => {
+                                reject(error);
+                            });
+                    } else {
+                        //? The request was made and the server responded with a status code
+                        //? that falls out of the range of 2xx
+                        reject(error.response.data.failure);
+                    }
+                } else if (error.request) {
+                    reject("Check you internet connection!");
+                } else {
+                    //? Something happened in setting up the request that triggered an Error
+                    reject(error.message);
+                }
+            });
+        });
+    }
+    static deleteOutputDirectory(dirName) {
+        return new Promise((resolve, reject) => {
+            axios.delete(url + "/outputs", {
+                params: {
+                    dirName
+                }
+            }).then((result) => {
+                resolve(result.data);
+            }).catch((error) => {
+                if (error.response) {
+                    if (error.response.status == 406) {
+                        AgentServices.RefreshToken()
+                            .then(() => {
+                                resolve(AgentServices.deleteOutputDirectory(dirName));
+                            })
+                            .catch(error => {
+                                reject(error);
+                            });
+                    } else {
+                        //? The request was made and the server responded with a status code
+                        //? that falls out of the range of 2xx
+                        reject(error.response.data.failure);
+                    }
+                } else if (error.request) {
+                    reject("Check you internet connection!");
+                } else {
+                    //? Something happened in setting up the request that triggered an Error
+                    reject(error.message);
+                }
+            });
+        });
+    }
 }
 
 export default FileServices;
