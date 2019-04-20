@@ -169,7 +169,11 @@
       >
         <v-card>
           <v-toolbar dark color="teal lighten-1">
-            <v-btn icon dark @click="doShowPortPanel = false">
+            <v-btn
+              icon
+              dark
+              @click="openPortDis == true ? leavePortPanelDialog = true : doShowPortPanel = false"
+            >
               <v-icon>close</v-icon>
             </v-btn>
             <v-toolbar-title>Port Panel</v-toolbar-title>
@@ -310,6 +314,22 @@
         </v-card>
       </v-dialog>
     </v-layout>
+    <!-- Leave Port panel Dialog -->
+    <v-dialog v-model="leavePortPanelDialog" persistent max-width="600px">
+      <v-card>
+        <v-card-title class="teal darken-2 white--text">
+          <span class="headline">Leave Port Panel</span>
+        </v-card-title>
+        <v-card-text>
+          <p>The port will be closed after leaving Port Panel, are you sure you want to leave?</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn color="white" class="teal--text" @click="leavePortPanelDialog = false">Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="teal" class="white--text" @click="closePortPanelDialog()">Leave</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <!-- Edit Profile Data Dialog -->
     <v-dialog v-model="editProfileDialog" persistent max-width="600px">
       <v-card>
@@ -362,7 +382,7 @@ export default {
       window.localStorage.getItem("first_name"),
     isAdmin: false,
     editProfileDialog: false,
-    drawer: true,
+    drawer: false,
     right: null,
     //? snackbar details ...
     snackbarContent: "",
@@ -372,6 +392,7 @@ export default {
     doShowPortPanel: false,
     selectedPortObject: undefined,
     //? to enable and disable control btns of port console panel
+    leavePortPanelDialog: false,
     flushPortDis: true,
     pausePortDis: true,
     resumePortDis: true,
@@ -381,11 +402,6 @@ export default {
     writeToPortTextField: "",
     writeToPortProgress: false,
     writeToPortProgressValue: "",
-    //? for pusher channels
-    isOnActiveBinded: false,
-    isOnPortDataBinded: false,
-    pusher: undefined,
-    portsChannel: undefined,
     portConsoleTxt: []
   }),
   sockets: {
@@ -425,6 +441,22 @@ export default {
         this.selectedPortObject = undefined;
       }
       this.portsList = newList;
+    },
+    closePortPanelDialog() {
+      PortsServices.closePort(this.selectedPortObject.comName)
+        .then(() => {
+          this.leavePortPanelDialog = false;
+          this.doShowPortPanel = false;
+          this.openPortDis = true;
+          this.resumePortDis = true;
+          this.closePortDis = false;
+          this.pausePortDis = false;
+          this.flushPortDis = false;
+        })
+        .catch(error => {
+          this.portConsoleTxt.unshift("Error occurred: " + error);
+          this.showErrorSnackbar(error);
+        });
     },
     performLogout() {
       let id = localStorage.getItem("id");
@@ -547,6 +579,7 @@ export default {
       }
     },
     showPortPanel(portObject) {
+      //TODO: check if the port is active or not before opening the Panel
       this.selectedPortObject = portObject;
       PortsServices.isPortOpen(portObject.comName)
         .then(isOpen => {

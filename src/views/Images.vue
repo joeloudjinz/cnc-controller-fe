@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-container fluid wrap mt-0 pa-0>
     <!-- Toolbar -->
     <!-- <v-flex xs12>
       <v-toolbar color="teal" dark>
@@ -13,12 +13,12 @@
     <!-- Content -->
     <v-alert
       :value="isTransmissionProcessActive"
-      type="error"
-    >There is already a process going on, so you can't use this page again until that process is finished</v-alert>
+      color="error"
+    >Transmission process is going on, some functionalities are disabled until it's over</v-alert>
     <v-layout justify-center row wrap>
       <!-- Image Upload and display Section -->
-      <v-flex d-flex xs12 sm12 md12 lg8 pa-1>
-        <v-card>
+      <v-flex d-felx xs12 sm12 md12 lg8 pa-1>
+        <v-card max-height="760">
           <v-card-text>
             <input
               type="file"
@@ -28,7 +28,7 @@
               ref="selectImageRef"
             >
             <div id="preview">
-              <img v-if="url" :src="url">
+              <v-img contain max-height="650" v-if="url" :src="url"></v-img>
             </div>
           </v-card-text>
           <v-card-actions>
@@ -470,11 +470,11 @@
         <v-card-text class="py-0 px-0">
           <v-progress-linear v-if="portsListProgress" :indeterminate="true" color="teal"></v-progress-linear>
           <v-container grid-list-sm>
-            <v-alert
-              :value="true"
-              type="info"
-              class="mb-2"
-            >This operation will send the generated gcode file to the machine over the selected port and it will start drawing the coordinates the process will take to much time (1s for each line of code), you can monitor the whole process and the incoming data from the console below.</v-alert>
+            <v-alert :value="true" color="teal darken-4" class="mb-2">
+              This operation will send the generated gcode file to the machine over the selected port and it will start drawing the coordinates,
+              the process will take too much time (1s for each line of code),
+              you can monitor the whole process and the incoming data from the consoles.
+            </v-alert>
             <p class="title">Chose port:</p>
             <v-alert
               :value="isTransmissionProcessActive"
@@ -522,9 +522,12 @@
     <v-snackbar
       v-model="scaleAccessSnackbar"
       :timeout="0"
-      :bottom="'bottom'"
-      :color="'teal darkren-4'"
-      :multi-line="'multi-line'"
+      bottom
+      right
+      color="teal darken-4"
+      multi-line
+      auto-height
+      class="mb-2 white--text"
     >For Scale Axes use the height value of the image, you can multiply it by a number to apply scale up, or divide it by a number to apply scale down</v-snackbar>
     <!-- Main Snackbar -->
     <v-snackbar
@@ -534,7 +537,7 @@
       :color="snackbarColor"
       :multi-line="'multi-line'"
     >{{ snackbarContent }}</v-snackbar>
-  </div>
+  </v-container>
 </template>
 <script>
 import ConversionServices from "@/services/conversion.js";
@@ -621,15 +624,23 @@ export default {
     resumePortDis: true
   }),
   sockets: {
-    connect() {
-      // console.log("socket connected");
-    },
     onPortData(data) {
       // console.log("data :", data);
       this.onPortDataCallback(data.data);
     },
     onTransmissionLog(data) {
       this.onTransmissionLogCallback(data.data);
+    },
+    onServerStatusChanged(data) {
+      let status = data.status;
+      this.isTransmissionProcessActive = status;
+      this.stopSendDis = !status;
+      this.pauseSendDis = !status;
+      if (!status) {
+        this.showSuccessSnackbar(
+          "Transmission of file " + this.fileName + " Has been completed"
+        );
+      }
     }
   },
   created() {
@@ -658,12 +669,6 @@ export default {
         // console.warn("data is empty!");
       } else {
         this.transmissionConsoleTxt.unshift(data);
-        if (data.includes("All lines has been sent")) {
-          this.showSuccessSnackbar(
-            "Transmission of file " + this.fileName + " Has been completed"
-          );
-          this.isTransmissionProcessActive = false;
-        }
       }
     },
     handleOnBeforeUnload(event) {
@@ -764,7 +769,7 @@ export default {
       PortsServices.getConnectedPortsList()
         .then(result => {
           this.portsListProgress = false;
-          this.isTransmissionProcessActive = result.isServerActive;
+          // this.isTransmissionProcessActive = result.isServerActive;
           if (result.count !== 0) {
             this.portsList = result.ports;
           }
@@ -940,10 +945,10 @@ export default {
   align-items: center;
 }
 
-#preview img {
+/* #preview img {
   width: 600px;
   max-height: 900px;
-}
+} */
 .custom-loader {
   animation: loader 1s infinite;
   display: flex;

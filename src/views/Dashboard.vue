@@ -80,16 +80,13 @@
         </v-card-actions>
       </v-card>
     </v-flex>
-    <!-- Images Directory Component
-    <v-flex xs12>
-      <ImagesDirVue/>
-    </v-flex>-->
   </v-layout>
 </template>
 
 <script>
 import ConversionServices from "@/services/conversion.js";
 import AgentsServices from "@/services/agent.js";
+import PortsServices from "@/services/ports.js";
 export default {
   name: "dashboard",
   data() {
@@ -134,6 +131,13 @@ export default {
         AgentsServices.getAdminsCount()
           .then(adminsCount => {
             this.adminsCount = adminsCount;
+            PortsServices.getConnectedPortsList()
+              .then(result => {
+                this.activePortsCount = result.count;
+              })
+              .catch(error => {
+                this.showErrorSnackbar(error);
+              });
           })
           .catch(error => {
             this.adminsCount = "NaN";
