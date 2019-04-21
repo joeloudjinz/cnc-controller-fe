@@ -13,7 +13,7 @@ class FileServices {
                     if (error.response.status == 406) {
                         AgentServices.RefreshToken()
                             .then(() => {
-                                resolve(AgentServices.getDirectoryTree());
+                                resolve(FileServices.getDirectoryTree());
                             })
                             .catch(error => {
                                 reject(error);
@@ -45,7 +45,7 @@ class FileServices {
                     if (error.response.status == 406) {
                         AgentServices.RefreshToken()
                             .then(() => {
-                                resolve(AgentServices.getImageData(path));
+                                resolve(FileServices.getImageData(path));
                             })
                             .catch(error => {
                                 reject(error);
@@ -77,7 +77,7 @@ class FileServices {
                     if (error.response.status == 406) {
                         AgentServices.RefreshToken()
                             .then(() => {
-                                resolve(AgentServices.getFileLines(path));
+                                resolve(FileServices.getFileLines(path));
                             })
                             .catch(error => {
                                 reject(error);
@@ -109,7 +109,7 @@ class FileServices {
                     if (error.response.status == 406) {
                         AgentServices.RefreshToken()
                             .then(() => {
-                                resolve(AgentServices.deleteGcodeFile(fileName));
+                                resolve(FileServices.deleteGcodeFile(fileName));
                             })
                             .catch(error => {
                                 reject(error);
@@ -141,7 +141,39 @@ class FileServices {
                     if (error.response.status == 406) {
                         AgentServices.RefreshToken()
                             .then(() => {
-                                resolve(AgentServices.deleteOutputDirectory(dirName));
+                                resolve(FileServices.deleteOutputDirectory(dirName));
+                            })
+                            .catch(error => {
+                                reject(error);
+                            });
+                    } else {
+                        //? The request was made and the server responded with a status code
+                        //? that falls out of the range of 2xx
+                        reject(error.response.data.failure);
+                    }
+                } else if (error.request) {
+                    reject("Check you internet connection!");
+                } else {
+                    //? Something happened in setting up the request that triggered an Error
+                    reject(error.message);
+                }
+            });
+        });
+    }
+    static deleteImage(imageName) {
+        return new Promise((resolve, reject) => {
+            axios.delete(url + "/images", {
+                params: {
+                    imageName
+                }
+            }).then((result) => {
+                resolve(result.data);
+            }).catch((error) => {
+                if (error.response) {
+                    if (error.response.status == 406) {
+                        AgentServices.RefreshToken()
+                            .then(() => {
+                                resolve(FileServices.deleteImage(imageName));
                             })
                             .catch(error => {
                                 reject(error);

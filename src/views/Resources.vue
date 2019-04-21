@@ -34,12 +34,17 @@
       <v-card>
         <v-toolbar dark color="teal lighten-1">
           <v-btn icon dark @click="imageDialog = false">
-            <v-icon>close</v-icon>
+            <v-icon>fas fa-times-circle</v-icon>
           </v-btn>
           <v-toolbar-title>{{currentFileName}}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
-            <v-btn dark flat @click="imageDialog = false">Save</v-btn>
+            <v-btn dark flat @click="deleteSelectedImage()">
+              <v-icon left>fas fa-trash-alt</v-icon>Delete
+            </v-btn>
+            <v-btn dark flat @click="imageDialog = false">
+              <v-icon left>fas fa-pencil-ruler</v-icon>Draw
+            </v-btn>
           </v-toolbar-items>
         </v-toolbar>
         <v-card-text>
@@ -103,7 +108,6 @@
               </tr>
             </table>
           </v-card-text>
-          <!-- <v-divider></v-divider> -->
         </v-card>
         <!-- Card Action for gcode & log files content card -->
         <v-card-actions class="teal lighten-5 elevation-3 mt-1">
@@ -173,7 +177,8 @@ export default {
     doShowDeleteFileBtn() {
       return (
         this.currentFileName != undefined &&
-        this.currentFileName.includes(".gcode")
+        this.currentFileName.includes(".gcode") &&
+        !this.currentFileName.includes("clean")
       );
     },
     doShowDeleteDirectoryBtn() {
@@ -318,27 +323,21 @@ export default {
     deleteSelectedFile() {
       if (this.currentFileName) {
         if (this.currentFileName.includes(".gcode")) {
-          if (this.currentFileName.includes("clean")) {
-            // delete from output directory
-          } else {
-            FileServices.deleteGcodeFile(this.currentFileName)
-              .then(() => {
-                console.log("File deleted");
-                for (let i = 0; i < this.items[1].children.length; i++) {
-                  if (this.items[1].children[i].name == this.currentFileName) {
-                    this.items[1].children.splice(i, 1);
-                    break;
-                  }
+          FileServices.deleteGcodeFile(this.currentFileName)
+            .then(() => {
+              console.log("File deleted");
+              for (let i = 0; i < this.items[1].children.length; i++) {
+                if (this.items[1].children[i].name == this.currentFileName) {
+                  this.items[1].children.splice(i, 1);
+                  break;
                 }
-                this.gcodeData = [];
-                this.showSuccessSnackbar("File was deleted successfully");
-              })
-              .catch(error => {
-                this.showErrorSnackbar(error);
-              });
-          }
-        } else {
-          console.log("it's log file", this.currentFileName);
+              }
+              this.gcodeData = [];
+              this.showSuccessSnackbar("File was deleted successfully");
+            })
+            .catch(error => {
+              this.showErrorSnackbar(error);
+            });
         }
       } else {
         this.showErrorSnackbar("File name is undefined");
@@ -356,6 +355,22 @@ export default {
           }
           this.logData = [];
           this.showSuccessSnackbar("Directory deleted successfully");
+        })
+        .catch(error => {
+          this.showErrorSnackbar(error);
+        });
+    },
+    deleteSelectedImage() {
+      FileServices.deleteImage(this.currentFileName)
+        .then(() => {
+          for (let i = 0; i < this.items[0].children.length; i++) {
+            if (this.items[0].children[i].name == this.currentFileName) {
+              this.items[0].children.splice(i, 1);
+              break;
+            }
+          }
+          this.imageDialog = false;
+          this.showSuccessSnackbar("Image deleted successfully");
         })
         .catch(error => {
           this.showErrorSnackbar(error);
