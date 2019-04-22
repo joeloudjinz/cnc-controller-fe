@@ -39,7 +39,7 @@
           <v-toolbar-title>{{currentFileName}}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
-            <v-btn dark flat @click="confirmFileDeletionDialog = true">
+            <v-btn dark flat @click="showDeleteFileConfirmationDialog = true">
               <v-icon left>fas fa-trash-alt</v-icon>Delete
             </v-btn>
             <v-btn dark flat @click="imageDialog = false">
@@ -49,7 +49,7 @@
         </v-toolbar>
         <v-card-text>
           <div id="preview">
-            <img :src="imageURL">
+            <v-img :src="imageURL" contain max-height="600"/>
           </div>
         </v-card-text>
       </v-card>
@@ -62,7 +62,7 @@
           <div v-if="doShowDeleteDirectoryBtn">
             <v-tooltip bottom>
               <template #activator="data">
-                <v-btn v-on="data.on" icon @click="confirmFileDeletionDialog = true">
+                <v-btn v-on="data.on" icon @click="showDeleteFileConfirmationDialog = true">
                   <v-icon color="white">fas fa-folder-minus</v-icon>
                 </v-btn>
               </template>
@@ -72,7 +72,7 @@
           <div v-if="doShowDeleteFileBtn">
             <v-tooltip bottom>
               <template #activator="data">
-                <v-btn v-on="data.on" icon @click="confirmFileDeletionDialog = true">
+                <v-btn v-on="data.on" icon @click="showDeleteFileConfirmationDialog = true">
                   <v-icon color="white">fas fa-trash-alt</v-icon>
                 </v-btn>
               </template>
@@ -128,7 +128,7 @@
       </v-flex>
     </v-fade-transition>
     <!-- File Deletion Confirmation -->
-    <v-dialog v-model="confirmFileDeletionDialog" persistent width="500">
+    <v-dialog v-model="showDeleteFileConfirmationDialog" persistent width="500">
       <v-card color="white" dark>
         <v-card-title class="error white--text headline">Agent Delete Confirmation</v-card-title>
         <v-divider></v-divider>
@@ -138,13 +138,13 @@
           <p v-else>Are you sure you want to delete this image?</p>
         </v-card-text>
         <v-card-actions>
-          <v-btn flat @click="confirmFileDeletionDialog = false" class="grey--text lighten-1">Cancel</v-btn>
-          <v-spacer></v-spacer>
           <v-btn
-            @click="selecteDeletionType()"
-            color="red lighten-1"
-            class="white--text"
-          >Delete</v-btn>
+            flat
+            @click="showDeleteFileConfirmationDialog = false"
+            class="grey--text lighten-1"
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn @click="selecteDeletionType()" color="red lighten-1" class="white--text">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -189,7 +189,7 @@ export default {
     fullLogData: [],
     stoppedIn: 0,
     logURL: undefined,
-    confirmFileDeletionDialog: false,
+    showDeleteFileConfirmationDialog: false,
     //? snackbar details ...
     snackbarContent: "",
     snackbarColor: "",
@@ -243,7 +243,7 @@ export default {
       } else {
         this.deleteSelectedImage();
       }
-      this.confirmFileDeletionDialog = false;
+      this.showDeleteFileConfirmationDialog = false;
     },
     getResourcesDirDetails() {
       FileServices.getDirectoryTree()

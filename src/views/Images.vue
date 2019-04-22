@@ -1,54 +1,51 @@
 <template>
-  <v-container fluid wrap mt-0 pa-0>
-    <!-- Toolbar -->
-    <!-- <v-flex xs12>
-      <v-toolbar color="teal" dark>
-        <v-toolbar-title>Image Conversion</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn icon>
-          <v-icon>more_vert</v-icon>
-        </v-btn>
-      </v-toolbar>
-    </v-flex>-->
-    <!-- Content -->
+  <v-container fluid wrap pa-1 ma-0>
     <v-alert
       :value="isTransmissionProcessActive"
       color="error"
     >Transmission process is going on, some functionalities are disabled until it's over</v-alert>
-    <v-layout justify-center row wrap>
+    <!-- Image upload form -->
+    <v-layout row wrap>
       <!-- Image Upload and display Section -->
       <v-flex d-felx xs12 sm12 md12 lg8 pa-1>
-        <v-card max-height="760">
-          <v-card-text>
-            <input
-              type="file"
-              @change="fileIsSelected"
-              accept=".png, .jpg, .jpeg"
-              style="display: none"
-              ref="selectImageRef"
-            >
-            <div id="preview">
-              <v-img contain max-height="650" v-if="url" :src="url"></v-img>
-            </div>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn
-              flat
-              @click="clear"
-              :disabled="isConversionActive || isTransmissionProcessActive"
-              color="teal darken-4"
-            >Clear</v-btn>
-            <v-spacer></v-spacer>
-            <v-fade-transition>
-              <v-btn
-                color="teal"
-                class="white--text"
-                :disabled="isTransmissionProcessActive || isConversionActive"
-                v-show="selectedFile == null"
-                @click="$refs.selectImageRef.click()"
-              >Select</v-btn>
-            </v-fade-transition>
-          </v-card-actions>
+        <v-card>
+          <v-container px-0 pb-0 pt-4>
+            <v-card color="transparent" class="elevation-0">
+              <v-layout align-center justify-center row fill-height>
+                <v-card-text>
+                  <input
+                    type="file"
+                    @change="fileIsSelected"
+                    accept=".png, .jpg, .jpeg"
+                    style="display: none"
+                    ref="selectImageRef"
+                  >
+                  <div id="preview">
+                    <!--  -->
+                    <v-img contain max-height="650" v-if="url" :src="url"></v-img>
+                  </div>
+                </v-card-text>
+              </v-layout>
+              <v-card-actions>
+                <v-btn
+                  flat
+                  @click="clear"
+                  :disabled="isConversionActive || isTransmissionProcessActive"
+                  color="teal darken-4"
+                >Clear</v-btn>
+                <v-spacer></v-spacer>
+                <v-fade-transition>
+                  <v-btn
+                    color="teal"
+                    class="white--text"
+                    :disabled="isTransmissionProcessActive || isConversionActive"
+                    v-show="selectedFile == null"
+                    @click="$refs.selectImageRef.click()"
+                  >Select</v-btn>
+                </v-fade-transition>
+              </v-card-actions>
+            </v-card>
+          </v-container>
         </v-card>
       </v-flex>
       <!-- Parameters Section -->
@@ -150,167 +147,234 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <!-- Conversion Results panel -->
-    <v-layout v-if="displayRsultes == true" v-show="displayRsultes" justify-center row wrap pa-1>
-      <v-flex d-flex xs12>
-        <v-toolbar color="teal" dark card dense>
-          <v-toolbar-title>Conversion Results</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-btn icon>
-            <v-icon>more_vert</v-icon>
-          </v-btn>
-          <v-btn icon @click="showResultsPanel = !showResultsPanel">
-            <v-icon>{{ showResultsPanel ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
-          </v-btn>
-        </v-toolbar>
-      </v-flex>
-      <v-flex d-flex xs12>
-        <v-fade-transition>
-          <v-card v-show="showResultsPanel">
-            <v-card-text>
-              <v-layout justify-center row wrap>
-                <!-- Old configuration -->
-                <v-flex xs12 sm12 md3 lg3 px-1>
-                  <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
-                    <v-card-text class="d-flex">
-                      <table>
-                        <header class="font-weight-bold py-2">Conversion Prameters</header>
-                        <tr>
-                          <td class="font-weight-meduim">Tool Diameter</td>
-                          <td class="align-center">{{ oldtoolDiameter }} mm</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-meduim">Sensitivity</td>
-                          <td class="align-center">{{ oldsensitivity }} mm</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-meduim">Scale Axes</td>
-                          <td class="align-center">{{ oldscaleAxes }} mm</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-meduim">Deep Step</td>
-                          <td class="align-center">{{ olddeepStep }} mm</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-meduim">Black Z</td>
-                          <td class="align-center">{{ oldblackZ }}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-meduim">White Z</td>
-                          <td class="align-center">{{ oldwhiteZ }}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-meduim">Safe Z</td>
-                          <td class="align-center">{{ oldsafeZ }}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-meduim">Safe Z</td>
-                          <td class="align-center">{{ oldsafeZ }}</td>
-                        </tr>
-                      </table>
-                    </v-card-text>
-                  </v-card>
-                </v-flex>
-                <!-- Image size & times & file information -->
-                <v-flex xs12 sm12 md5 lg5 px-1>
-                  <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
-                    <v-card-text class="d-flex">
-                      <table>
-                        <tr>
-                          <td class="font-weight-bold">Image Size:</td>
-                          <td class="align-end">{{ imegSize }}</td>
-                        </tr>
-                      </table>
-                    </v-card-text>
-                  </v-card>
-                  <v-card color="teal lighten-1" class="white--text elevation-5 mb-1">
-                    <v-card-text class="d-flex">
-                      <table>
-                        <tr>
-                          <td class="font-weight-bold">Started at</td>
-                          <td class="align-center">{{ startTime }}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold">Ended at</td>
-                          <td class="align-center">{{ endTime }}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold">Elapsed Time</td>
-                          <td class="align-center">{{ elapsedTime }} seconds</td>
-                        </tr>
-                      </table>
-                    </v-card-text>
-                  </v-card>
-                  <v-card color="teal lighten-1" class="white--text elevation-5 my-1">
-                    <v-card-text class="d-flex pb-4">
-                      <!-- <p class="font-weight-bold">GCode File Information</p> -->
-                      <table>
-                        <tr>
-                          <td class="font-weight-bold">File Name</td>
-                          <td class="align-end">{{ fileName }}</td>
-                        </tr>
-                        <tr>
-                          <td class="font-weight-bold">Size</td>
-                          <td class="align-end">{{ size }} Mb</td>
-                        </tr>
-                      </table>
-                    </v-card-text>
-                  </v-card>
-                </v-flex>
-                <!-- Proccessed black pixels progress circle -->
-                <v-flex xs12 sm12 md4 lg4 px-1>
-                  <v-card color="teal lighten-1" class="white--text elevation-5">
-                    <v-card-text class="d-flex">
-                      <v-tooltip bottom>
-                        <template #activator="data">
-                          <v-progress-circular
-                            :rotate="360"
-                            :size="220"
-                            :width="10"
-                            :value="value"
-                            color="white"
-                            v-on="data.on"
-                          >{{ value }}</v-progress-circular>
-                        </template>
-                        <span>The percentage of the proccessed black pixels in the picture</span>
-                      </v-tooltip>
-                      <v-tooltip bottom>
-                        <template #activator="data">
-                          <v-progress-circular
-                            :rotate="360"
-                            :size="150"
-                            :width="10"
-                            :value="errorValue"
-                            color="red lighten-1"
-                            v-on="data.on"
-                          >{{ errorValue }}</v-progress-circular>
-                        </template>
-                        <span>The percentage of the unproccessed black pixels in the picture</span>
-                      </v-tooltip>
-                    </v-card-text>
-                  </v-card>
-                </v-flex>
-              </v-layout>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-tooltip bottom>
-                <template #activator="data">
-                  <v-btn
-                    class="teal--text"
-                    flat
-                    v-on="data.on"
-                    @click="initializeDrawOperation()"
-                    :disabled="isTransmissionProcessActive"
-                  >
-                    <v-icon left dark>fas fa-draw-polygon</v-icon>Draw
-                  </v-btn>
-                </template>
-                <span>Send generated gcode to machine</span>
-              </v-tooltip>
-            </v-card-actions>
-          </v-card>
-        </v-fade-transition>
+    <!-- Parameters & Conversion Results panel Section -->
+    <v-layout row wrap>
+      <!-- Conversion Results panel -->
+      <v-flex d-flex xs12 sm12 md12 lg12 pa-1>
+        <v-card>
+          <v-container fluid px-0 pb-0 pt-4>
+            <v-card color="transparent elevation-0">
+              <v-fade-transition>
+                <v-card-text v-if="!displayResultsPanel">
+                  <v-layout align-center justify-center row fill-height>
+                    <dir>
+                      <v-img :src="resultsImageSrc" contain max-height="200"/>
+                      <p
+                        class="font-weight-light pt-2"
+                      >Converiosn Results will be displayed here after you convert an image</p>
+                    </dir>
+                  </v-layout>
+                </v-card-text>
+                <v-card-text v-else>
+                  <v-layout align-start justify-space-between row fill-height wrap>
+                    <v-flex xs12 sm12 md12 lg3>
+                      <v-list class="elevation-1 ma-1" subheader>
+                        <v-subheader>Used Parameters</v-subheader>
+                        <v-list-tile>
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Tool Diameter</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ oldtoolDiameter }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Sensitivity</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ oldsensitivity }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Scale Axes</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ oldscaleAxes }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Deep Step</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ olddeepStep }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >White Z</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ oldwhiteZ }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Bloack Z</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ oldblackZ }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Safe Z</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ oldsafeZ }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Image Height</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ imegSize }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                      </v-list>
+                    </v-flex>
+                    <v-flex xs12 sm12 md12 lg9>
+                      <v-layout align-start justify-space-between row fill-height wrap>
+                        <v-flex xs12 sm12 md12 lg6>
+                          <v-list class="elevation-1 ma-1" subheader>
+                            <v-subheader>Durations</v-subheader>
+                            <v-list-tile>
+                              <v-list-tile-content>
+                                <v-list-tile-title
+                                  class="font-weight-meduim teal--text text--lighten-2"
+                                >Started at</v-list-tile-title>
+                                <v-list-tile-sub-title
+                                  class="font-weight-bold teal--text text--darken-2"
+                                >{{ startTime }}</v-list-tile-sub-title>
+                              </v-list-tile-content>
+                            </v-list-tile>
+                            <v-list-tile>
+                              <v-list-tile-content>
+                                <v-list-tile-title
+                                  class="font-weight-meduim teal--text text--lighten-2"
+                                >Ended In</v-list-tile-title>
+                                <v-list-tile-sub-title
+                                  class="font-weight-bold teal--text text--darken-2"
+                                >{{ endTime }}</v-list-tile-sub-title>
+                              </v-list-tile-content>
+                            </v-list-tile>
+                            <v-list-tile>
+                              <v-list-tile-content>
+                                <v-list-tile-title
+                                  class="font-weight-meduim teal--text text--lighten-2"
+                                >Elapsed Time</v-list-tile-title>
+                                <v-list-tile-sub-title
+                                  class="font-weight-bold teal--text text--darken-2"
+                                >{{ elapsedTime }}</v-list-tile-sub-title>
+                              </v-list-tile-content>
+                            </v-list-tile>
+                          </v-list>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12 lg6>
+                          <v-list class="elevation-1 ma-1" subheader>
+                            <v-subheader>File Information</v-subheader>
+                            <v-list-tile>
+                              <v-list-tile-content>
+                                <v-list-tile-title
+                                  class="font-weight-meduim teal--text text--lighten-2"
+                                >Size</v-list-tile-title>
+                                <v-list-tile-sub-title
+                                  class="font-weight-bold teal--text text--darken-2"
+                                >{{ size }}</v-list-tile-sub-title>
+                              </v-list-tile-content>
+                            </v-list-tile>
+                            <v-list-tile>
+                              <v-list-tile-content>
+                                <v-list-tile-title
+                                  class="font-weight-meduim teal--text text--lighten-2"
+                                >Name</v-list-tile-title>
+                                <v-list-tile-sub-title
+                                  class="font-weight-bold teal--text text--darken-2"
+                                >{{ fileName }}</v-list-tile-sub-title>
+                              </v-list-tile-content>
+                            </v-list-tile>
+                          </v-list>
+                        </v-flex>
+                      </v-layout>
+                      <v-layout align-center justify-center row fill-height pt-2 wrap>
+                        <v-flex xs12 sm12 md12 lg6>
+                          <v-layout align-center justify-center row fill-height>
+                            <v-tooltip bottom>
+                              <template #activator="data">
+                                <v-progress-circular
+                                  :rotate="360"
+                                  :size="200"
+                                  :width="10"
+                                  :value="value"
+                                  color="teal lighten-1"
+                                  v-on="data.on"
+                                >{{ value }}</v-progress-circular>
+                              </template>
+                              <span>The percentage of the proccessed black pixels in the picture</span>
+                            </v-tooltip>
+                          </v-layout>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12 lg6>
+                          <v-layout align-center justify-center row fill-height>
+                            <v-tooltip bottom>
+                              <template #activator="data">
+                                <v-progress-circular
+                                  :rotate="360"
+                                  :size="200"
+                                  :width="10"
+                                  :value="errorValue"
+                                  color="red lighten-1"
+                                  v-on="data.on"
+                                >{{ errorValue }}</v-progress-circular>
+                              </template>
+                              <span>The percentage of the unproccessed black pixels in the picture</span>
+                            </v-tooltip>
+                          </v-layout>
+                        </v-flex>
+                      </v-layout>
+                    </v-flex>
+                  </v-layout>
+                </v-card-text>
+              </v-fade-transition>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-tooltip bottom>
+                  <template #activator="data">
+                    <v-btn
+                      class="teal--text"
+                      flat
+                      v-on="data.on"
+                      @click="initializeDrawOperation()"
+                      :disabled="isTransmissionProcessActive"
+                    >
+                      <v-icon left dark>fas fa-pencil-ruler</v-icon>Draw
+                    </v-btn>
+                  </template>
+                  <span>Start tranmission process to a specific port</span>
+                </v-tooltip>
+              </v-card-actions>
+            </v-card>
+          </v-container>
+        </v-card>
       </v-flex>
     </v-layout>
     <!-- Consoles Area -->
@@ -546,12 +610,13 @@ import { setTimeout } from "timers";
 export default {
   data: () => ({
     //? to display the results section
-    displayRsultes: true,
-    //? ro expand the result panel
+    displayResultsPanel: false,
+    //? to expand the result panel
     showResultsPanel: true,
     //? for image file
     selectedFile: null,
     url: require("@/assets/default.png"),
+    resultsImageSrc: require("@/assets/results.png"),
     //? for conversion button
     showConversionBtn: true,
     isConversionActive: false,
@@ -688,7 +753,7 @@ export default {
       this.selectedFile = null;
       this.url = require("@/assets/default.png");
       this.showConversionBtn = true;
-      this.displayRsultes = false;
+      this.displayResultsPanel = false;
       this.consolesArea = false;
       this.clearPortConsole();
       this.clearTransmissionConsole();
@@ -733,7 +798,7 @@ export default {
           ConversionServices.ConvertImage(fd)
             .then(result => {
               this.isConversionActive = false;
-              this.displayRsultes = true;
+              this.displayResultsPanel = true;
               this.dialog = false;
               this.oldtoolDiameter = result.toolDiameter;
               this.oldsensitivity = result.sensitivity;
