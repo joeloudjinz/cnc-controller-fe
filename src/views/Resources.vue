@@ -302,6 +302,10 @@ export default {
     onGcodeFileDeleted(data) {
       // console.log("data.fileName :", data.fileName);
       this.removeGcodeFileFormItems(data.fileName);
+    },
+    onOutputSubDirectoryDeleted(data){
+      // console.log('data.dirName :', data.dirName);
+      this.removeOutputSubdirectoryFormItems(data.dirName);
     }
   },
   computed: {
@@ -344,6 +348,14 @@ export default {
     this.getResourcesDirDetails();
   },
   methods: {
+    removeOutputSubdirectoryFormItems(dirName){
+      for (let i = 0; i < this.items[2].children.length; i++) {
+        if (this.items[2].children[i].name == dirName) {
+          this.items[2].children.splice(i, 1);
+          break;
+        }
+      }
+    },
     removeGcodeFileFormItems(fileName) {
       for (let i = 0; i < this.items[1].children.length; i++) {
         if (this.items[1].children[i].name == fileName) {
@@ -503,12 +515,7 @@ export default {
       const dirName = this.currentFileName.split(".")[0];
       FileServices.deleteOutputDirectory(dirName)
         .then(() => {
-          for (let i = 0; i < this.items[2].children.length; i++) {
-            if (this.items[2].children[i].name == dirName) {
-              this.items[2].children.splice(i, 1);
-              break;
-            }
-          }
+          // this.removeOutputSubdirectoryFormItems(dirName);
           this.logData = [];
           this.showSuccessSnackbar("Directory deleted successfully");
         })
