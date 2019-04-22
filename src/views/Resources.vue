@@ -42,7 +42,7 @@
             <v-btn dark flat @click="showDeleteFileConfirmationDialog = true">
               <v-icon left>fas fa-trash-alt</v-icon>Delete
             </v-btn>
-            <v-btn dark flat @click="imageDialog = false">
+            <v-btn dark flat @click="prepareQuickDrawOperation()">
               <v-icon left>fas fa-pencil-ruler</v-icon>Draw
             </v-btn>
           </v-toolbar-items>
@@ -127,6 +127,92 @@
         </v-card-actions>
       </v-flex>
     </v-fade-transition>
+    <!-- Params dialog -->
+    <v-dialog v-model="showConversionParamsDialog" persistent max-width="500">
+      <v-card>
+        <v-card-text>
+          <v-alert
+            :value="true"
+            color="teal darken-4"
+          >The image doesn't have a gcode file, enter paramaters to convert it first.</v-alert>
+          <v-container fluid grid-list-lg>
+            <v-flex xs12>
+              <v-subheader class="pl-0">Tool Diameter</v-subheader>
+              <v-slider
+                v-model="toolDiameter"
+                color="teal"
+                thumb-label="always"
+                min="0"
+                max="3"
+                step="0.01"
+              ></v-slider>
+            </v-flex>
+            <v-flex xs12>
+              <v-subheader class="pl-0">Sensitivity</v-subheader>
+              <v-slider
+                v-model="sensitivity"
+                color="teal"
+                thumb-label="always"
+                min="0"
+                max="1"
+                step="0.01"
+              ></v-slider>
+            </v-flex>
+            <v-layout justify-center row wrap>
+              <v-flex xs12 sm12 md6 lg6>
+                <v-text-field
+                  label="Scale Axes"
+                  persistent-hint
+                  hint="This field is required"
+                  v-model="scaleAxes"
+                  class="mt-0"
+                  type="number"
+                  :error="scaleAxesErrorState"
+                  :error-messages="scaleAxesErrorContent"
+                ></v-text-field>
+                <!-- @focus="scaleAccessSnackbar = true"
+                @focusout="scaleAccessSnackbar = false"-->
+              </v-flex>
+              <v-flex xs12 sm12 md6 lg6>
+                <v-text-field label="Deep Step" v-model="deepStep" class="mt-0" type="number"></v-text-field>
+              </v-flex>
+            </v-layout>
+            <v-layout justify-center row wrap>
+              <v-flex xs12 sm12 md4 lg4>
+                <v-text-field label="White Z" v-model="whiteZ" class="mt-0" type="number"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm12 md4 lg4>
+                <v-text-field label="Black Z" v-model="blackZ" class="mt-0" type="number"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm12 md4 lg4>
+                <v-text-field label="Safe Z" v-model="safeZ" class="mt-0" type="number"></v-text-field>
+              </v-flex>
+            </v-layout>Feed Rate
+            <v-layout justify-center row wrap>
+              <v-flex xs12 sm12 md6 lg6>
+                <v-text-field label="Work" v-model="work" class="mt-0" type="number"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm12 md6 lg6>
+                <v-text-field label="Idle" v-model="idle" class="mt-0" type="number"></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            flat
+            @click="showConversionParamsDialog = false"
+            class="teal--text lighten-1"
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            @click="startConversionProcess()"
+            color="teal lighten-1"
+            class="white--text"
+          >Convert</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <!-- File Deletion Confirmation -->
     <v-dialog v-model="showDeleteFileConfirmationDialog" persistent width="500">
       <v-card color="white" dark>
@@ -160,6 +246,8 @@
 </template>
 <script>
 import FileServices from "@/services/files.js";
+import ConversionServices from "@/services/conversion.js";
+
 export default {
   data: () => ({
     items: [
@@ -190,11 +278,32 @@ export default {
     stoppedIn: 0,
     logURL: undefined,
     showDeleteFileConfirmationDialog: false,
+    //? for params dialog --------------------
+    showConversionParamsDialog: false,
+    //? conversion params ...
+    toolDiameter: 1,
+    sensitivity: 0.95,
+    scaleAxes: 0,
+    scaleAxesErrorContent: "",
+    scaleAxesErrorState: false,
+    deepStep: -1,
+    blackZ: -2,
+    whiteZ: 0,
+    safeZ: 1,
+    work: 1200,
+    idle: 3000,
+    //? end of params dialog data ---------------------
     //? snackbar details ...
     snackbarContent: "",
     snackbarColor: "",
     snackbar: false
   }),
+  sockets: {
+    onGcodeFileDeleted(data) {
+      // console.log("data.fileName :", data.fileName);
+      this.removeGcodeFileFormItems(data.fileName);
+    }
+  },
   computed: {
     isCurrentFileGcode() {
       return (
@@ -235,9 +344,17 @@ export default {
     this.getResourcesDirDetails();
   },
   methods: {
+    removeGcodeFileFormItems(fileName) {
+      for (let i = 0; i < this.items[1].children.length; i++) {
+        if (this.items[1].children[i].name == fileName) {
+          this.items[1].children.splice(i, 1);
+          break;
+        }
+      }
+    },
     selecteDeletionType() {
       if (this.isCurrentFileGcode) {
-        this.deleteSelectedFile();
+        this.deleteGcodeFile();
       } else if (this.isCurrentFileLog) {
         this.deleteOutputDirectory();
       } else {
@@ -364,18 +481,13 @@ export default {
         this.stoppedIn = this.fullGcodeData.length;
       }
     },
-    deleteSelectedFile() {
+    deleteGcodeFile() {
       if (this.currentFileName) {
         if (this.currentFileName.includes(".gcode")) {
           FileServices.deleteGcodeFile(this.currentFileName)
             .then(() => {
-              console.log("File deleted");
-              for (let i = 0; i < this.items[1].children.length; i++) {
-                if (this.items[1].children[i].name == this.currentFileName) {
-                  this.items[1].children.splice(i, 1);
-                  break;
-                }
-              }
+              // console.log("File deleted");
+              this.removeGcodeFileFormItems(this.currentFileName);
               this.gcodeData = [];
               this.showSuccessSnackbar("File was deleted successfully");
             })
@@ -427,6 +539,60 @@ export default {
         .catch(error => {
           this.showErrorSnackbar(error);
         });
+    },
+    prepareQuickDrawOperation() {
+      // display progress dialog
+      // check the existance of the corresponding gcode file for the image
+      const splitted = this.currentFileName.split(".");
+      const gcodeFileName = splitted[0] + "." + splitted[1] + ".gcode";
+      let doesExist = false;
+      for (let i = 0; i < this.items[1].children.length; i++) {
+        if (this.items[1].children[i].name == gcodeFileName) {
+          doesExist = true;
+          break;
+        }
+      }
+      if (doesExist) {
+        // display ports list dialog
+        // display two consoles
+        //TODO remove this line of code
+        this.showErrorSnackbar("Gcode file exist already");
+      } else {
+        // display params dialog if there is no corresponding gcode file
+        this.showConversionParamsDialog = true;
+        // display progress dialog
+        // start conversion process
+      }
+    },
+    startConversionProcess() {
+      if (this.scaleAxes <= 0) {
+        this.scaleAxesErrorState = true;
+        this.scaleAxesErrorContent = "Scale Axes must be superior of 0";
+      } else {
+        // start converiosn
+        this.scaleAxesErrorState = false;
+        this.scaleAxesErrorContent = "";
+        ConversionServices.QuickConvertImage(this.currentFileName, {
+          toolDiameter: this.toolDiameter,
+          sensitivity: this.sensitivity,
+          scaleAxes: this.scaleAxes,
+          deepStep: this.deepStep,
+          blackZ: this.blackZ,
+          whiteZ: this.whiteZ,
+          safeZ: this.safeZ,
+          work: this.work,
+          idle: this.idle
+        })
+          .then(result => {
+            console.log("result :", result);
+            this.showSuccessSnackbar("Converted successfully");
+          })
+          .catch(error => {
+            console.warn(error);
+
+            this.showErrorSnackbar(error);
+          });
+      }
     },
     showSuccessSnackbar(content) {
       this.snackbar = true;
