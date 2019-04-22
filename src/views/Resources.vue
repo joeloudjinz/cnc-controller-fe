@@ -413,6 +413,14 @@ export default {
               break;
             }
           }
+          const splitted = this.currentFileName.split(".");
+          const gcodeFileName = splitted[0] + "." + splitted[1] + ".gcode";
+          for (let i = 0; i < this.items[1].children.length; i++) {
+            if (this.items[1].children[i].name == gcodeFileName) {
+              this.items[1].children.splice(i, 1);
+              break;
+            }
+          }
           this.imageDialog = false;
           this.showSuccessSnackbar("Image deleted successfully");
         })
