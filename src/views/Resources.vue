@@ -303,9 +303,12 @@ export default {
       // console.log("data.fileName :", data.fileName);
       this.removeGcodeFileFormItems(data.fileName);
     },
-    onOutputSubDirectoryDeleted(data){
+    onOutputSubDirectoryDeleted(data) {
       // console.log('data.dirName :', data.dirName);
       this.removeOutputSubdirectoryFormItems(data.dirName);
+    },
+    onImageDeleted(data) {
+      this.removeImageFromItems(data.imageName);
     }
   },
   computed: {
@@ -348,7 +351,23 @@ export default {
     this.getResourcesDirDetails();
   },
   methods: {
-    removeOutputSubdirectoryFormItems(dirName){
+    removeImageFromItems(imageName) {
+      for (let i = 0; i < this.items[0].children.length; i++) {
+        if (this.items[0].children[i].name == imageName) {
+          this.items[0].children.splice(i, 1);
+          break;
+        }
+      }
+      const splitted = imageName.split(".");
+      const gcodeFileName = splitted[0] + "." + splitted[1] + ".gcode";
+      for (let i = 0; i < this.items[1].children.length; i++) {
+        if (this.items[1].children[i].name == gcodeFileName) {
+          this.items[1].children.splice(i, 1);
+          break;
+        }
+      }
+    },
+    removeOutputSubdirectoryFormItems(dirName) {
       for (let i = 0; i < this.items[2].children.length; i++) {
         if (this.items[2].children[i].name == dirName) {
           this.items[2].children.splice(i, 1);
@@ -498,8 +517,6 @@ export default {
         if (this.currentFileName.includes(".gcode")) {
           FileServices.deleteGcodeFile(this.currentFileName)
             .then(() => {
-              // console.log("File deleted");
-              this.removeGcodeFileFormItems(this.currentFileName);
               this.gcodeData = [];
               this.showSuccessSnackbar("File was deleted successfully");
             })
@@ -515,7 +532,6 @@ export default {
       const dirName = this.currentFileName.split(".")[0];
       FileServices.deleteOutputDirectory(dirName)
         .then(() => {
-          // this.removeOutputSubdirectoryFormItems(dirName);
           this.logData = [];
           this.showSuccessSnackbar("Directory deleted successfully");
         })
@@ -526,20 +542,6 @@ export default {
     deleteSelectedImage() {
       FileServices.deleteImage(this.currentFileName)
         .then(() => {
-          for (let i = 0; i < this.items[0].children.length; i++) {
-            if (this.items[0].children[i].name == this.currentFileName) {
-              this.items[0].children.splice(i, 1);
-              break;
-            }
-          }
-          const splitted = this.currentFileName.split(".");
-          const gcodeFileName = splitted[0] + "." + splitted[1] + ".gcode";
-          for (let i = 0; i < this.items[1].children.length; i++) {
-            if (this.items[1].children[i].name == gcodeFileName) {
-              this.items[1].children.splice(i, 1);
-              break;
-            }
-          }
           this.imageDialog = false;
           this.showSuccessSnackbar("Image deleted successfully");
         })
