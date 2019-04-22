@@ -128,7 +128,7 @@
             </v-tooltip>
             <v-spacer></v-spacer>
             <v-fade-transition>
-              <v-tooltip top>
+              <v-tooltip :disabled="isTransmissionProcessActive || isConversionActive" top>
                 <template #activator="data">
                   <v-btn
                     v-show="!showConversionBtn"
@@ -147,7 +147,7 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <!-- Parameters & Conversion Results panel Section -->
+    <!-- Conversion Results panel Section -->
     <v-layout row wrap>
       <!-- Conversion Results panel -->
       <v-flex d-flex xs12 sm12 md12 lg12 pa-1>
