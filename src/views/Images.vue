@@ -1,9 +1,9 @@
 <template>
   <v-container fluid wrap pa-1 ma-0>
-    <v-alert
-      :value="isTransmissionProcessActive"
-      color="warning"
-    >Transmission process is going on, some functionalities are disabled until it's over</v-alert>
+    <v-alert :value="isTransmissionProcessActive" color="warning">
+      Transmission process is going on, some functionalities
+      are disabled until it's over
+    </v-alert>
     <!-- Image upload form -->
     <v-layout row wrap>
       <!-- Image Upload and display Section -->
@@ -452,7 +452,7 @@
                 v-show="showTranmsissionConsole"
                 color="teal lighten-4 elevation-0"
                 height="300px"
-                class="scroll"
+                class="scroll scrollbar-style"
               >
                 <v-card-text class="teal--text darken-4">
                   <table>
@@ -529,7 +529,7 @@
                 v-show="showPortConsole"
                 color="teal lighten-4 elevation-0"
                 height="300px"
-                class="scroll"
+                class="scroll scrollbar-style"
               >
                 <v-card-text class="teal--text darken-4">
                   <table>
@@ -805,7 +805,6 @@ export default {
       } else {
         if (this.selectedFile != null) {
           this.dialog = true;
-          // call th api endpoint
           const fd = new FormData();
           fd.append("image", this.selectedFile, this.selectedFile.name);
           fd.append(
@@ -825,6 +824,7 @@ export default {
           this.isConversionActive = true;
           ConversionServices.ConvertImage(fd)
             .then(result => {
+              this.showDrawBtn = true;
               this.isConversionActive = false;
               this.displayResultsPanel = true;
               this.dialog = false;
@@ -1080,6 +1080,21 @@ export default {
 }
 .scroll {
   overflow-y: auto;
+}
+.scrollbar-style::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.3);
+  background-color: #e0f2f1;
+}
+
+.scrollbar-style::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+  background-color: #004d40;
+}
+
+.scrollbar-style::-webkit-scrollbar-thumb {
+  background-color: #00695c;
 }
 .fade-enter-active,
 .fade-leave-active {

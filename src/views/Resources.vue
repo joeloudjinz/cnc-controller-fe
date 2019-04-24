@@ -4,7 +4,7 @@
       <v-toolbar card class="teal white--text">
         <h2>Resources Directory Tree</h2>
       </v-toolbar>
-      <v-card height="900" class="scroll">
+      <v-card height="900" class="scroll scrollbar-style">
         <v-card-text>
           <v-progress-linear :indeterminate="inProgress"></v-progress-linear>
           <v-treeview :items="items">
@@ -137,12 +137,12 @@
                   </v-toolbar>
                 </v-flex>
                 <v-flex d-flex xs12 sm12 md12 lg12>
-                  <v-fade-transition>
+                  <v-slide-y-transition>
                     <v-card
                       v-show="showTranmsissionConsole"
                       color="teal lighten-4 elevation-0"
                       height="300px"
-                      class="scroll"
+                      class="scroll scrollbar-style"
                     >
                       <v-card-text class="teal--text darken-4">
                         <table>
@@ -157,7 +157,7 @@
                         </table>
                       </v-card-text>
                     </v-card>
-                  </v-fade-transition>
+                  </v-slide-y-transition>
                 </v-flex>
               </v-layout>
             </v-flex>
@@ -219,12 +219,12 @@
                   </v-toolbar>
                 </v-flex>
                 <v-flex d-flex xs12 sm12 md12 lg12>
-                  <v-fade-transition>
+                  <v-slide-y-transition>
                     <v-card
                       v-show="showPortConsole"
                       color="teal lighten-4 elevation-0"
                       height="300px"
-                      class="scroll"
+                      class="scroll scrollbar-style"
                     >
                       <v-card-text class="teal--text darken-4">
                         <table>
@@ -239,7 +239,7 @@
                         </table>
                       </v-card-text>
                     </v-card>
-                  </v-fade-transition>
+                  </v-slide-y-transition>
                 </v-flex>
               </v-layout>
             </v-flex>
@@ -273,7 +273,7 @@
             </v-tooltip>
           </div>
         </v-toolbar>
-        <v-card height="842" color="teal lighten-5" class="scroll">
+        <v-card height="842" color="teal lighten-5" class="scroll scrollbar-style">
           <!-- To display gcode file content -->
           <v-card-text v-if="gcodeData.length != 0">
             <table>
@@ -663,11 +663,19 @@ export default {
       }
     },
     onGcodeFileAdded(data) {
-      console.log("data", data);
+      // console.log("data", data);
       this.items[1].children.push({
         id: this.items[1].children.length + 1,
         name: data.name,
         type: "gcode",
+        path: data.path
+      });
+    },
+    onImageAdded(data) {
+      this.items[0].children.push({
+        id: this.items[0].children.length + 1,
+        name: data.name,
+        type: "image",
         path: data.path
       });
     }
@@ -1210,7 +1218,7 @@ export default {
   }
 };
 </script>
-<style>
+<style scopped>
 .scroll {
   overflow-y: auto;
 }
@@ -1218,5 +1226,20 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.scrollbar-style::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.3);
+  background-color: #e0f2f1;
+}
+
+.scrollbar-style::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+  background-color: #004d40;
+}
+
+.scrollbar-style::-webkit-scrollbar-thumb {
+  background-color: #00695c;
 }
 </style>
