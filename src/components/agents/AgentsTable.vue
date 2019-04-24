@@ -180,7 +180,7 @@ export default {
       } else {
         AgentServices.deleteAgentById(this.selectedAgentId)
           .then(result => {
-            console.log(this.selectedAgentId);
+            // console.log(this.selectedAgentId);
             for (let i = 0; i < this.agents.length; i++) {
               if (this.agents[i].id == this.selectedAgentId) {
                 this.agents.splice(i, 1);

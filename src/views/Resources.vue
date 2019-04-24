@@ -906,8 +906,8 @@ export default {
       }
     },
     deleteGcodeFile(gcodeFileName) {
-      console.log("deleteGcodeFile() is called");
-      console.log("gcodeFileName :", gcodeFileName);
+      // console.log("deleteGcodeFile() is called");
+      // console.log("gcodeFileName :", gcodeFileName);
       if (gcodeFileName != undefined) {
         if (this.currentFileName.includes(".gcode")) {
           FileServices.deleteGcodeFile(gcodeFileName)
@@ -1050,7 +1050,7 @@ export default {
           .then(result => {
             this.showConversionProgress = false;
             this.showConversionResultAlert = true;
-            console.log("result :", result);
+            // console.log("result :", result);
             this.proccessBlackPixelsValue = 100 - result;
             this.unproccessBlackPixelsValue = result;
             this.showSuccessSnackbar("Converted successfully");
