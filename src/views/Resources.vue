@@ -30,23 +30,39 @@
         </v-card-text>
       </v-card>
     </v-flex>
-    <v-dialog v-model="imageDialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+    <v-dialog v-model="imagePanel" fullscreen hide-overlay transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark color="teal lighten-1">
-          <v-btn icon dark @click="imageDialog = false">
+          <v-btn
+            :disabled="isTransmissionProcessActive"
+            icon
+            dark
+            @click="prepareToCloseImagePanel()"
+          >
             <v-icon>fas fa-times-circle</v-icon>
           </v-btn>
           <v-toolbar-title>{{currentFileName}}</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
-            <v-btn dark flat @click="showDeleteFileConfirmationDialog = true">
+            <v-btn
+              :disabled="disableImagePanelToolbarBtns"
+              dark
+              flat
+              @click="showDeleteFileConfirmationDialog = true"
+            >
               <v-icon left>fas fa-trash-alt</v-icon>Delete
             </v-btn>
-            <v-btn dark flat @click="prepareQuickDrawOperation()">
+            <v-btn
+              :disabled="disableImagePanelToolbarBtns"
+              dark
+              flat
+              @click="prepareQuickDrawOperation()"
+            >
               <v-icon left>fas fa-pencil-ruler</v-icon>Draw
             </v-btn>
           </v-toolbar-items>
         </v-toolbar>
+        <!-- Consoles Area & Image Preview -->
         <v-card-text>
           <div id="preview">
             <v-img :src="imageURL" contain max-height="600"/>
@@ -61,6 +77,7 @@
                     color="teal lighten-4"
                     class="elevation-0 teal--text text--darken-1"
                     card
+                    dark
                     dense
                   >
                     <v-toolbar-title>Transmission Process Console</v-toolbar-title>
@@ -152,6 +169,7 @@
                     color="teal lighten-4"
                     class="elevation-0 teal--text text--darken-1"
                     card
+                    dark
                     dense
                   >
                     <v-toolbar-title>Port Data Console</v-toolbar-title>
@@ -434,9 +452,17 @@
           <v-btn
             @click="reStartConversionProcess()"
             v-show="!doShowConversionBtn"
+            :disabled="disableConversionCardActionBtns"
+            color="white"
+            class="teal--text"
+          >Re-Convert</v-btn>
+          <v-btn
+            @click="prepareQuickDrawOperation()"
+            v-show="!doShowConversionBtn"
+            :disabled="disableConversionCardActionBtns"
             color="teal lighten-1"
             class="white--text"
-          >Re-Convert</v-btn>
+          >Draw</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -544,7 +570,7 @@ export default {
     inProgress: false,
     currentFileName: undefined,
     imageURL: undefined,
-    imageDialog: false,
+    imagePanel: false,
     gcodeData: [],
     fullGcodeData: [],
     logData: [],
@@ -647,8 +673,15 @@ export default {
     }
   },
   computed: {
+    disableConversionCardActionBtns() {
+      //? when conversion progress is true, disable action btns
+      return this.showConversionProgress;
+    },
     doShowConversionBtn() {
       return this.doShowParamsForm;
+    },
+    disableImagePanelToolbarBtns() {
+      return this.isTransmissionProcessActive;
     },
     isCurrentFileGcode() {
       return (
@@ -796,7 +829,7 @@ export default {
         });
     },
     displayImage(name, path) {
-      this.imageDialog = true;
+      this.imagePanel = true;
       this.currentFileName = name;
       FileServices.getImageData(path)
         .then(result => {
@@ -896,7 +929,7 @@ export default {
     deleteSelectedImage() {
       FileServices.deleteImage(this.currentFileName)
         .then(() => {
-          this.imageDialog = false;
+          this.imagePanel = false;
           this.showSuccessSnackbar("Image deleted successfully");
         })
         .catch(error => {
@@ -904,11 +937,10 @@ export default {
         });
     },
     prepareQuickDrawOperation() {
-      // display progress dialog
       const splitted = this.currentFileName.split(".");
       const gcodeFileName = splitted[0] + "." + splitted[1] + ".gcode";
       let doesExist = false;
-      // check the existance of the corresponding gcode file for the image
+      //? check the existance of the corresponding gcode file for the image
       for (let i = 0; i < this.items[1].children.length; i++) {
         if (this.items[1].children[i].name == gcodeFileName) {
           doesExist = true;
@@ -916,13 +948,10 @@ export default {
         }
       }
       if (doesExist) {
+        this.showConversionParamsDialog = false;
         this.displayPortsListDialog();
       } else {
-        //TODO: complete this operation
-        // display params dialog if there is no corresponding gcode file
         this.showConversionParamsDialog = true;
-        // display progress dialog
-        // start conversion process
       }
     },
     displayPortsListDialog() {
@@ -989,16 +1018,16 @@ export default {
       }
     },
     startConversionProcess() {
-      if (this.scaleAxes <= 0) {
+      //? checking the value of Scale Axes
+      if (this.scaleAxes <= 50) {
         this.scaleAxesErrorState = true;
-        this.scaleAxesErrorContent = "Scale Axes must be superior of 0";
+        this.scaleAxesErrorContent = "Scale Axes must be superior of 50";
       } else {
-        // start converiosn
+        this.showConversionProgress = true;
         this.showBeforConversionAlert = false;
+        this.doShowParamsForm = false;
         this.scaleAxesErrorState = false;
         this.scaleAxesErrorContent = "";
-        this.showConversionProgress = true;
-        this.doShowParamsForm = false;
         ConversionServices.QuickConvertImage(this.currentFileName, {
           toolDiameter: this.toolDiameter,
           sensitivity: this.sensitivity,
@@ -1047,6 +1076,23 @@ export default {
             "There was an error while deleting the generated gcode file, try deleting it manually"
           );
         });
+    },
+    prepareToCloseImagePanel() {
+      if (this.isTransmissionProcessActive) {
+        this.showCloseImagePanelConfirmationDialog = true;
+      } else {
+        //? hide consoles area
+        this.consolesArea = false;
+        //? empty all the consoels data
+        this.portConsoleTxt = [];
+        this.transmissionConsoleTxt = [];
+        this.scaleAxes = 0;
+        this.doShowParamsForm = true;
+        this.proccessBlackPixelsValue = 0;
+        this.unproccessBlackPixelsValue = 0;
+        //? close the panel
+        this.imagePanel = false;
+      }
     },
     pausePort() {
       if (this.port) {

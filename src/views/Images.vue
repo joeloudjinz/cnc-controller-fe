@@ -2,7 +2,7 @@
   <v-container fluid wrap pa-1 ma-0>
     <v-alert
       :value="isTransmissionProcessActive"
-      color="error"
+      color="warning"
     >Transmission process is going on, some functionalities are disabled until it's over</v-alert>
     <!-- Image upload form -->
     <v-layout row wrap>
@@ -52,9 +52,9 @@
       <v-flex d-flex xs12 sm12 md12 lg4 pa-1>
         <v-card>
           <v-card-title>
-            <v-alert :value="true" dismissibale transition="scale-transition" type="warning">
-              Tweak these parameters as long as you know what you are doing,
-              or leave them by default
+            <v-alert :value="true" transition="scale-transition" type="info" color="teal darken-4">
+              Adjust these parameters to control the quality of gcode,
+              you can leave them by default as well
             </v-alert>
           </v-card-title>
           <v-card-text>
@@ -85,9 +85,13 @@
                 <v-flex xs12 sm12 md6 lg6>
                   <v-text-field
                     label="Scale Axes"
+                    persistent-hint
+                    hint="This field is required"
                     v-model="scaleAxes"
                     class="mt-0"
                     type="number"
+                    :error="scaleAxesErrorState"
+                    :error-messages="scaleAxesErrorContent"
                     @focus="scaleAccessSnackbar = true"
                     @focusout="scaleAccessSnackbar = false"
                   ></v-text-field>
@@ -364,6 +368,7 @@
                       flat
                       v-on="data.on"
                       @click="initializeDrawOperation()"
+                      v-show="showDrawBtn"
                       :disabled="isTransmissionProcessActive"
                     >
                       <v-icon left dark>fas fa-pencil-ruler</v-icon>Draw
@@ -388,6 +393,7 @@
               class="elevation-0 teal--text text--darken-1"
               card
               dense
+              dark
             >
               <v-toolbar-title>Transmission Process Console</v-toolbar-title>
               <v-spacer></v-spacer>
@@ -441,7 +447,7 @@
             </v-toolbar>
           </v-flex>
           <v-flex d-flex xs12 sm12 md12 lg12>
-            <v-fade-transition>
+            <v-slide-y-transition>
               <v-card
                 v-show="showTranmsissionConsole"
                 color="teal lighten-4 elevation-0"
@@ -461,7 +467,7 @@
                   </table>
                 </v-card-text>
               </v-card>
-            </v-fade-transition>
+            </v-slide-y-transition>
           </v-flex>
         </v-layout>
       </v-flex>
@@ -474,6 +480,7 @@
               class="elevation-0 teal--text text--darken-1"
               card
               dense
+              dark
             >
               <v-toolbar-title>Port Data Console</v-toolbar-title>
               <v-spacer></v-spacer>
@@ -517,7 +524,7 @@
             </v-toolbar>
           </v-flex>
           <v-flex d-flex xs12 sm12 md12 lg12>
-            <v-fade-transition>
+            <v-slide-y-transition>
               <v-card
                 v-show="showPortConsole"
                 color="teal lighten-4 elevation-0"
@@ -537,7 +544,7 @@
                   </table>
                 </v-card-text>
               </v-card>
-            </v-fade-transition>
+            </v-slide-y-transition>
           </v-flex>
         </v-layout>
       </v-flex>
@@ -598,6 +605,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- Scale axes information snackbar -->
     <v-snackbar
       v-model="scaleAccessSnackbar"
       :timeout="0"
@@ -607,7 +615,10 @@
       multi-line
       auto-height
       class="mb-2 white--text"
-    >For Scale Axes use the height value of the image, you can multiply it by a number to apply scale up, or divide it by a number to apply scale down</v-snackbar>
+    >
+      For Scale Axes use the height value of the image, you can multiply it by a number to apply scale up,
+      or divide it by a number to apply scale down
+    </v-snackbar>
     <!-- Main Snackbar -->
     <v-snackbar
       v-model="snackbar"
@@ -643,6 +654,8 @@ export default {
     toolDiameter: 1,
     sensitivity: 0.95,
     scaleAxes: 0,
+    scaleAxesErrorContent: "",
+    scaleAxesErrorState: false,
     deepStep: -1,
     blackZ: -2,
     whiteZ: 0,
@@ -687,12 +700,12 @@ export default {
     portConsoleTxt: [],
     port: undefined,
     //? for transmission process
-    displayTransmissionConsole: true,
+    displayTransmissionConsole: false,
     transmissionConsoleTxt: [],
     showTranmsissionConsole: true,
     isTransmissionProcessActive: false,
     //? for consoles area
-    consolesArea: true,
+    consolesArea: false,
     showPortConsole: true,
     //? to enable and disable control btns of transmission console panel
     stopSendDis: true,
@@ -701,7 +714,8 @@ export default {
     //? to enable and disable control btns of port console panel
     flushPortDis: false,
     pausePortDis: false,
-    resumePortDis: true
+    resumePortDis: true,
+    showDrawBtn: false
   }),
   sockets: {
     onPortData(data) {
@@ -785,10 +799,9 @@ export default {
       this.idle = 3000;
     },
     performConversion() {
-      if (this.scaleAxes == 0) {
-        this.showErrorSnackbar(
-          "Scale Axes Should Not Be Equale to Zero (0), Use Image Height"
-        );
+      if (this.scaleAxes <= 50) {
+        this.scaleAxesErrorState = true;
+        this.scaleAxesErrorContent = "Scale Axes must be superior then 50";
       } else {
         if (this.selectedFile != null) {
           this.dialog = true;
