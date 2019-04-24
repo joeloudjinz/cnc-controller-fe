@@ -307,10 +307,17 @@
       <v-card>
         <v-card-text>
           <v-alert
-            :value="true"
+            :value="showBeforConversionAlert"
             color="teal darken-4"
+            transition="fade-transition"
           >The image doesn't have a gcode file, enter paramaters to convert it first.</v-alert>
-          <v-container fluid grid-list-lg>
+          <v-alert
+            :value="showConversionResultAlert"
+            color="teal darken-4"
+            transition="fade-transition"
+          >This is the percentages of the proccessed and unproccessed pixels in the picture.</v-alert>
+          <v-progress-linear v-show="showConversionProgress" :indeterminate="true"></v-progress-linear>
+          <v-container fluid grid-list-lg v-if="doShowParamsForm">
             <v-flex xs12>
               <v-subheader class="pl-0">Tool Diameter</v-subheader>
               <v-slider
@@ -372,6 +379,44 @@
               </v-flex>
             </v-layout>
           </v-container>
+          <v-container v-else>
+            <v-layout align-center justify-center row fill-height wrap>
+              <v-flex xs12 sm12 md6 lg6>
+                <v-layout align-center justify-center row fill-height>
+                  <v-tooltip bottom>
+                    <template #activator="data">
+                      <v-progress-circular
+                        :rotate="360"
+                        :size="170"
+                        :width="20"
+                        :value="proccessBlackPixelsValue"
+                        color="teal lighten-1"
+                        v-on="data.on"
+                      >{{ proccessBlackPixelsValue }}%</v-progress-circular>
+                    </template>
+                    <span>The percentage of the proccessed black pixels in the picture</span>
+                  </v-tooltip>
+                </v-layout>
+              </v-flex>
+              <v-flex xs12 sm12 md6 lg6>
+                <v-layout align-center justify-center row fill-height>
+                  <v-tooltip bottom>
+                    <template #activator="data">
+                      <v-progress-circular
+                        :rotate="360"
+                        :size="170"
+                        :width="20"
+                        :value="unproccessBlackPixelsValue"
+                        color="red lighten-1"
+                        v-on="data.on"
+                      >{{ unproccessBlackPixelsValue }}%</v-progress-circular>
+                    </template>
+                    <span>The percentage of the unproccessed black pixels in the picture</span>
+                  </v-tooltip>
+                </v-layout>
+              </v-flex>
+            </v-layout>
+          </v-container>
         </v-card-text>
         <v-card-actions>
           <v-btn
@@ -382,35 +427,21 @@
           <v-spacer></v-spacer>
           <v-btn
             @click="startConversionProcess()"
+            v-show="doShowConversionBtn"
             color="teal lighten-1"
             class="white--text"
           >Convert</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- File Deletion Confirmation -->
-    <v-dialog v-model="showDeleteFileConfirmationDialog" persistent width="500">
-      <v-card color="white" dark>
-        <v-card-title class="error white--text headline">Agent Delete Confirmation</v-card-title>
-        <v-divider></v-divider>
-        <v-card-text class="font-weight-bold black--text">
-          <p v-if="isCurrentFileGcode">Are you sure you want to delete this file?</p>
-          <p v-else-if="isCurrentFileLog">Are you sure you want to delete this directory?</p>
-          <p v-else>Are you sure you want to delete this image?</p>
-        </v-card-text>
-        <v-card-actions>
           <v-btn
-            flat
-            @click="showDeleteFileConfirmationDialog = false"
-            class="grey--text lighten-1"
-          >Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn @click="selecteDeletionType()" color="red lighten-1" class="white--text">Delete</v-btn>
+            @click="reStartConversionProcess()"
+            v-show="!doShowConversionBtn"
+            color="teal lighten-1"
+            class="white--text"
+          >Re-Convert</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- Ports List dialoge -->
-    <v-dialog v-model="portsListDialog" persistent width="700px">
+    <v-dialog v-model="showPortsListDialog" persistent width="700px">
       <v-card>
         <v-card-title class="teal darken-4 py-4 title white--text">GCode File Transmission</v-card-title>
         <v-card-text class="py-0 px-0">
@@ -450,7 +481,28 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn flat color="teal" @click="portsListDialog = false">Cancel</v-btn>
+          <v-btn flat color="teal" @click="showPortsListDialog = false">Cancel</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- File Deletion Confirmation -->
+    <v-dialog v-model="showDeleteFileConfirmationDialog" persistent width="500">
+      <v-card color="white" dark>
+        <v-card-title class="error white--text headline">Agent Delete Confirmation</v-card-title>
+        <v-divider></v-divider>
+        <v-card-text class="font-weight-bold black--text">
+          <p v-if="isCurrentFileGcode">Are you sure you want to delete this file?</p>
+          <p v-else-if="isCurrentFileLog">Are you sure you want to delete this directory?</p>
+          <p v-else>Are you sure you want to delete this image?</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            flat
+            @click="showDeleteFileConfirmationDialog = false"
+            class="grey--text lighten-1"
+          >Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn @click="selecteDeletionType()" color="red lighten-1" class="white--text">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -502,7 +554,8 @@ export default {
     showDeleteFileConfirmationDialog: false,
     //? for params dialog --------------------
     showConversionParamsDialog: false,
-    //? conversion params ...
+    //? conversion params section ...
+    doShowParamsForm: true,
     toolDiameter: 1,
     sensitivity: 0.95,
     scaleAxes: 0,
@@ -514,16 +567,23 @@ export default {
     safeZ: 1,
     work: 1200,
     idle: 3000,
+    showBeforConversionAlert: true,
     //? end of params dialog data ---------------------
+    //? conversion results section
+    proccessBlackPixelsValue: 0,
+    unproccessBlackPixelsValue: 0,
+    showConversionResultAlert: false,
+    //? end
     //? ports list data ---------------------
-    portsListDialog: false,
+    showPortsListDialog: false,
     portsList: [],
     portsListProgress: true,
     //? end of ports list data ---------------------
     //? transmission data
     isTransmissionProcessActive: false,
     //? data in consoles area ------------------------
-    consolesArea: true,
+    consolesArea: false,
+    //? this variable is used to operate on the port when the transmission process is going on
     port: undefined,
     portConsoleTxt: [],
     transmissionConsoleTxt: [],
@@ -538,6 +598,12 @@ export default {
     pausePortDis: false,
     resumePortDis: true,
     //? end of data in consoles area ------------------------
+    //? conversion params dialog progress
+    conversionProgressValue: 0,
+    conversionProgressQuery: false,
+    showConversionProgress: false,
+    conversionProgressInterval: 0,
+    //? end
     //? snackbar details ...
     snackbarContent: "",
     snackbarColor: "",
@@ -569,9 +635,21 @@ export default {
           "Transmission of Gcode file Has been completed"
         );
       }
+    },
+    onGcodeFileAdded(data) {
+      console.log("data", data);
+      this.items[1].children.push({
+        id: this.items[1].children.length + 1,
+        name: data.name,
+        type: "gcode",
+        path: data.path
+      });
     }
   },
   computed: {
+    doShowConversionBtn() {
+      return this.doShowParamsForm;
+    },
     isCurrentFileGcode() {
       return (
         this.currentFileName != undefined &&
@@ -659,7 +737,7 @@ export default {
     },
     selecteDeletionType() {
       if (this.isCurrentFileGcode) {
-        this.deleteGcodeFile();
+        this.deleteGcodeFile(this.currentFileName);
       } else if (this.isCurrentFileLog) {
         this.deleteOutputDirectory();
       } else {
@@ -786,10 +864,12 @@ export default {
         this.stoppedIn = this.fullGcodeData.length;
       }
     },
-    deleteGcodeFile() {
-      if (this.currentFileName) {
+    deleteGcodeFile(gcodeFileName) {
+      console.log("deleteGcodeFile() is called");
+      console.log("gcodeFileName :", gcodeFileName);
+      if (gcodeFileName != undefined) {
         if (this.currentFileName.includes(".gcode")) {
-          FileServices.deleteGcodeFile(this.currentFileName)
+          FileServices.deleteGcodeFile(gcodeFileName)
             .then(() => {
               this.gcodeData = [];
               this.showSuccessSnackbar("File was deleted successfully");
@@ -836,10 +916,9 @@ export default {
         }
       }
       if (doesExist) {
-        // display ports list dialog
         this.displayPortsListDialog();
-        // display two consoles
       } else {
+        //TODO: complete this operation
         // display params dialog if there is no corresponding gcode file
         this.showConversionParamsDialog = true;
         // display progress dialog
@@ -847,7 +926,7 @@ export default {
       }
     },
     displayPortsListDialog() {
-      this.portsListDialog = true;
+      this.showPortsListDialog = true;
       PortsServices.getConnectedPortsList()
         .then(result => {
           this.portsListProgress = false;
@@ -858,48 +937,54 @@ export default {
         })
         .catch(error => {
           this.portsListProgress = false;
-          this.portsListDialog = false;
+          this.showPortsListDialog = false;
           this.showErrorSnackbar(error);
         });
     },
     startTransmitingGCode(portName) {
-      this.consolesArea = true;
+      this.portsListProgress = true;
       this.port = portName;
-      //TODO: replace thes.fileName to this.currentFileName
+      //? ensuring that the current file name is valide gcode file name
       if (this.currentFileName !== undefined && this.currentFileName !== "") {
-        // const splitted = this.currentFileName.split(".");
-        // const fileName = splitted[0] + "." + splitted[1];
+        //? removing the extension from the fileName because the endpoint function uses gcode file name without ext
+        const splitted = this.currentFileName.split(".");
+        const fileName = splitted[0] + "." + splitted[1];
         setTimeout(() => {
-          this.consolesArea = true;
-          //TODO: replace sm-sample with fileName after uncommenting it
-          PortsServices.performFullDrawOperation("sm-sample", portName)
+          PortsServices.performFullDrawOperation(fileName, portName)
             .then(result => {
+              this.portsListProgress = false;
+              //? show consoles area
+              this.consolesArea = true;
+              //? hiding ports list dialog
+              this.showPortsListDialog = false;
+              //? enabling pause & stop tranmission operations btns
               this.pauseSendDis = false;
               this.stopSendDis = false;
-              this.portsListDialog = false;
+              //? enabling pause & flush port data btns
               this.pausePortDis = false;
               this.flushPortDis = false;
+              //? activating transmission state variable
               this.isTransmissionProcessActive = true;
               this.showSuccessSnackbar(result.success);
             })
             .catch(error => {
-              this.portsListDialog = false;
+              //? hiding ports list dialog
+              this.showPortsListDialog = false;
               this.port = undefined;
-              this.pausePortDis = true;
-              this.flushPortDis = true;
-              // console.log(error);
+              //? showing the error about why the transmission process didn't start
               this.showErrorSnackbar(error.failure.split(":")[1]);
-              this.portConsoleTxt.push("Operation: " + error.operation + "|");
-              this.portConsoleTxt.push("Message: " + error.failure + "|");
-              if (error.isPortClosed) {
-                this.portConsoleTxt.push(
-                  "Port Status: " + error.isPortClosed ? " Closed|" : " Opened|"
-                );
-              }
+              //? disabling these lines becuase the consoles are hidden
+              // this.portConsoleTxt.push("Operation: " + error.operation + "|");
+              // this.portConsoleTxt.push("Message: " + error.failure + "|");
+              // if (error.isPortClosed) {
+              //   this.portConsoleTxt.push(
+              //     "Port Status: " + error.isPortClosed ? " Closed|" : " Opened|"
+              //   );
+              // }
             });
         }, 500);
       } else {
-        this.portsListDialog = false;
+        this.showPortsListDialog = false;
         this.showErrorSnackbar("Gcode file name is missing!");
       }
     },
@@ -909,8 +994,11 @@ export default {
         this.scaleAxesErrorContent = "Scale Axes must be superior of 0";
       } else {
         // start converiosn
+        this.showBeforConversionAlert = false;
         this.scaleAxesErrorState = false;
         this.scaleAxesErrorContent = "";
+        this.showConversionProgress = true;
+        this.doShowParamsForm = false;
         ConversionServices.QuickConvertImage(this.currentFileName, {
           toolDiameter: this.toolDiameter,
           sensitivity: this.sensitivity,
@@ -923,15 +1011,42 @@ export default {
           idle: this.idle
         })
           .then(result => {
+            this.showConversionProgress = false;
+            this.showConversionResultAlert = true;
             console.log("result :", result);
+            this.proccessBlackPixelsValue = 100 - result;
+            this.unproccessBlackPixelsValue = result;
             this.showSuccessSnackbar("Converted successfully");
           })
           .catch(error => {
-            console.warn(error);
-
+            this.showConversionProgress = false;
+            this.doShowParamsForm = true;
+            // console.warn(error);
             this.showErrorSnackbar(error);
           });
       }
+    },
+    async reStartConversionProcess() {
+      //? reseting scale axes value
+      this.scaleAxes = 0;
+      //? calculating the corresponding gcode file name
+      const gcodeFileName =
+        this.currentFileName.split(".")[0] +
+        "." +
+        this.currentFileName.split(".")[1] +
+        ".gcode";
+      //? deleting generated gcode file
+      await FileServices.deleteGcodeFile(gcodeFileName)
+        .then(() => {
+          this.removeGcodeFileFormItems(gcodeFileName);
+          //? showing params form, 'convert' btn & hiding 're-convert' btn
+          this.doShowParamsForm = true;
+        })
+        .catch(() => {
+          this.showErrorSnackbar(
+            "There was an error while deleting the generated gcode file, try deleting it manually"
+          );
+        });
     },
     pausePort() {
       if (this.port) {

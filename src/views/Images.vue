@@ -378,12 +378,17 @@
       </v-flex>
     </v-layout>
     <!-- Consoles Area -->
-    <v-layout v-if="consolesArea == true" justify-center row wrap pa-1>
+    <v-layout v-if="consolesArea == true" row wrap pa-1>
       <!-- Transmission Console Area -->
-      <v-flex xs12 sm12 md12 lg12 mb-2>
-        <v-layout justify-center row wrap>
+      <v-flex xs12 sm12 md12 lg6 pa-1>
+        <v-layout row wrap>
           <v-flex d-flex xs12 sm12 md12 lg12>
-            <v-toolbar color="teal" dark dense>
+            <v-toolbar
+              color="teal lighten-4"
+              class="elevation-0 teal--text text--darken-1"
+              card
+              dense
+            >
               <v-toolbar-title>Transmission Process Console</v-toolbar-title>
               <v-spacer></v-spacer>
               <div v-if="port != undefined">
@@ -431,7 +436,7 @@
                 <span>Clear the console</span>
               </v-tooltip>
               <v-btn icon @click="showTranmsissionConsole = !showTranmsissionConsole">
-                <v-icon>{{ showTranmsissionConsole ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                <v-icon>{{ showTranmsissionConsole ? 'keyboard_arrow_up': 'keyboard_arrow_down' }}</v-icon>
               </v-btn>
             </v-toolbar>
           </v-flex>
@@ -439,7 +444,7 @@
             <v-fade-transition>
               <v-card
                 v-show="showTranmsissionConsole"
-                color="teal lighten-4"
+                color="teal lighten-4 elevation-0"
                 height="300px"
                 class="scroll"
               >
@@ -461,10 +466,15 @@
         </v-layout>
       </v-flex>
       <!-- Port Console Area -->
-      <v-flex xs12 sm12 md12 lg12>
+      <v-flex xs12 sm12 md12 lg6 pa-1>
         <v-layout row wrap>
-          <v-flex xs12>
-            <v-toolbar color="teal" dark dense>
+          <v-flex xs12 sm12 md12 lg12>
+            <v-toolbar
+              color="teal lighten-4"
+              class="elevation-0 teal--text text--darken-1"
+              card
+              dense
+            >
               <v-toolbar-title>Port Data Console</v-toolbar-title>
               <v-spacer></v-spacer>
               <div v-if="port != undefined">
@@ -508,7 +518,12 @@
           </v-flex>
           <v-flex d-flex xs12 sm12 md12 lg12>
             <v-fade-transition>
-              <v-card v-show="showPortConsole" color="teal lighten-4" height="300px" class="scroll">
+              <v-card
+                v-show="showPortConsole"
+                color="teal lighten-4 elevation-0"
+                height="300px"
+                class="scroll"
+              >
                 <v-card-text class="teal--text darken-4">
                   <table>
                     <tr
@@ -677,7 +692,7 @@ export default {
     showTranmsissionConsole: true,
     isTransmissionProcessActive: false,
     //? for consoles area
-    consolesArea: false,
+    consolesArea: true,
     showPortConsole: true,
     //? to enable and disable control btns of transmission console panel
     stopSendDis: true,
