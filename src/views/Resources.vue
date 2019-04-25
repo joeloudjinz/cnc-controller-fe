@@ -837,10 +837,11 @@ export default {
         });
     },
     displayImage(name, path) {
-      this.imagePanel = true;
+      this.inProgress = true;
       this.currentFileName = name;
       FileServices.getImageData(path)
         .then(result => {
+          this.imagePanel = true;
           this.inProgress = false;
           this.imageURL = "data:image/" + result.ext + ";base64," + result.data;
         })
