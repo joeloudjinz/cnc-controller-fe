@@ -288,7 +288,7 @@
                                 >Elapsed Time</v-list-tile-title>
                                 <v-list-tile-sub-title
                                   class="font-weight-bold teal--text text--darken-2"
-                                >{{ elapsedTime }}</v-list-tile-sub-title>
+                                >{{ fromatElapsedTimeValue }}</v-list-tile-sub-title>
                               </v-list-tile-content>
                             </v-list-tile>
                           </v-list>
@@ -303,7 +303,7 @@
                                 >Size</v-list-tile-title>
                                 <v-list-tile-sub-title
                                   class="font-weight-bold teal--text text--darken-2"
-                                >{{ size }}</v-list-tile-sub-title>
+                                >{{ formatSizeValue }}</v-list-tile-sub-title>
                               </v-list-tile-content>
                             </v-list-tile>
                             <v-list-tile>
@@ -519,7 +519,7 @@
                 <span>Clear the console</span>
               </v-tooltip>
               <v-btn icon @click="showPortConsole = !showPortConsole">
-                <v-icon>{{ showPortConsole ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                <v-icon>{{ showPortConsole ? 'keyboard_arrow_up': 'keyboard_arrow_down'}}</v-icon>
               </v-btn>
             </v-toolbar>
           </v-flex>
@@ -595,10 +595,10 @@
       </v-card>
     </v-dialog>
     <!-- Conversion Process Dialog -->
-    <v-dialog v-model="dialog" persistent width="500">
+    <v-dialog v-model="conversionProgressDialog" persistent width="500">
       <v-card color="teal" dark>
-        <v-card-title class="font-weight-bold">Starting Conversion Process</v-card-title>
-        <v-card-text>The process of converting an image into GCode takes a considerable amount of time, so be patient</v-card-text>
+        <v-card-title class="font-weight-bold">Conversion Process</v-card-title>
+        <v-card-text>This process will take some time depending on the image dimensions.</v-card-text>
         <v-divider/>
         <v-card-actions>
           <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
@@ -647,7 +647,7 @@ export default {
     showConversionBtn: true,
     isConversionActive: false,
     //? for dialog
-    dialog: false,
+    conversionProgressDialog: false,
     //? for progress in dialog window
     progress: 1,
     //? conversion params ...
@@ -705,7 +705,7 @@ export default {
     showTranmsissionConsole: true,
     isTransmissionProcessActive: false,
     //? for consoles area
-    consolesArea: false,
+    consolesArea: true,
     showPortConsole: true,
     //? to enable and disable control btns of transmission console panel
     stopSendDis: true,
@@ -717,9 +717,34 @@ export default {
     resumePortDis: true,
     showDrawBtn: false
   }),
+  computed: {
+    fromatElapsedTimeValue() {
+      if (this.elapsedTime != undefined) {
+        if (this.elapsedTime < 60) {
+          return `${this.elapsedTime} seconds`;
+        } else {
+          const minutes = this.elapsedTime / 60;
+          const rest = this.elapsedTime % 60;
+          return `${minutes} minute & ${rest} seconds`;
+        }
+      } else {
+        return (this.elapsedTime).toFixed(2);
+      }
+    },
+    formatSizeValue() {
+      if (this.size != undefined) {
+        if (this.size < 1) {
+          return `${(this.size / 0.001).toFixed(2)} Kb`;
+        } else {
+          return `${(this.size).toFixed(2)} Mb`;
+        }
+      } else {
+        return (this.size).toFixed(2);
+      }
+    }
+  },
   sockets: {
     onPortData(data) {
-      // console.log("data :", data);
       this.onPortDataCallback(data.data);
     },
     onTransmissionLog(data) {
@@ -735,6 +760,38 @@ export default {
           "Transmission of file " + this.fileName + " Has been completed"
         );
       }
+    },
+    onConversionEnded(data) {
+      const result = data;
+      this.showDrawBtn = true;
+      this.isConversionActive = false;
+      this.displayResultsPanel = true;
+      this.conversionProgressDialog = false;
+      //? update the conversion result variables
+      this.oldtoolDiameter = result.toolDiameter;
+      this.oldsensitivity = result.sensitivity;
+      this.oldscaleAxes = result.scaleAxes;
+      this.olddeepStep = result.deepStep;
+      this.oldwhiteZ = result.whiteZ;
+      this.oldblackZ = result.blackZ;
+      this.oldsafeZ = result.safeZ;
+      this.oldwork = result.feedrate.work;
+      this.oldidle = result.feedrate.idle;
+      this.value = Math.round(100 - result.errBlackPixel);
+      this.errorValue = Math.round(result.errBlackPixel);
+      this.imegSize = result.imgSize;
+      this.fileName = result.fileName;
+      this.startTime = result.startTime;
+      this.endTime = result.endTime;
+      this.elapsedTime = result.elapsedTime;
+      this.size = result.size;
+    },
+    onConversionErrorOccur(data) {
+      this.showDrawBtn = false;
+      this.isConversionActive = false;
+      this.displayResultsPanel = false;
+      this.conversionProgressDialog = false;
+      this.showErrorSnackbar(data.errorData);
     }
   },
   created() {
@@ -782,7 +839,7 @@ export default {
       this.selectedFile = null;
       this.url = require("@/assets/default.png");
       this.showConversionBtn = true;
-      this.showDrawBtn = true;
+      this.showDrawBtn = false;
       this.displayResultsPanel = false;
       this.consolesArea = false;
       this.clearPortConsole();
@@ -805,7 +862,7 @@ export default {
         this.scaleAxesErrorContent = "Scale Axes must be superior then 50";
       } else {
         if (this.selectedFile != null) {
-          this.dialog = true;
+          this.conversionProgressDialog = true;
           const fd = new FormData();
           fd.append("image", this.selectedFile, this.selectedFile.name);
           fd.append(
@@ -825,31 +882,11 @@ export default {
           this.isConversionActive = true;
           ConversionServices.ConvertImage(fd)
             .then(result => {
-              this.showDrawBtn = true;
-              this.isConversionActive = false;
-              this.displayResultsPanel = true;
-              this.dialog = false;
-              this.oldtoolDiameter = result.toolDiameter;
-              this.oldsensitivity = result.sensitivity;
-              this.oldscaleAxes = result.scaleAxes;
-              this.olddeepStep = result.deepStep;
-              this.oldwhiteZ = result.whiteZ;
-              this.oldblackZ = result.blackZ;
-              this.oldsafeZ = result.safeZ;
-              this.oldwork = result.feedrate.work;
-              this.oldidle = result.feedrate.idle;
-              this.value = Math.round(100 - result.errBlackPixel);
-              this.errorValue = Math.round(result.errBlackPixel);
-              this.imegSize = result.imgSize;
-              this.fileName = result.fileName;
-              this.startTime = result.startTime;
-              this.endTime = result.endTime;
-              this.elapsedTime = result.elapsedTime.toFixed(2);
-              this.size = result.size.toFixed(2);
+              this.showSuccessSnackbar(result.success);
             })
             .catch(error => {
               this.isConversionActive = false;
-              this.dialog = false;
+              this.conversionProgressDialog = false;
               this.showErrorSnackbar(error);
               this.loading = false;
             });

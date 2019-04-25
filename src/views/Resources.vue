@@ -678,6 +678,20 @@ export default {
         type: "image",
         path: data.path
       });
+    },
+    onQuickConversionEnded(data){
+      this.showConversionProgress = false;
+      this.showConversionResultAlert = true;
+      this.proccessBlackPixelsValue = 100 - data.data;
+      this.unproccessBlackPixelsValue = data.data;
+      this.showSuccessSnackbar("Converted successfully");
+    },
+    onQuickConversionErrorOccur(data){
+      this.doShowParamsForm = true;
+      this.showConversionProgress = false;
+      this.showConversionResultAlert = false;
+      this.showBeforConversionAlert = true;
+      this.showErrorSnackbar(data.errorData);
     }
   },
   computed: {
@@ -1049,17 +1063,11 @@ export default {
           idle: this.idle
         })
           .then(result => {
-            this.showConversionProgress = false;
-            this.showConversionResultAlert = true;
-            // console.log("result :", result);
-            this.proccessBlackPixelsValue = 100 - result;
-            this.unproccessBlackPixelsValue = result;
-            this.showSuccessSnackbar("Converted successfully");
+            this.showSuccessSnackbar(result.success);
           })
           .catch(error => {
             this.showConversionProgress = false;
             this.doShowParamsForm = true;
-            // console.warn(error);
             this.showErrorSnackbar(error);
           });
       }

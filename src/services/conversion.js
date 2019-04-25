@@ -14,7 +14,7 @@ class ConversionServices {
           }
         })
         .then(result => {
-          resolve(result.data.data);
+          resolve(result.data);
         })
         .catch(error => {
           if (error.response) {
@@ -54,7 +54,7 @@ class ConversionServices {
           }
         })
         .then(result => {
-          resolve(result.data.data);
+          resolve(result.data);
         })
         .catch(error => {
           if (error.response) {
