@@ -29,7 +29,7 @@
               <v-card-actions>
                 <v-btn
                   flat
-                  @click="clear"
+                  @click="clearImageDisplayCard()"
                   :disabled="isConversionActive || isTransmissionProcessActive"
                   color="teal darken-4"
                 >Clear</v-btn>
@@ -778,10 +778,11 @@ export default {
       this.url = URL.createObjectURL(this.selectedFile);
       this.showConversionBtn = false;
     },
-    clear() {
+    clearImageDisplayCard() {
       this.selectedFile = null;
       this.url = require("@/assets/default.png");
       this.showConversionBtn = true;
+      this.showDrawBtn = true;
       this.displayResultsPanel = false;
       this.consolesArea = false;
       this.clearPortConsole();
