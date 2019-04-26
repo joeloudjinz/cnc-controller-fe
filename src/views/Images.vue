@@ -858,41 +858,49 @@ export default {
       this.idle = 3000;
     },
     performConversion() {
+      this.scaleAxesErrorState = false;
+      this.scaleAxesErrorContent = "";
       if (this.scaleAxes <= 50) {
         this.scaleAxesErrorState = true;
         this.scaleAxesErrorContent = "Scale Axes must be superior then 50";
       } else {
-        if (this.selectedFile != null) {
-          this.conversionProgressDialog = true;
-          const fd = new FormData();
-          fd.append("image", this.selectedFile, this.selectedFile.name);
-          fd.append(
-            "parameters",
-            JSON.stringify({
-              toolDiameter: this.toolDiameter,
-              sensitivity: this.sensitivity,
-              scaleAxes: this.scaleAxes,
-              deepStep: this.deepStep,
-              blackZ: this.blackZ,
-              whiteZ: this.whiteZ,
-              safeZ: this.safeZ,
-              work: this.work,
-              idle: this.idle
-            })
-          );
-          this.isConversionActive = true;
-          ConversionServices.ConvertImage(fd)
-            .then(result => {
-              this.showSuccessSnackbar(result.success);
-            })
-            .catch(error => {
-              this.isConversionActive = false;
-              this.conversionProgressDialog = false;
-              this.showErrorSnackbar(error);
-              this.loading = false;
-            });
-        } else {
-          this.showErrorSnackbar("No Image is Selected");
+        const surfaceHeight = window.localStorage.getItem("surfaceHeight");
+        if(this.scaleAxes < surfaceHeight){
+          if (this.selectedFile != null) {
+            this.conversionProgressDialog = true;
+            const fd = new FormData();
+            fd.append("image", this.selectedFile, this.selectedFile.name);
+            fd.append(
+              "parameters",
+              JSON.stringify({
+                toolDiameter: this.toolDiameter,
+                sensitivity: this.sensitivity,
+                scaleAxes: this.scaleAxes,
+                deepStep: this.deepStep,
+                blackZ: this.blackZ,
+                whiteZ: this.whiteZ,
+                safeZ: this.safeZ,
+                work: this.work,
+                idle: this.idle
+              })
+            );
+            this.isConversionActive = true;
+            ConversionServices.ConvertImage(fd)
+              .then(result => {
+                this.showSuccessSnackbar(result.success);
+              })
+              .catch(error => {
+                this.isConversionActive = false;
+                this.conversionProgressDialog = false;
+                this.showErrorSnackbar(error);
+                this.loading = false;
+              });
+          } else {
+            this.showErrorSnackbar("No Image is Selected");
+          }
+        }else{
+          this.scaleAxesErrorState = true;
+          this.scaleAxesErrorContent = "Scale Axes must be less then the height of the surface ("+surfaceHeight+")";
         }
       }
     },
