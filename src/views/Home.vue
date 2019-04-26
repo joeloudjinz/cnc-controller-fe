@@ -75,6 +75,15 @@
       </div>
       <v-divider></v-divider>
       <v-list class="pt-0" dense>
+        <v-list-tile @click="showSettingsDialog()">
+          <v-list-tile-action>
+            <v-icon>fas fa-tools</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Settings</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider></v-divider>
         <v-list-group v-if="portsCount != 0" prepend-icon="fas fa-parking" value="true">
           <template v-slot:activator>
             <v-list-tile>
@@ -159,6 +168,74 @@
         </v-layout>
       </v-container>
     </v-content>
+    <!-- Settings dialog -->
+    <v-dialog
+      v-model="settingsDialog"
+      fullscreen
+      hide-overlay
+      transition="dialog-bottom-transition"
+    >
+      <v-card>
+        <v-toolbar dark color="teal">
+          <v-btn icon dark :disabled="doDisableCloseSettingsDialogBtn" @click="settingsDialog = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Settings</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn dark flat @click="settingsDialog = false">Save</v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-card-text>
+          <v-layout row wrap>
+            <v-flex xs12>
+              <v-list class="py-0" three-line>
+                <v-list-tile>
+                  <v-list-tile-content>
+                    <v-list-tile-title>The Drawing Surface Dimensions</v-list-tile-title>
+                    <v-list-tile-sub-title>These two values will be used to generate appropriate gcode coordinates for the drawing surface of the machine</v-list-tile-sub-title>
+                  </v-list-tile-content>
+                </v-list-tile>
+              </v-list>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap>
+            <v-flex xs12 sm12 md6 lg3 px-2 pl-4>
+              <v-text-field
+                type="number"
+                label="Width"
+                v-model="surfaceWidth"
+                clearable
+                :error-messages="surfaceWidthErrors"
+                @input="$v.surfaceWidth.$touch()"
+                @blur="$v.surfaceWidth.$touch()"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm12 md6 lg3 px-2>
+              <v-text-field
+                type="number"
+                label="Height"
+                v-model="surfaceHeight"
+                clearable
+                :error-messages="surfaceHeightErrors"
+                @input="$v.surfaceHeight.$touch()"
+                @blur="$v.surfaceHeight.$touch()"
+              ></v-text-field>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="teal"
+              class="white--text"
+              :disabled="doDisableSurfaceDimensionsUpdateBtn"
+              @click="updateSurfaceDimensions()"
+            >Update</v-btn>
+          </v-layout>
+        </v-card-text>
+        <v-divider></v-divider>
+      </v-card>
+    </v-dialog>
     <!-- Port dialog -->
     <v-layout row justify-center>
       <v-dialog
@@ -363,6 +440,8 @@
 import AuthServices from "@/services/auth.js";
 import AgentServices from "@/services/agent.js";
 import PortsServices from "@/services/ports.js";
+import { validationMixin } from "vuelidate";
+import { required, minValue, maxValue } from "vuelidate/lib/validators";
 
 import InfoFormVue from "../components/agents/InfoForm.vue";
 import PassFormVue from "../components/agents/PassForm.vue";
@@ -371,6 +450,19 @@ export default {
   components: {
     InfoFormVue,
     PassFormVue
+  },
+  mixins: [validationMixin],
+  validations: {
+    surfaceWidth: {
+      required,
+      minValue: minValue(50),
+      maxValue: maxValue(2000)
+    },
+    surfaceHeight: {
+      required,
+      minValue: minValue(50),
+      maxValue: maxValue(2000)
+    }
   },
   data: () => ({
     portsList: [],
@@ -401,8 +493,41 @@ export default {
     writeToPortTextField: "",
     writeToPortProgress: false,
     writeToPortProgressValue: "",
-    portConsoleTxt: []
+    portConsoleTxt: [],
+    settingsDialog: false,
+    surfaceHeight: 0,
+    surfaceWidth: 0
   }),
+  computed: {
+    surfaceWidthErrors() {
+      const errors = [];
+      if (!this.$v.surfaceWidth.$dirty) return errors;
+      !this.$v.surfaceWidth.required &&
+        errors.push("Surface Width is required.");
+      !this.$v.surfaceWidth.minValue &&
+        errors.push("Surface Width sould be more then 50mm.");
+      !this.$v.surfaceWidth.maxValue &&
+        errors.push("Surface Width sould be less then 2000mm.");
+      return errors;
+    },
+    surfaceHeightErrors() {
+      const errors = [];
+      if (!this.$v.surfaceHeight.$dirty) return errors;
+      !this.$v.surfaceHeight.required &&
+        errors.push("Surface Height is required.");
+      !this.$v.surfaceHeight.minValue &&
+        errors.push("Surface Height sould be more then 50mm.");
+      !this.$v.surfaceHeight.maxValue &&
+        errors.push("Surface Height sould be less then 2000mm.");
+      return errors;
+    },
+    doDisableSurfaceDimensionsUpdateBtn() {
+      return this.$v.$invalid;
+    },
+    doDisableCloseSettingsDialogBtn(){
+      return this.doDisableSurfaceDimensionsUpdateBtn;
+    }
+  },
   sockets: {
     connect() {
       // console.log("socket connected");
@@ -584,13 +709,15 @@ export default {
             .then(isPortActive => {
               if (isPortActive) {
                 this.doShowPortPanel = false;
-                this.showErrorSnackbar("The port is already active, you can't use the panel");
+                this.showErrorSnackbar(
+                  "The port is already active, you can't use the panel"
+                );
                 // this.flushPortDis = true;
                 // this.pausePortDis = true;
                 // this.resumePortDis = true;
                 // this.openPortDis = true;
                 // this.closePortDis = true;
-              }else{
+              } else {
                 this.doShowPortPanel = true;
               }
             })
@@ -633,9 +760,22 @@ export default {
       this.$refs.passFormRef.$v.$reset();
       this.$refs.infoFormRef.$v.$reset();
     },
+    showSettingsDialog() {
+      //? before opening the dialoge, initialize the settings values from the local storage
+      this.surfaceWidth =  window.localStorage.getItem("surfaceWidth");
+      this.surfaceHeight =  window.localStorage.getItem("surfaceHeight");
+      this.settingsDialog = true;
+    },
     //? form methods
     launcheEditProfile() {
       this.editProfileDialog = true;
+    },
+    updateSurfaceDimensions() {
+      this.$v.$touch();
+      if (!this.$v.$invalid) {
+        window.localStorage.setItem("surfaceWidth", this.surfaceWidth);
+        window.localStorage.setItem("surfaceHeight", this.surfaceHeight);
+      }
     }
   },
   //! DON'T use arrow functions here
