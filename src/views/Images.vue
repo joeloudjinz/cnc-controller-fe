@@ -556,7 +556,7 @@
         <v-card-text class="py-0 px-0">
           <v-progress-linear v-if="portsListProgress" :indeterminate="true" color="teal"></v-progress-linear>
           <v-container grid-list-sm>
-            <v-alert :value="true" color="teal darken-4" class="mb-2">
+            <v-alert :value="true" color="teal darken-4" class="mb-2" type="info">
               This operation will send the generated gcode file to the machine over the selected port and it will start drawing the coordinates,
               the process will take too much time (1s for each line of code),
               you can monitor the whole process and the incoming data from the consoles.
@@ -721,14 +721,14 @@ export default {
     fromatElapsedTimeValue() {
       if (this.elapsedTime != undefined) {
         if (this.elapsedTime < 60) {
-          return `${this.elapsedTime} seconds`;
+          return `${(this.elapsedTime).toFixed(2)} seconds`;
         } else {
           const minutes = this.elapsedTime / 60;
           const rest = this.elapsedTime % 60;
           return `${minutes} minute & ${rest} seconds`;
         }
       } else {
-        return (this.elapsedTime).toFixed(2);
+        return 0;
       }
     },
     formatSizeValue() {
@@ -739,7 +739,7 @@ export default {
           return `${(this.size).toFixed(2)} Mb`;
         }
       } else {
-        return (this.size).toFixed(2);
+        return 0;
       }
     }
   },
