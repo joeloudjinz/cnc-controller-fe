@@ -140,7 +140,8 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw", {
                 fileName,
-                portName
+                portName,
+                target
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {

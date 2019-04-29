@@ -746,24 +746,28 @@ export default {
   },
   sockets: {
     onPortData(data) {
-      this.onPortDataCallback(data.data);
+      if (data.target == window.localStorage.getItem("id")) {
+        this.onPortDataCallback(data.data);
+      }
     },
     onTransmissionLog(data) {
-      this.onTransmissionLogCallback(data.data);
+      if (data.target == window.localStorage.getItem("id")) {
+        this.onTransmissionLogCallback(data.data);
+      }
     },
     onServerStatusChanged(data) {
       let status = data.status;
       this.isTransmissionProcessActive = status;
       this.stopSendDis = !status;
       this.pauseSendDis = !status;
-      if (!status) {
+      if (!status && data.target == window.localStorage.getItem("id")) {
         this.showSuccessSnackbar(
           "Transmission of file " + this.fileName + " Has been completed"
         );
       }
     },
     onConversionEnded(data) {
-      if(data.target == window.localStorage.getItem("id")){
+      if (data.target == window.localStorage.getItem("id")) {
         const result = data.conversionDetails;
         this.showDrawBtn = true;
         this.isConversionActive = false;
@@ -790,7 +794,7 @@ export default {
       }
     },
     onConversionErrorOccur(data) {
-      if(data.target == window.localStorage.getItem("id")){
+      if (data.target == window.localStorage.getItem("id")) {
         this.showDrawBtn = false;
         this.isConversionActive = false;
         this.displayResultsPanel = false;
@@ -821,9 +825,7 @@ export default {
       }
     },
     onTransmissionLogCallback(data) {
-      if (data.length == 0) {
-        // console.warn("data is empty!");
-      } else {
+      if (data.length != 0) {
         this.transmissionConsoleTxt.unshift(data);
       }
     },
