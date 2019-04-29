@@ -514,7 +514,7 @@
     <!-- File Deletion Confirmation -->
     <v-dialog v-model="showDeleteFileConfirmationDialog" persistent width="500">
       <v-card color="white" dark>
-        <v-card-title class="error white--text headline">Agent Delete Confirmation</v-card-title>
+        <v-card-title class="error white--text headline">Confirm Deletion</v-card-title>
         <v-divider></v-divider>
         <v-card-text class="font-weight-bold black--text">
           <p v-if="isCurrentFileGcode">Are you sure you want to delete this file?</p>
@@ -637,10 +637,14 @@ export default {
   }),
   sockets: {
     onPortData(data) {
-      this.onPortDataCallback(data.data);
+      if (data.target == window.localStorage.getItem("id")) {
+        this.onPortDataCallback(data.data);
+      }
     },
     onTransmissionLog(data) {
-      this.onTransmissionLogCallback(data.data);
+      if (data.target == window.localStorage.getItem("id")) {
+        this.onTransmissionLogCallback(data.data);
+      }
     },
     onGcodeFileDeleted(data) {
       this.removeGcodeFileFormItems(data.fileName);
@@ -680,18 +684,22 @@ export default {
       });
     },
     onQuickConversionEnded(data){
-      this.showConversionProgress = false;
-      this.showConversionResultAlert = true;
-      this.proccessBlackPixelsValue = 100 - data.data;
-      this.unproccessBlackPixelsValue = data.data;
-      this.showSuccessSnackbar("Converted successfully");
+      if (data.target == window.localStorage.getItem("id")) {
+        this.showConversionProgress = false;
+        this.showConversionResultAlert = true;
+        this.proccessBlackPixelsValue = 100 - data.conversionDetails;
+        this.unproccessBlackPixelsValue = data.conversionDetails;
+        this.showSuccessSnackbar("Converted successfully");
+      }
     },
     onQuickConversionErrorOccur(data){
-      this.doShowParamsForm = true;
-      this.showConversionProgress = false;
-      this.showConversionResultAlert = false;
-      this.showBeforConversionAlert = true;
-      this.showErrorSnackbar(data.errorData);
+      if (data.target == window.localStorage.getItem("id")) {
+        this.doShowParamsForm = true;
+        this.showConversionProgress = false;
+        this.showConversionResultAlert = false;
+        this.showBeforConversionAlert = true;
+        this.showErrorSnackbar(data.errorData);
+      }
     }
   },
   computed: {

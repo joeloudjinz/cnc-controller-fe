@@ -2,7 +2,8 @@ import axios from "axios";
 import AgentServices from "./agent.js";
 
 const url = "api/local/images";
-// /convert
+
+const target = window.localStorage.getItem("id");
 
 class ConversionServices {
   static ConvertImage(formData) {
@@ -44,7 +45,7 @@ class ConversionServices {
     return new Promise(async (resolve, reject) => {
       await axios
         .post(url + "/convert/quick", {
-          parameters: params
+          parameters: params, target
         }, {
           params: {
             imageName,
