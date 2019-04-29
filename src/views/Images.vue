@@ -450,8 +450,8 @@
             <v-slide-y-transition>
               <v-card
                 v-show="showTranmsissionConsole"
-                color="teal lighten-4 elevation-0"
                 height="300px"
+                color="teal lighten-4 elevation-0"
                 class="scroll scrollbar-style"
               >
                 <v-card-text class="teal--text darken-4">
@@ -722,7 +722,7 @@ export default {
     fromatElapsedTimeValue() {
       if (this.elapsedTime != undefined) {
         if (this.elapsedTime < 60) {
-          return `${(this.elapsedTime).toFixed(2)} seconds`;
+          return `${this.elapsedTime.toFixed(2)} seconds`;
         } else {
           const minutes = this.elapsedTime / 60;
           const rest = this.elapsedTime % 60;
@@ -737,7 +737,7 @@ export default {
         if (this.size < 1) {
           return `${(this.size / 0.001).toFixed(2)} Kb`;
         } else {
-          return `${(this.size).toFixed(2)} Mb`;
+          return `${this.size.toFixed(2)} Mb`;
         }
       } else {
         return 0;
@@ -865,7 +865,7 @@ export default {
         this.scaleAxesErrorContent = "Scale Axes must be superior then 50";
       } else {
         const surfaceHeight = window.localStorage.getItem("surfaceHeight");
-        if(this.scaleAxes < surfaceHeight){
+        if (this.scaleAxes < surfaceHeight) {
           if (this.selectedFile != null) {
             this.conversionProgressDialog = true;
             const fd = new FormData();
@@ -898,9 +898,12 @@ export default {
           } else {
             this.showErrorSnackbar("No Image is Selected");
           }
-        }else{
+        } else {
           this.scaleAxesErrorState = true;
-          this.scaleAxesErrorContent = "Scale Axes must be less then the height of the surface ("+surfaceHeight+")";
+          this.scaleAxesErrorContent =
+            "Scale Axes must be less then the height of the surface (" +
+            surfaceHeight +
+            ")";
         }
       }
     },

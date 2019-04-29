@@ -177,7 +177,12 @@
     >
       <v-card>
         <v-toolbar dark color="teal">
-          <v-btn icon dark :disabled="doDisableCloseSettingsDialogBtn" @click="settingsDialog = false">
+          <v-btn
+            icon
+            dark
+            :disabled="doDisableCloseSettingsDialogBtn"
+            @click="settingsDialog = false"
+          >
             <v-icon>close</v-icon>
           </v-btn>
           <v-toolbar-title>Settings</v-toolbar-title>
@@ -309,6 +314,7 @@
           <v-alert
             :value="true"
             type="info"
+            color="teal darken-4"
             transition="fade-transition"
             class="mx-3"
           >Only "Port Name" is guaranteed 100%, other information is related to the connected device of the current port.</v-alert>
@@ -353,13 +359,16 @@
           <v-divider></v-divider>
           <v-layout row wrap>
             <v-flex xs12 px-3>
-              <v-toolbar color="teal" card dark class="mt-2">
+              <v-toolbar
+                color="teal lighten-4"
+                class="elevation-0 mt-2 teal--text text--darken-1"
+                card
+              >
                 <v-text-field
-                  dark
                   v-model="writeToPortTextField"
                   label="Commands"
-                  solo-inverted
-                  class="pt-2"
+                  solo
+                  class="pt-2 teal--text text--darken-4"
                 ></v-text-field>
                 <v-fade-transition>
                   <v-btn
@@ -367,16 +376,20 @@
                     icon
                     @click="sendCommandToPort(selectedPortObject.comName)"
                   >
-                    <v-icon color="white">fas fa-paper-plane</v-icon>
+                    <v-icon color="teal darken-4">fas fa-paper-plane</v-icon>
                   </v-btn>
                 </v-fade-transition>
                 <v-btn icon @click="clearPortConsole()">
-                  <v-icon color="white">fas fa-eraser</v-icon>
+                  <v-icon color="teal darken-4">fas fa-eraser</v-icon>
                 </v-btn>
               </v-toolbar>
             </v-flex>
             <v-flex xs12 pb-3>
-              <v-card height="300px" color="teal lighten-4" class="mx-3 scroll">
+              <v-card
+                height="300px"
+                color="teal lighten-4 elevation-0"
+                class="scroll scrollbar-style mx-3"
+              >
                 <v-card-text class="black--text text-darken-4">
                   <table>
                     <tr v-for="(line, index) in portConsoleTxt" :key="index">
@@ -524,7 +537,7 @@ export default {
     doDisableSurfaceDimensionsUpdateBtn() {
       return this.$v.$invalid;
     },
-    doDisableCloseSettingsDialogBtn(){
+    doDisableCloseSettingsDialogBtn() {
       return this.doDisableSurfaceDimensionsUpdateBtn;
     }
   },
@@ -762,8 +775,8 @@ export default {
     },
     showSettingsDialog() {
       //? before opening the dialoge, initialize the settings values from the local storage
-      this.surfaceWidth =  window.localStorage.getItem("surfaceWidth");
-      this.surfaceHeight =  window.localStorage.getItem("surfaceHeight");
+      this.surfaceWidth = window.localStorage.getItem("surfaceWidth");
+      this.surfaceHeight = window.localStorage.getItem("surfaceHeight");
       this.settingsDialog = true;
     },
     //? form methods
@@ -802,5 +815,20 @@ export default {
 <style>
 .scroll {
   overflow-y: auto;
+}
+.scrollbar-style::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.3);
+  background-color: #e0f2f1;
+}
+
+.scrollbar-style::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+  background-color: #004d40;
+}
+
+.scrollbar-style::-webkit-scrollbar-thumb {
+  background-color: #00695c;
 }
 </style>
