@@ -763,36 +763,40 @@ export default {
       }
     },
     onConversionEnded(data) {
-      const result = data;
-      this.showDrawBtn = true;
-      this.isConversionActive = false;
-      this.displayResultsPanel = true;
-      this.conversionProgressDialog = false;
-      //? update the conversion result variables
-      this.oldtoolDiameter = result.toolDiameter;
-      this.oldsensitivity = result.sensitivity;
-      this.oldscaleAxes = result.scaleAxes;
-      this.olddeepStep = result.deepStep;
-      this.oldwhiteZ = result.whiteZ;
-      this.oldblackZ = result.blackZ;
-      this.oldsafeZ = result.safeZ;
-      this.oldwork = result.feedrate.work;
-      this.oldidle = result.feedrate.idle;
-      this.value = Math.round(100 - result.errBlackPixel);
-      this.errorValue = Math.round(result.errBlackPixel);
-      this.imegSize = result.imgSize;
-      this.fileName = result.fileName;
-      this.startTime = result.startTime;
-      this.endTime = result.endTime;
-      this.elapsedTime = result.elapsedTime;
-      this.size = result.size;
+      if(data.target == window.localStorage.getItem("id")){
+        const result = data.conversionDetails;
+        this.showDrawBtn = true;
+        this.isConversionActive = false;
+        this.displayResultsPanel = true;
+        this.conversionProgressDialog = false;
+        //? update the conversion result variables
+        this.oldtoolDiameter = result.toolDiameter;
+        this.oldsensitivity = result.sensitivity;
+        this.oldscaleAxes = result.scaleAxes;
+        this.olddeepStep = result.deepStep;
+        this.oldwhiteZ = result.whiteZ;
+        this.oldblackZ = result.blackZ;
+        this.oldsafeZ = result.safeZ;
+        this.oldwork = result.feedrate.work;
+        this.oldidle = result.feedrate.idle;
+        this.value = Math.round(100 - result.errBlackPixel);
+        this.errorValue = Math.round(result.errBlackPixel);
+        this.imegSize = result.imgSize;
+        this.fileName = result.fileName;
+        this.startTime = result.startTime;
+        this.endTime = result.endTime;
+        this.elapsedTime = result.elapsedTime;
+        this.size = result.size;
+      }
     },
     onConversionErrorOccur(data) {
-      this.showDrawBtn = false;
-      this.isConversionActive = false;
-      this.displayResultsPanel = false;
-      this.conversionProgressDialog = false;
-      this.showErrorSnackbar(data.errorData);
+      if(data.target == window.localStorage.getItem("id")){
+        this.showDrawBtn = false;
+        this.isConversionActive = false;
+        this.displayResultsPanel = false;
+        this.conversionProgressDialog = false;
+        this.showErrorSnackbar(data.errorData);
+      }
     }
   },
   created() {
@@ -884,6 +888,7 @@ export default {
                 idle: this.idle
               })
             );
+            fd.append("target", window.localStorage.getItem("id"));
             this.isConversionActive = true;
             ConversionServices.ConvertImage(fd)
               .then(result => {
@@ -927,11 +932,11 @@ export default {
       this.consolesArea = true;
       this.port = port;
       if (this.fileName !== undefined && this.fileName !== "") {
-        // const splitted = this.fileName.split(".");
-        // const fileName = splitted[0] + "." + splitted[1];
+        const splitted = this.fileName.split(".");
+        const fileName = splitted[0] + "." + splitted[1];
         setTimeout(() => {
           this.consolesArea = true;
-          PortsServices.performFullDrawOperation("sm-sample", port)
+          PortsServices.performFullDrawOperation(fileName, port)
             .then(result => {
               this.pauseSendDis = false;
               this.stopSendDis = false;

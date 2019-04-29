@@ -551,7 +551,8 @@ export default {
     },
     onSinglePortData(data) {
       // console.log("data :", data);
-      this.onSinglePortDataCallback(data);
+      if(data.target == window.localStorage.getItem('id'))
+        this.onSinglePortDataCallback(data);
     }
   },
   methods: {

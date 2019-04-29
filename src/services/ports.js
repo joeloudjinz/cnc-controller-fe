@@ -3,6 +3,7 @@ import AgentServices from "./agent.js";
 
 const url = "api/local/ports";
 
+const target = window.localStorage.getItem("id");
 class PortServices {
     /**
      * TODO: add token to header
@@ -349,7 +350,7 @@ class PortServices {
     static openPort(portName) {
         return new Promise((resolve, reject) => {
             axios.post(url + "/open", {
-                portName
+                portName, target
             }).then((result) => {
                 resolve(result.data.success);
             }).catch((error) => {
