@@ -22,7 +22,7 @@
                   >
                   <div id="preview">
                     <!--  -->
-                    <v-img contain max-height="650" v-if="url" :src="url"></v-img>
+                    <v-img contain height="650" v-if="url" :src="url"></v-img>
                   </div>
                 </v-card-text>
               </v-layout>
@@ -383,9 +383,9 @@
       </v-flex>
     </v-layout>
     <!-- Consoles Area -->
-    <v-layout v-if="consolesArea == true" row wrap pa-1>
+    <v-layout v-if="consolesArea == true" row wrap>
       <!-- Transmission Console Area -->
-      <v-flex xs12 sm12 md12 lg6 pa-1>
+      <v-flex xs12 sm12 md12 lg7 pa-1>
         <v-layout row wrap>
           <v-flex d-flex xs12 sm12 md12 lg12>
             <v-toolbar
@@ -472,7 +472,7 @@
         </v-layout>
       </v-flex>
       <!-- Port Console Area -->
-      <v-flex xs12 sm12 md12 lg6 pa-1>
+      <v-flex xs12 sm12 md12 lg5 pa-1>
         <v-layout row wrap>
           <v-flex xs12 sm12 md12 lg12>
             <v-toolbar
