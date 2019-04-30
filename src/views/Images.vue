@@ -706,7 +706,7 @@ export default {
     showTranmsissionConsole: true,
     isTransmissionProcessActive: false,
     //? for consoles area
-    consolesArea: true,
+    consolesArea: false,
     showPortConsole: true,
     //? to enable and disable control btns of transmission console panel
     stopSendDis: true,
