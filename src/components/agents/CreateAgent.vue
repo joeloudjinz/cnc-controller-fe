@@ -91,12 +91,14 @@
       <v-spacer></v-spacer>
       <v-btn class="white--text" color="teal" @click="submit">Submit</v-btn>
     </v-card-actions>
+    <!-- Main Snackbar -->
     <v-snackbar
       v-model="snackbar"
       :timeout="5000"
-      :bottom="'bottom'"
+      bottom
       :color="snackbarColor"
       :multi-line="'multi-line'"
+      class="mb-2"
     >{{ snackbarContent }}</v-snackbar>
   </v-card>
 </template>

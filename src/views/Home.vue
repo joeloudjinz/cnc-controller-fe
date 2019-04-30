@@ -187,9 +187,9 @@
           </v-btn>
           <v-toolbar-title>Settings</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-toolbar-items>
+          <!-- <v-toolbar-items>
             <v-btn dark flat @click="settingsDialog = false">Save</v-btn>
-          </v-toolbar-items>
+          </v-toolbar-items>-->
         </v-toolbar>
         <v-card-text>
           <v-layout row wrap>
@@ -198,7 +198,7 @@
                 <v-list-tile>
                   <v-list-tile-content>
                     <v-list-tile-title>The Drawing Surface Dimensions</v-list-tile-title>
-                    <v-list-tile-sub-title>These two values will be used to generate appropriate gcode coordinates for the drawing surface of the machine</v-list-tile-sub-title>
+                    <v-list-tile-sub-title>These two values will be used to generate appropriate gcode coordinates according to the drawing surface of the machine</v-list-tile-sub-title>
                   </v-list-tile-content>
                 </v-list-tile>
               </v-list>
@@ -439,13 +439,14 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- Snackbar -->
+    <!-- Main Snackbar -->
     <v-snackbar
       v-model="snackbar"
       :timeout="5000"
-      :bottom="'bottom'"
+      bottom
       :color="snackbarColor"
       :multi-line="'multi-line'"
+      class="mb-2"
     >{{ snackbarContent }}</v-snackbar>
   </v-app>
 </template>
@@ -551,7 +552,7 @@ export default {
     },
     onSinglePortData(data) {
       // console.log("data :", data);
-      if(data.target == window.localStorage.getItem('id'))
+      if (data.target == window.localStorage.getItem("id"))
         this.onSinglePortDataCallback(data);
     }
   },
@@ -789,6 +790,7 @@ export default {
       if (!this.$v.$invalid) {
         window.localStorage.setItem("surfaceWidth", this.surfaceWidth);
         window.localStorage.setItem("surfaceHeight", this.surfaceHeight);
+        this.showSuccessSnackbar("Information Updated Successfully");
       }
     }
   },
