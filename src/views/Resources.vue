@@ -1,27 +1,27 @@
 <template>
   <v-layout wrap row>
     <v-flex xs12 sm12 md4 lg4 pa-2>
-      <v-toolbar card color="teal" class="white--text">
+      <v-toolbar card color="teal lighten-5" class="teal--text text--darken-4">
         <h2>Resources Directory Tree</h2>
       </v-toolbar>
-      <v-card height="900" color="white" class="elevation-0 scroll scrollbar-style">
-        <v-card-text>
-          <v-progress-linear :indeterminate="inProgress"></v-progress-linear>
+      <v-card height="900" color="teal lighten-5" class="elevation-0 scroll scrollbar-style">
+        <v-card-text class="pt-0">
+          <v-progress-linear :indeterminate="inProgress" color="teal darken-2"></v-progress-linear>
           <v-treeview :items="items">
             <template v-slot:prepend="{ item }">
-              <v-icon color="teal" v-if="item.children">fas fa-folder</v-icon>
+              <v-icon color="teal darken-2" v-if="item.children">fas fa-folder</v-icon>
               <v-icon
-                color="teal lighten-2"
+                color="teal darken-2"
                 v-else-if="item.type === 'image'"
                 @click="displayImage(item.name, item.path)"
               >fas fa-image</v-icon>
               <v-icon
-                color="teal lighten-2"
+                color="teal darken-2"
                 v-else-if="item.type === 'gcode'"
                 @click="displayGcodeLines(item.name, item.path)"
               >fas fa-file-code</v-icon>
               <v-icon
-                color="teal lighten-2"
+                color="teal darken-2"
                 v-else-if="item.type === 'log'"
                 @click="displayLogFile(item.name, item.path)"
               >fas fa-file-alt</v-icon>
@@ -249,14 +249,14 @@
     </v-dialog>
     <v-fade-transition>
       <v-flex xs12 sm12 md8 lg8 v-show="doShowDisplayCard" pa-2>
-        <v-toolbar card class="teal white--text">
+        <v-toolbar card color="teal lighten-5" class="teal--text text--darken-4">
           <h2>{{currentFileName}}</h2>
           <v-spacer></v-spacer>
           <div v-if="doShowDeleteDirectoryBtn">
             <v-tooltip bottom>
               <template #activator="data">
                 <v-btn v-on="data.on" icon @click="showDeleteFileConfirmationDialog = true">
-                  <v-icon color="white">fas fa-folder-minus</v-icon>
+                  <v-icon color="teal darken-2">fas fa-folder-minus</v-icon>
                 </v-btn>
               </template>
               <span>Delete the current directory</span>
@@ -266,14 +266,14 @@
             <v-tooltip bottom>
               <template #activator="data">
                 <v-btn v-on="data.on" icon @click="showDeleteFileConfirmationDialog = true">
-                  <v-icon color="white">fas fa-trash-alt</v-icon>
+                  <v-icon color="teal darken-2">fas fa-trash-alt</v-icon>
                 </v-btn>
               </template>
               <span>Delete the current file</span>
             </v-tooltip>
           </div>
         </v-toolbar>
-        <v-card height="842" color="teal lighten-5" class="scroll scrollbar-style">
+        <v-card height="842" color="teal lighten-5" class="elevation-0 scroll scrollbar-style">
           <!-- To display gcode file content -->
           <v-card-text v-if="gcodeData.length != 0">
             <table>
@@ -303,7 +303,7 @@
           </v-card-text>
         </v-card>
         <!-- Card Action for gcode & log files content card -->
-        <v-card-actions class="teal lighten-5 elevation-3 mt-1">
+        <v-card-actions class="teal lighten-5 elevation-0 mt-1">
           <v-btn
             flat
             class="teal--text text--darken-2"
@@ -334,7 +334,7 @@
             color="teal darken-4"
             transition="fade-transition"
           >This is the percentages of the proccessed and unproccessed pixels in the picture.</v-alert>
-          <v-progress-linear v-show="showConversionProgress" :indeterminate="true"></v-progress-linear>
+          <v-progress-linear v-show="showConversionProgress" :indeterminate="true" color="teal darken-2"></v-progress-linear>
           <v-container fluid grid-list-lg v-if="doShowParamsForm">
             <v-flex xs12>
               <v-subheader class="pl-0">Tool Diameter</v-subheader>
@@ -471,7 +471,7 @@
       <v-card>
         <v-card-title class="teal darken-4 py-4 title white--text">GCode File Transmission</v-card-title>
         <v-card-text class="py-0 px-0">
-          <v-progress-linear v-if="portsListProgress" :indeterminate="true" color="teal"></v-progress-linear>
+          <v-progress-linear v-if="portsListProgress" :indeterminate="true" color="teal darken-2"></v-progress-linear>
           <v-container grid-list-sm>
             <v-alert :value="true" color="teal darken-4" class="mb-2">
               This operation will send the generated gcode file to the machine over the selected port and it will start drawing the coordinates,
@@ -513,8 +513,10 @@
     </v-dialog>
     <!-- File Deletion Confirmation -->
     <v-dialog v-model="showDeleteFileConfirmationDialog" persistent width="500">
-      <v-card color="white" dark>
-        <v-card-title class="error white--text headline">Confirm Deletion</v-card-title>
+      <v-card color="teal lighten-5" dark>
+        <v-card-title class="teal--text text--darken-2 headline">
+          <v-icon color="teal darken-2" large left>fas fa-exclamation-circle</v-icon>Confirm Deletion
+        </v-card-title>
         <v-divider></v-divider>
         <v-card-text class="font-weight-bold black--text">
           <p v-if="isCurrentFileGcode">Are you sure you want to delete this file?</p>
@@ -525,10 +527,10 @@
           <v-btn
             flat
             @click="showDeleteFileConfirmationDialog = false"
-            class="grey--text lighten-1"
+            class="teal--text lighten-1"
           >Cancel</v-btn>
           <v-spacer></v-spacer>
-          <v-btn @click="selecteDeletionType()" color="red lighten-1" class="white--text">Delete</v-btn>
+          <v-btn @click="selecteDeletionType()" color="red lighten-1" class="white--text">Yes</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

@@ -110,7 +110,7 @@
       </v-list>
     </v-navigation-drawer>
     <!-- TOOLBAR -->
-    <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="teal darken-3" dark app fixed>
+    <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="teal" dark app fixed>
       <v-toolbar-title class="ml-0 pl-0">
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
         <span class="center">Loudjein CNC System</span>
@@ -125,12 +125,6 @@
           </template>
           <span>Moniter the system and control it's data</span>
         </v-tooltip>
-        <!-- <v-tooltip bottom>
-          <template #activator="data">
-            <v-btn flat v-on="data.on" class="m-0">Machines</v-btn>
-          </template>
-          <span>Machines page</span>
-        </v-tooltip>-->
         <!-- Protect it by isAdmin ! -->
         <v-tooltip bottom>
           <template v-if="isAdmin == true" #activator="data">
@@ -250,7 +244,7 @@
         transition="dialog-bottom-transition"
       >
         <v-card>
-          <v-toolbar dark color="teal lighten-1">
+          <v-toolbar dark color="teal">
             <v-btn
               icon
               dark
@@ -406,32 +400,30 @@
     </v-layout>
     <!-- Leave Port panel Dialog -->
     <v-dialog v-model="leavePortPanelDialog" persistent max-width="600px">
-      <v-card>
-        <v-card-title class="teal darken-2 white--text">
-          <span class="headline">Leave Port Panel</span>
+      <v-card color="teal lighten-5">
+        <v-card-title class="teal--text text--darken-2 headline">
+          <v-icon color="teal darken-2" large left>fas fa-exclamation-circle</v-icon>Leave Port Panel
         </v-card-title>
         <v-card-text>
           <p>The port will be closed after leaving Port Panel, are you sure you want to leave?</p>
         </v-card-text>
         <v-card-actions>
-          <v-btn color="white" class="teal--text" @click="leavePortPanelDialog = false">Cancel</v-btn>
+          <v-btn flat class="teal--text" @click="leavePortPanelDialog = false">Cancel</v-btn>
           <v-spacer></v-spacer>
-          <v-btn color="teal" class="white--text" @click="closePortPanelDialog()">Leave</v-btn>
+          <v-btn color="error" class="white--text" @click="closePortPanelDialog()">Yes</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- Edit Profile Data Dialog -->
     <v-dialog v-model="editProfileDialog" persistent max-width="600px">
-      <v-card>
-        <v-card-title class="teal darken-2 white--text">
-          <span class="headline">Edit Profile Data</span>
+      <v-card color="teal lighten-5">
+        <v-card-title class="teal--text text--darken-2 headline">
+          <v-icon x-large color="teal darken-2" left>fas fa-user-edit</v-icon>Edit Profile Data
         </v-card-title>
         <v-card-text>
           <InfoFormVue ref="infoFormRef"/>
           <v-divider></v-divider>
           <PassFormVue ref="passFormRef"/>
-          <v-divider></v-divider>
-          <small class="text--red">All fields are required if they are empty</small>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -552,7 +544,9 @@ export default {
     },
     onSinglePortData(data) {
       // console.log("data :", data);
-      if (data.target == window.localStorage.getItem("id"))
+      // console.log('typeof data.target :', typeof data.target);
+      // console.log('data.target :', data.target);
+      if (data.target === window.localStorage.getItem("id"))
         this.onSinglePortDataCallback(data);
     }
   },

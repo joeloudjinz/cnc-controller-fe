@@ -1,6 +1,6 @@
 <template>
   <v-container fluid wrap pa-1 ma-0>
-    <v-alert :value="isTransmissionProcessActive" color="warning">
+    <v-alert :value="isTransmissionProcessActive" type="warning" color="warning">
       Transmission process is going on, some functionalities
       are disabled until it's over
     </v-alert>
@@ -8,7 +8,7 @@
     <v-layout row wrap>
       <!-- Image Upload and display Section -->
       <v-flex d-felx xs12 sm12 md12 lg8 pa-1>
-        <v-card>
+        <v-card color="teal lighten-5">
           <v-container px-0 pb-0 pt-4>
             <v-card color="transparent" class="elevation-0">
               <v-layout align-center justify-center row fill-height>
@@ -49,8 +49,8 @@
         </v-card>
       </v-flex>
       <!-- Parameters Section -->
-      <v-flex d-flex xs12 sm12 md12 lg4 pa-1>
-        <v-card>
+      <v-flex d-flex xs12 sm12 md12 lg4 pa-1 class="transparent">
+        <v-card color="teal lighten-5">
           <v-card-title>
             <v-alert :value="true" transition="scale-transition" type="info" color="teal darken-4">
               Adjust these parameters to control the quality of gcode,
@@ -151,11 +151,11 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <!-- Conversion Results panel Section -->
+    <!-- Conversion Results Section -->
     <v-layout row wrap>
       <!-- Conversion Results panel -->
       <v-flex d-flex xs12 sm12 md12 lg12 pa-1>
-        <v-card>
+        <v-card color="teal lighten-5">
           <v-container fluid px-0 pb-0 pt-4>
             <v-card color="transparent elevation-0">
               <v-fade-transition>

@@ -1,12 +1,12 @@
 <template>
   <v-flex xs12 sm12 md12 lg12>
-    <v-toolbar color="teal lighten-1" dark>
+    <v-toolbar color="teal lighten-5" class="elevation-0 teal--text text--darken-4">
       <v-toolbar-title>{{ title }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-tooltip bottom>
         <template #activator="data">
           <v-btn icon v-on="data.on" @click="mounteAgentsTableComponent">
-            <v-icon>fas fa-list-alt</v-icon>
+            <v-icon color="teal darken-2">fas fa-list-alt</v-icon>
           </v-btn>
         </template>
         <span>list of all the agents</span>
@@ -14,7 +14,7 @@
       <v-tooltip bottom>
         <template #activator="data">
           <v-btn icon v-on="data.on" @click="mounteAddAgentComponent">
-            <v-icon>fas fa-plus-circle</v-icon>
+            <v-icon color="teal darken-2">fas fa-plus-circle</v-icon>
           </v-btn>
         </template>
         <span>add new agnet</span>

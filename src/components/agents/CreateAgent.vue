@@ -1,5 +1,5 @@
 <template>
-  <v-card ref="form">
+  <v-card ref="form" color="teal lighten-5" class="elevation-0">
     <v-card-text class="mt-0 pt-3">
       <v-alert
         :value="true"

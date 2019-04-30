@@ -1,23 +1,33 @@
 <template>
-  <v-card class="pt-3">
+  <v-card class="pt-3 elevation-0" color="teal lighten-5">
+    <!-- icon="check_circle" -->
     <v-alert
       :value="true"
       color="teal darken-1"
-      icon="check_circle"
+      type="info"
       class="mx-3"
     >Here you can find the list of all the users of the system, both agnets and admins, with there status of activeness</v-alert>
     <v-card-title>
       <v-spacer></v-spacer>
-      <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+      <v-text-field
+        v-model="search"
+        append-icon="search"
+        label="Search"
+        color="teal darken-2"
+        single-line
+        hide-details
+        clearable
+      ></v-text-field>
     </v-card-title>
     <v-data-table
+      class="elevation-3"
       :headers="headers"
       :items="agents"
       :search="search"
       :loading="loading"
       item-key="index"
     >
-      <v-progress-linear slot="progress" color="teal" indeterminate></v-progress-linear>
+      <v-progress-linear slot="progress" color="teal darken-2" indeterminate></v-progress-linear>
       <template slot="items" slot-scope="props">
         <td>
           <v-badge right color="transparent">
@@ -84,26 +94,33 @@
     </v-data-table>
     <!-- Agent delete confirmation dialog -->
     <v-dialog v-model="confirmeDeleteDialog" persistent width="500">
-      <v-card color="white" dark>
-        <v-card-title class="error white--text headline">Agent Delete Confirmation</v-card-title>
+      <v-card color="teal lighten-5" dark>
+        <v-card-title class="teal--text text--darken-2 headline">
+          <v-icon color="teal darken-2" large left>fas fa-exclamation-circle</v-icon>Confirm Deletion
+        </v-card-title>
         <v-divider></v-divider>
-        <v-card-text class="font-weight-bold black--text">Are you sure you want to delete agent?</v-card-text>
+        <v-card-text
+          class="font-weight-bold teal lighten-5 teal--text text--darken-2"
+        >Confirm the deletion of this agent?</v-card-text>
         <v-card-actions>
-          <v-btn flat @click="cancelConfirmDeleteDialog()" class="grey--text lighten-1">Cancel</v-btn>
+          <v-btn flat @click="cancelConfirmDeleteDialog()" class="teal--text lighten-1">Cancel</v-btn>
           <v-spacer></v-spacer>
-          <v-btn @click="deleteAgent()" color="red lighten-1" class="white--text">Delete</v-btn>
+          <v-btn @click="deleteAgent()" color="red lighten-1" class="white--text">Yes</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- New password after reset -->
-    <v-dialog v-model="dialog" persistent width="500">
-      <v-card color="white" dark>
-        <v-card-title class="teal white--text headline">Reset Agent Password</v-card-title>
-        <v-divider></v-divider>
-        <v-card-text class="font-weight-bold teal--text">
-          {{dialogContent}}
-          <v-progress-linear indeterminate color="white" class="mb-0" :active="loadingPass"></v-progress-linear>
-        </v-card-text>
+    <v-dialog v-model="dialog" persistent width="400">
+      <v-card color="teal lighten-5" dark>
+        <v-card-title class="teal--text text--darken-2 headline">Agent Password Reset</v-card-title>
+        <!-- <v-divider></v-divider> -->
+        <v-progress-linear
+          indeterminate
+          color="teal darken-2"
+          class="pa-0 mb-0"
+          :active="loadingPass"
+        ></v-progress-linear>
+        <v-card-text class="font-weight-bold black--text">{{dialogContent}}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn flat @click="dialog = false" class="teal--text">Ok</v-btn>
