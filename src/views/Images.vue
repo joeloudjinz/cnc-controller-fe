@@ -664,7 +664,7 @@ export default {
     work: 1200,
     idle: 3000,
     //? for gcode file
-    fileName: "sm-sample",
+    fileName: "",
     size: 0,
     link: null,
     //? for conversion details in results section
@@ -696,7 +696,7 @@ export default {
     displayPortConsole: true,
     //? for ports list
     portsList: [],
-    portsListProgress: true,
+    portsListProgress: false,
     //? for console
     portConsoleTxt: [],
     port: undefined,
@@ -807,7 +807,7 @@ export default {
     window.addEventListener("beforeunload", event =>
       this.handleOnBeforeUnload(event)
     );
-    // see if there is a transmission process going on
+    // see if there is a transmission process going on when loading the page
     PortsServices.isServerActive()
       .then(status => {
         this.isTransmissionProcessActive = status;
@@ -818,9 +818,7 @@ export default {
   },
   methods: {
     onPortDataCallback(content) {
-      if (content.length == 0) {
-        // console.warn("data is empty!");
-      } else {
+      if (content.length != 0) {
         this.portConsoleTxt.unshift(content);
       }
     },
@@ -931,7 +929,7 @@ export default {
         });
     },
     startTransmitingGCode(port) {
-      this.consolesArea = true;
+      this.portsListProgress = true;
       this.port = port;
       if (this.fileName !== undefined && this.fileName !== "") {
         const splitted = this.fileName.split(".");
@@ -940,6 +938,7 @@ export default {
           this.consolesArea = true;
           PortsServices.performFullDrawOperation(fileName, port)
             .then(result => {
+              this.portsListProgress = false;
               this.pauseSendDis = false;
               this.stopSendDis = false;
               this.portsListDialog = false;
@@ -953,15 +952,15 @@ export default {
               this.port = undefined;
               this.pausePortDis = true;
               this.flushPortDis = true;
-              // console.log(error);
               this.showErrorSnackbar(error.failure.split(":")[1]);
-              this.portConsoleTxt.push("Operation: " + error.operation + "|");
-              this.portConsoleTxt.push("Message: " + error.failure + "|");
-              if (error.isPortClosed) {
-                this.portConsoleTxt.push(
-                  "Port Status: " + error.isPortClosed ? " Closed|" : " Opened|"
-                );
-              }
+              //? disabling these lines becuase the consoles are hidden
+              // this.portConsoleTxt.push("Operation: " + error.operation + "|");
+              // this.portConsoleTxt.push("Message: " + error.failure + "|");
+              // if (error.isPortClosed) {
+              //   this.portConsoleTxt.push(
+              //     "Port Status: " + error.isPortClosed ? " Closed|" : " Opened|"
+              //   );
+              // }
             });
         }, 500);
       } else {

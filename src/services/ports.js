@@ -261,7 +261,8 @@ class PortServices {
     static pauseSendOperation(portName) {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/pause", {
-                portName
+                portName,
+                target
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -291,7 +292,8 @@ class PortServices {
     static resumeSendOperation(portName) {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/resume", {
-                portName
+                portName,
+                target
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -321,7 +323,8 @@ class PortServices {
     static stopSendOperation(portName) {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/stop", {
-                portName
+                portName,
+                target
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -351,7 +354,8 @@ class PortServices {
     static openPort(portName) {
         return new Promise((resolve, reject) => {
             axios.post(url + "/open", {
-                portName, target
+                portName,
+                target
             }).then((result) => {
                 resolve(result.data.success);
             }).catch((error) => {

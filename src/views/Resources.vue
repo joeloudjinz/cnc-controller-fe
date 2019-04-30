@@ -1,10 +1,10 @@
 <template>
   <v-layout wrap row>
     <v-flex xs12 sm12 md4 lg4 pa-2>
-      <v-toolbar card class="teal white--text">
+      <v-toolbar card color="teal" class="white--text">
         <h2>Resources Directory Tree</h2>
       </v-toolbar>
-      <v-card height="900" class="scroll scrollbar-style">
+      <v-card height="900" color="white" class="elevation-0 scroll scrollbar-style">
         <v-card-text>
           <v-progress-linear :indeterminate="inProgress"></v-progress-linear>
           <v-treeview :items="items">
@@ -660,7 +660,7 @@ export default {
       this.isTransmissionProcessActive = status;
       this.stopSendDis = !status;
       this.pauseSendDis = !status;
-      if (!status) {
+      if (!status && data.target == window.localStorage.getItem("id")) {
         this.showSuccessSnackbar(
           "Transmission of Gcode file Has been completed"
         );
@@ -683,7 +683,7 @@ export default {
         path: data.path
       });
     },
-    onQuickConversionEnded(data){
+    onQuickConversionEnded(data) {
       if (data.target == window.localStorage.getItem("id")) {
         this.showConversionProgress = false;
         this.showConversionResultAlert = true;
@@ -692,7 +692,7 @@ export default {
         this.showSuccessSnackbar("Converted successfully");
       }
     },
-    onQuickConversionErrorOccur(data){
+    onQuickConversionErrorOccur(data) {
       if (data.target == window.localStorage.getItem("id")) {
         this.doShowParamsForm = true;
         this.showConversionProgress = false;
