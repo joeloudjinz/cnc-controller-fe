@@ -468,15 +468,15 @@
     </v-dialog>
     <!-- Ports List dialoge -->
     <v-dialog v-model="showPortsListDialog" persistent width="700px">
-      <v-card>
-        <v-card-title class="teal darken-4 py-4 title white--text">GCode File Transmission</v-card-title>
+      <v-card color="teal lighten-5">
+        <v-card-title class="headline teal--text">Ports List</v-card-title>
         <v-card-text class="py-0 px-0">
-          <v-progress-linear v-if="portsListProgress" :indeterminate="true" color="teal darken-2"></v-progress-linear>
+          <v-progress-linear v-if="portsListProgress" :indeterminate="true" color="teal darken-2" class="pa-0"></v-progress-linear>
           <v-container grid-list-sm>
-            <v-alert :value="true" color="teal darken-4" class="mb-2">
-              This operation will send the generated gcode file to the machine over the selected port and it will start drawing the coordinates,
-              the process will take too much time (1s for each line of code),
-              you can monitor the whole process and the incoming data from the consoles.
+            <v-alert :value="true" color="teal darken-4" type="info" class="mb-2">
+              Tranmission process consume to mush time, so be patient until it's successfully completed,
+              You can monitor the whole process from the two consoles below after you select the port.
+              If the process hang up for some reasons, you can pause and resume it.
             </v-alert>
             <p class="title">Chose port:</p>
             <v-alert
