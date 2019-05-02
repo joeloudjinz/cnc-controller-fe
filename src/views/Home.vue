@@ -158,11 +158,7 @@
     <v-content>
       <v-container justify-center align-center fluid>
         <v-fade-transition>
-          <v-layout
-            row
-            wrap
-            v-show="doShowSurfaceDimensionsAlert"
-          >
+          <v-layout row wrap v-show="doShowSurfaceDimensionsAlert">
             <v-flex xs12 ms12 md12 lg12 px-1 pb-1>
               <v-list class="teal darken-4 pa-2 elevation-5">
                 <v-list-tile avatar three-line>
@@ -482,7 +478,7 @@ import AgentServices from "@/services/agent.js";
 import PortsServices from "@/services/ports.js";
 import { validationMixin } from "vuelidate";
 import { required, minValue, maxValue } from "vuelidate/lib/validators";
-import {mapState, mapMutations} from 'vuex';
+import { mapState, mapMutations } from "vuex";
 
 import InfoFormVue from "../components/agents/InfoForm.vue";
 import PassFormVue from "../components/agents/PassForm.vue";
@@ -542,9 +538,7 @@ export default {
     keepShowingSurfaceDimensionsAlert: true
   }),
   computed: {
-    ...mapState([
-      'doShowSurfaceDimensionsAlert'  
-    ]),
+    ...mapState(["doShowSurfaceDimensionsAlert", "isTransmissionProcessActive"]),
     surfaceWidthErrors() {
       const errors = [];
       if (!this.$v.surfaceWidth.$dirty) return errors;
@@ -579,27 +573,24 @@ export default {
       // console.log("socket connected");
     },
     onPortsListChanged(newListObject) {
-      // console.log("newListObject :", newListObject);
       this.onActiveCallback(newListObject);
     },
     onSinglePortData(data) {
-      // console.log("data :", data);
-      // console.log('typeof data.target :', typeof data.target);
-      // console.log('data.target :', data.target);
       if (data.target === window.localStorage.getItem("id"))
         this.onSinglePortDataCallback(data);
-    }
+    },
+    onServerStatusChanged(data) {
+      this.SET_TRANSMISSION_PROCESS_STATE(data.status);
+      // console.log("from store", this.isTransmissionProcessActive);
+    },
   },
   methods: {
-    ...mapMutations([
-      'TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE'
-    ]),
+    ...mapMutations(["TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE", "SET_TRANSMISSION_PROCESS_STATE"]),
     onSinglePortDataCallback(data) {
       this.portConsoleTxt.unshift("-> data received: " + data.data);
     },
     onActiveCallback(data) {
       this.portsCount = Object.keys(data).length;
-      // window.localStorage.setItem("portsCount", count);
       let newList = [];
       for (let i = 0; i < this.portsCount; i++) {
         newList.push(data[i + 1]);
@@ -792,7 +783,6 @@ export default {
             "Error while checking port open status!" + error
           );
         });
-      // this.doShowPortPanel = true;
     },
     clearPortConsole() {
       this.portConsoleTxt = [];

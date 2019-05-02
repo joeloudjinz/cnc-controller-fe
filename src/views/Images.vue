@@ -397,7 +397,7 @@
             >
               <v-toolbar-title>Transmission Process Console</v-toolbar-title>
               <v-spacer></v-spacer>
-              <div v-if="port != undefined">
+              <div v-if="currentActivePort != undefined">
                 <v-tooltip :disabled="stopSendDis" bottom>
                   <template #activator="data">
                     <v-btn :disabled="stopSendDis" v-on="data.on" icon @click="stopSendOperation()">
@@ -484,7 +484,7 @@
             >
               <v-toolbar-title>Port Data Console</v-toolbar-title>
               <v-spacer></v-spacer>
-              <div v-if="port != undefined">
+              <div v-if="currentActivePort != undefined">
                 <v-tooltip :disabled="flushPortDis" bottom>
                   <template #activator="data">
                     <v-btn :disabled="flushPortDis" v-on="data.on" icon @click="flushPort()">
@@ -554,9 +554,14 @@
       <v-card color="teal lighten-5">
         <v-card-title class="headline teal--text">Ports List</v-card-title>
         <v-card-text class="py-0 px-0">
-          <v-progress-linear v-if="portsListProgress" :indeterminate="true" color="teal darken-2" class="pa-0"></v-progress-linear>
+          <v-progress-linear
+            v-if="portsListProgress"
+            :indeterminate="true"
+            color="teal darken-2"
+            class="pa-0"
+          ></v-progress-linear>
           <v-container grid-list-sm>
-           <v-alert :value="true" color="teal darken-4" type="info" class="mb-2">
+            <v-alert :value="true" color="teal darken-4" type="info" class="mb-2">
               Tranmission process consume to mush time, so be patient until it's successfully completed,
               You can monitor the whole process from the two consoles below after you select the port.
               If the process hang up for some reasons, you can pause and resume it.
@@ -634,6 +639,7 @@
 import ConversionServices from "@/services/conversion.js";
 import PortsServices from "@/services/ports.js";
 import { setTimeout } from "timers";
+import { mapState, mapMutations } from "vuex";
 export default {
   data: () => ({
     //? to display the results section
@@ -699,12 +705,10 @@ export default {
     portsListProgress: false,
     //? for console
     portConsoleTxt: [],
-    port: undefined,
     //? for transmission process
     displayTransmissionConsole: false,
     transmissionConsoleTxt: [],
     showTranmsissionConsole: true,
-    isTransmissionProcessActive: false,
     //? for consoles area
     consolesArea: false,
     showPortConsole: true,
@@ -719,6 +723,7 @@ export default {
     showDrawBtn: false
   }),
   computed: {
+    ...mapState(["isTransmissionProcessActive", "currentActivePort"]),
     fromatElapsedTimeValue() {
       if (this.elapsedTime != undefined) {
         if (this.elapsedTime < 60) {
@@ -757,7 +762,6 @@ export default {
     },
     onServerStatusChanged(data) {
       let status = data.status;
-      this.isTransmissionProcessActive = status;
       this.stopSendDis = !status;
       this.pauseSendDis = !status;
       if (!status && data.target == window.localStorage.getItem("id")) {
@@ -810,13 +814,17 @@ export default {
     // see if there is a transmission process going on when loading the page
     PortsServices.isServerActive()
       .then(status => {
-        this.isTransmissionProcessActive = status;
+        this.SET_TRANSMISSION_PROCESS_STATE(status);
       })
       .catch(error => {
         this.showErrorSnackbar(error);
       });
   },
   methods: {
+    ...mapMutations([
+      "SET_TRANSMISSION_PROCESS_STATE",
+      "SET_CURRENT_ACTIVE_PORT"
+    ]),
     onPortDataCallback(content) {
       if (content.length != 0) {
         this.portConsoleTxt.unshift(content);
@@ -917,7 +925,6 @@ export default {
       PortsServices.getConnectedPortsList()
         .then(result => {
           this.portsListProgress = false;
-          // this.isTransmissionProcessActive = result.isServerActive;
           if (result.count !== 0) {
             this.portsList = result.ports;
           }
@@ -928,12 +935,13 @@ export default {
           this.showErrorSnackbar(error);
         });
     },
+    //! port here is the comName
     startTransmitingGCode(port) {
       this.portsListProgress = true;
-      this.port = port;
       if (this.fileName !== undefined && this.fileName !== "") {
         const splitted = this.fileName.split(".");
         const fileName = splitted[0] + "." + splitted[1];
+        this.SET_CURRENT_ACTIVE_PORT(port);
         setTimeout(() => {
           this.consolesArea = true;
           PortsServices.performFullDrawOperation(fileName, port)
@@ -944,12 +952,12 @@ export default {
               this.portsListDialog = false;
               this.pausePortDis = false;
               this.flushPortDis = false;
-              this.isTransmissionProcessActive = true;
+              this.SET_TRANSMISSION_PROCESS_STATE(true);
               this.showSuccessSnackbar(result.success);
             })
             .catch(error => {
               this.portsListDialog = false;
-              this.port = undefined;
+              this.SET_CURRENT_ACTIVE_PORT(undefined);
               this.pausePortDis = true;
               this.flushPortDis = true;
               this.showErrorSnackbar(error.failure.split(":")[1]);
@@ -969,9 +977,8 @@ export default {
       }
     },
     pausePort() {
-      if (this.port) {
-        // console.warn("pausePort() is called, port is " + this.port);
-        PortsServices.pauseEmittingPort(this.port)
+      if (this.currentActivePort) {
+        PortsServices.pauseEmittingPort(this.currentActivePort)
           .then(result => {
             this.resumePortDis = false; //! means enable btn
             this.pausePortDis = true; //! means disable btn
@@ -981,14 +988,12 @@ export default {
             this.showErrorSnackbar(error);
           });
       } else {
-        // console.warn("port is undefined!!");
         this.showErrorSnackbar("No port is defined");
       }
     },
     resumePort() {
-      if (this.port) {
-        // console.warn("resumePort() is called, port is " + this.port);
-        PortsServices.resumeEmittingPort(this.port)
+      if (this.currentActivePort) {
+        PortsServices.resumeEmittingPort(this.currentActivePort)
           .then(result => {
             this.pausePortDis = false;
             this.resumePortDis = true;
@@ -998,14 +1003,12 @@ export default {
             this.showErrorSnackbar(error);
           });
       } else {
-        // console.warn("port is undefined!!");
         this.showErrorSnackbar("No port is defined");
       }
     },
     flushPort() {
-      if (this.port) {
-        // console.warn("flushPort() is called, port is " + this.port);
-        PortsServices.flushPort(this.port)
+      if (this.currentActivePort) {
+        PortsServices.flushPort(this.currentActivePort)
           .then(result => {
             this.showSuccessSnackbar(result.success);
           })
@@ -1013,19 +1016,18 @@ export default {
             this.showErrorSnackbar(error);
           });
       } else {
-        // console.warn("port is undefined!!");
         this.showErrorSnackbar("No port is defined");
       }
     },
     stopSendOperation() {
-      if (this.port) {
-        PortsServices.stopSendOperation(this.port)
+      if (this.currentActivePort) {
+        PortsServices.stopSendOperation(this.currentActivePort)
           .then(result => {
             //? disable all btns
             this.pauseSendDis = true;
             this.resumeSendDis = true;
             this.stopSendDis = true;
-            this.isTransmissionProcessActive = false;
+            this.SET_TRANSMISSION_PROCESS_STATE(false);
             this.showSuccessSnackbar(result.success);
           })
           .catch(error => {
@@ -1036,8 +1038,8 @@ export default {
       }
     },
     pauseSendOperation() {
-      if (this.port) {
-        PortsServices.pauseSendOperation(this.port)
+      if (this.currentActivePort) {
+        PortsServices.pauseSendOperation(this.currentActivePort)
           .then(result => {
             this.resumeSendDis = false;
             this.pauseSendDis = true;
@@ -1051,8 +1053,8 @@ export default {
       }
     },
     resumeSendOperation() {
-      if (this.port) {
-        PortsServices.resumeSendOperation(this.port)
+      if (this.currentActivePort) {
+        PortsServices.resumeSendOperation(this.currentActivePort)
           .then(result => {
             this.pauseSendDis = false;
             this.resumeSendDis = true;
@@ -1093,11 +1095,6 @@ export default {
   justify-content: center;
   align-items: center;
 }
-
-/* #preview img {
-  width: 600px;
-  max-height: 900px;
-} */
 .custom-loader {
   animation: loader 1s infinite;
   display: flex;

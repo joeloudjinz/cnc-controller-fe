@@ -16,7 +16,9 @@ const initializeShowSurfaceDimensionsAlertState = () => {
 
 export default new Vuex.Store({
   state: {
-    doShowSurfaceDimensionsAlert: initializeShowSurfaceDimensionsAlertState()
+    doShowSurfaceDimensionsAlert: initializeShowSurfaceDimensionsAlertState(),
+    isTransmissionProcessActive: false,
+    currentActivePort: undefined,
   },
   // getters: {
   //   getShowSurfaceDimensionsAlertState: state => {
@@ -26,6 +28,15 @@ export default new Vuex.Store({
   mutations: {
     TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE: (state) => {
       state.doShowSurfaceDimensionsAlert = !state.doShowSurfaceDimensionsAlert;
+    },
+    TOGGLE_TRANSMISSION_PROCESS_STATE: (state) => {
+      state.isTransmissionProcessActive = !state.isTransmissionProcessActive;
+    },
+    SET_TRANSMISSION_PROCESS_STATE: (state, newState) => {
+      state.isTransmissionProcessActive = newState;
+    },
+    SET_CURRENT_ACTIVE_PORT: (state, port) => {
+      state.currentActivePort = port;
     }
   },
   actions: {

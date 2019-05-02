@@ -142,7 +142,6 @@ export default {
           .catch(error => {
             this.adminsCount = "NaN";
             this.showErrorSnackbar(error);
-            // console.warn("in getAdminsCount(),error :", error);
           });
         AgentsServices.getAgentsCount()
           .then(result => {
@@ -152,13 +151,11 @@ export default {
           .catch(error => {
             this.agentsCount = "NaN";
             this.showErrorSnackbar(error);
-            // console.warn("in getAgentsCount(),error :", error);
           });
       })
       .catch(error => {
         this.conversionsCount = "NaN";
         this.showErrorSnackbar(error);
-        // console.warn("in getConversionsCount(),error :", error);
       });
   }
 };

@@ -863,9 +863,13 @@ export default {
     },
     displayImage(name, path) {
       this.inProgress = true;
-      this.currentFileName = name;
+      this.logData = [];
+      this.gcodeData = [];
+      this.fullLogData = [];
+      this.fullGcodeData = [];
       FileServices.getImageData(path)
         .then(result => {
+          this.currentFileName = name;
           this.imagePanel = true;
           this.inProgress = false;
           this.imageURL = "data:image/" + result.ext + ";base64," + result.data;
