@@ -156,8 +156,42 @@
     </v-toolbar>
     <!-- CONTENT OF THE PAGE -->
     <v-content>
-      <v-container fluid fill-height>
-        <v-layout justify-center row wrap>
+      <v-container justify-center align-center fluid>
+        <v-fade-transition>
+          <v-layout
+            row
+            wrap
+            v-show="doShowSurfaceDimensionsAlert"
+          >
+            <v-flex xs12 ms12 md12 lg12 px-1 pb-1>
+              <v-list class="teal darken-4 pa-2 elevation-5">
+                <v-list-tile avatar three-line>
+                  <v-list-tile-avatar>
+                    <v-icon left large color="white">fas fa-exclamation-triangle</v-icon>
+                  </v-list-tile-avatar>
+                  <v-list-tile-content class="font-weight-bold">
+                    <v-list-tile-title
+                      class="white--text text-lighten-3"
+                    >Height & Width of the Drawing Surface are NOT DEFINED</v-list-tile-title>
+                    <v-list-tile-sub-title class="teal--text text-lighten-3">
+                      in settings page, please set them so you can convert the uploaded images
+                      into gcode.
+                    </v-list-tile-sub-title>
+                  </v-list-tile-content>
+                  <v-list-tile-action>
+                    <v-btn
+                      flat
+                      color="white"
+                      class="font-weight-bold elevation-1"
+                      @click="showSettingsDialog()"
+                    >Set</v-btn>
+                  </v-list-tile-action>
+                </v-list-tile>
+              </v-list>
+            </v-flex>
+          </v-layout>
+        </v-fade-transition>
+        <v-layout row wrap>
           <router-view></router-view>
         </v-layout>
       </v-container>
@@ -448,6 +482,7 @@ import AgentServices from "@/services/agent.js";
 import PortsServices from "@/services/ports.js";
 import { validationMixin } from "vuelidate";
 import { required, minValue, maxValue } from "vuelidate/lib/validators";
+import {mapState, mapMutations} from 'vuex';
 
 import InfoFormVue from "../components/agents/InfoForm.vue";
 import PassFormVue from "../components/agents/PassForm.vue";
@@ -500,11 +535,16 @@ export default {
     writeToPortProgress: false,
     writeToPortProgressValue: "",
     portConsoleTxt: [],
+    //? Settings dialog data
     settingsDialog: false,
     surfaceHeight: 0,
-    surfaceWidth: 0
+    surfaceWidth: 0,
+    keepShowingSurfaceDimensionsAlert: true
   }),
   computed: {
+    ...mapState([
+      'doShowSurfaceDimensionsAlert'  
+    ]),
     surfaceWidthErrors() {
       const errors = [];
       if (!this.$v.surfaceWidth.$dirty) return errors;
@@ -551,6 +591,9 @@ export default {
     }
   },
   methods: {
+    ...mapMutations([
+      'TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE'
+    ]),
     onSinglePortDataCallback(data) {
       this.portConsoleTxt.unshift("-> data received: " + data.data);
     },
@@ -784,6 +827,7 @@ export default {
       if (!this.$v.$invalid) {
         window.localStorage.setItem("surfaceWidth", this.surfaceWidth);
         window.localStorage.setItem("surfaceHeight", this.surfaceHeight);
+        this.TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE();
         this.showSuccessSnackbar("Information Updated Successfully");
       }
     }

@@ -1,5 +1,5 @@
 <template>
-  <v-layout justify-center row wrap>
+  <v-layout row wrap>
     <!-- Simple Statistics -->
     <v-flex xs12 sm12 md3 lg3 class="pb-1 mb-0">
       <v-card class="teal lighten-5 mx-1">
