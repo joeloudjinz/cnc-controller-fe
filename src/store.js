@@ -43,13 +43,8 @@ export default new Vuex.Store({
       state.currentActivePort = port;
     },
     SHOW_SNACKBAR: (state, payload) => {
-      // console.log('in SHOW_SNACKBAR mutation');
-      // console.log('color :', payload.color);
-      // console.log('content :', payload.content);
-      // console.log('visibility :', payload.visibility);
       state.sbColor = payload.color;
       state.sbContent = payload.content;
-      // state.sbVisibility = payload.visibility;
     },
     TOGGLE_SB_VISIBILITY: (state, visibility) => {
       state.sbVisibility = visibility;

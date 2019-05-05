@@ -816,6 +816,7 @@ export default {
     ...mapMutations([
       "TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE",
       "SET_TRANSMISSION_PROCESS_STATE",
+      "SET_CURRENT_ACTIVE_PORT",
       "SHOW_SNACKBAR",
       "TOGGLE_SB_VISIBILITY"
     ]),
@@ -936,7 +937,6 @@ export default {
         const splitted = this.fileName.split(".");
         const fileName = splitted[0] + "." + splitted[1];
         this.SET_CURRENT_ACTIVE_PORT(port);
-        setTimeout(() => {
           this.consolesArea = true;
           PortsServices.performFullDrawOperation(fileName, port)
             .then(result => {
@@ -964,7 +964,6 @@ export default {
               //   );
               // }
             });
-        }, 500);
       } else {
         this.portsListDialog = false;
         this.showErrorSnackbar("Gcode file name is missing!");
