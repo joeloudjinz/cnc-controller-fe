@@ -825,7 +825,9 @@ export default {
       if (!this.$v.$invalid) {
         window.localStorage.setItem("surfaceWidth", this.surfaceWidth);
         window.localStorage.setItem("surfaceHeight", this.surfaceHeight);
-        this.TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE();
+        if (this.doShowSurfaceDimensionsAlert) {
+          this.TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE();
+        }
         this.showSuccessSnackbar("Information Updated Successfully");
       }
     }
