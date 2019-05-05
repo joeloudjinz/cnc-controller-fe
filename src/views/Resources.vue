@@ -334,7 +334,11 @@
             color="teal darken-4"
             transition="fade-transition"
           >This is the percentages of the proccessed and unproccessed pixels in the picture.</v-alert>
-          <v-progress-linear v-show="showConversionProgress" :indeterminate="true" color="teal darken-2"></v-progress-linear>
+          <v-progress-linear
+            v-show="showConversionProgress"
+            :indeterminate="true"
+            color="teal darken-2"
+          ></v-progress-linear>
           <v-container fluid grid-list-lg v-if="doShowParamsForm">
             <v-flex xs12>
               <v-subheader class="pl-0">Tool Diameter</v-subheader>
@@ -467,11 +471,16 @@
       </v-card>
     </v-dialog>
     <!-- Ports List dialoge -->
-    <v-dialog v-model="showPortsListDialog" persistent width="700px">
+    <v-dialog v-model="showPortsListDialog" persistent width="700">
       <v-card color="teal lighten-5">
         <v-card-title class="headline teal--text">Ports List</v-card-title>
         <v-card-text class="py-0 px-0">
-          <v-progress-linear v-if="portsListProgress" :indeterminate="true" color="teal darken-2" class="pa-0"></v-progress-linear>
+          <v-progress-linear
+            v-if="portsListProgress"
+            :indeterminate="true"
+            color="teal darken-2"
+            class="pa-0"
+          ></v-progress-linear>
           <v-container grid-list-sm>
             <v-alert :value="true" color="teal darken-4" type="info" class="mb-2">
               Tranmission process consume to mush time, so be patient until it's successfully completed,
@@ -623,7 +632,7 @@ export default {
     conversionProgressValue: 0,
     conversionProgressQuery: false,
     showConversionProgress: false,
-    conversionProgressInterval: 0,
+    conversionProgressInterval: 0
     //? end
   }),
   sockets: {
@@ -695,7 +704,7 @@ export default {
   computed: {
     ...mapState([
       "isTransmissionProcessActive",
-      "currentActivePort",
+      "currentActivePort"
       // "sbColor",
       // "sbContent",
       // "sbVisibility"
@@ -1062,30 +1071,39 @@ export default {
         this.scaleAxesErrorState = true;
         this.scaleAxesErrorContent = "Scale Axes must be superior of 50";
       } else {
-        this.showConversionProgress = true;
-        this.showBeforConversionAlert = false;
-        this.doShowParamsForm = false;
-        this.scaleAxesErrorState = false;
-        this.scaleAxesErrorContent = "";
-        ConversionServices.QuickConvertImage(this.currentFileName, {
-          toolDiameter: this.toolDiameter,
-          sensitivity: this.sensitivity,
-          scaleAxes: this.scaleAxes,
-          deepStep: this.deepStep,
-          blackZ: this.blackZ,
-          whiteZ: this.whiteZ,
-          safeZ: this.safeZ,
-          work: this.work,
-          idle: this.idle
-        })
-          .then(result => {
-            this.showSuccessSnackbar(result.success);
+        const surfaceHeight = window.localStorage.getItem("surfaceHeight");
+        if (this.scaleAxes < surfaceHeight) {
+          this.showConversionProgress = true;
+          this.showBeforConversionAlert = false;
+          this.doShowParamsForm = false;
+          this.scaleAxesErrorState = false;
+          this.scaleAxesErrorContent = "";
+          ConversionServices.QuickConvertImage(this.currentFileName, {
+            toolDiameter: this.toolDiameter,
+            sensitivity: this.sensitivity,
+            scaleAxes: this.scaleAxes,
+            deepStep: this.deepStep,
+            blackZ: this.blackZ,
+            whiteZ: this.whiteZ,
+            safeZ: this.safeZ,
+            work: this.work,
+            idle: this.idle
           })
-          .catch(error => {
-            this.showConversionProgress = false;
-            this.doShowParamsForm = true;
-            this.showErrorSnackbar(error);
-          });
+            .then(result => {
+              this.showSuccessSnackbar(result.success);
+            })
+            .catch(error => {
+              this.showConversionProgress = false;
+              this.doShowParamsForm = true;
+              this.showErrorSnackbar(error);
+            });
+        } else {
+          this.scaleAxesErrorState = true;
+          this.scaleAxesErrorContent =
+            "Scale Axes must be less then the height of the surface (" +
+            surfaceHeight +
+            ")";
+        }
       }
     },
     async reStartConversionProcess() {
@@ -1185,7 +1203,7 @@ export default {
             this.resumeSendDis = true;
             this.stopSendDis = true;
             // this.isTransmissionProcessActive = false;
-            this.SET_TRANSMISSION_PROCESS_STATE(false)
+            this.SET_TRANSMISSION_PROCESS_STATE(false);
             this.showSuccessSnackbar(result.success);
           })
           .catch(error => {
@@ -1233,18 +1251,19 @@ export default {
     },
     showSuccessSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({color: "success", content});
+      this.SHOW_SNACKBAR({ color: "success", content });
       setTimeout(() => {
         this.TOGGLE_SB_VISIBILITY(false);
       }, 5000);
     },
     showErrorSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({color: "error", content});
+      this.SHOW_SNACKBAR({ color: "error", content });
       setTimeout(() => {
         this.TOGGLE_SB_VISIBILITY(false);
       }, 5000);
-    },  }
+    }
+  }
 };
 </script>
 <style scopped>

@@ -4,7 +4,7 @@
       Transmission process is going on, some functionalities
       are disabled until it's over
     </v-alert>
-    <!-- Image upload form -->
+    <!-- Image upload form & Parameters Section -->
     <v-layout row wrap>
       <!-- Image Upload and display Section -->
       <v-flex d-felx xs12 sm12 md12 lg8 pa-1>
@@ -613,7 +613,6 @@
     <!-- Scale axes information snackbar -->
     <v-snackbar
       v-model="scaleAccessSnackbar"
-      :timeout="0"
       bottom
       right
       color="teal darken-4"
@@ -1068,7 +1067,7 @@ export default {
     clearTransmissionConsole() {
       this.transmissionConsoleTxt = [];
     },
-   showSuccessSnackbar(content) {
+    showSuccessSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
       this.SHOW_SNACKBAR({color: "success", content});
       setTimeout(() => {
