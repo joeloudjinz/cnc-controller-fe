@@ -624,15 +624,6 @@
       For Scale Axes use the height value of the image, you can multiply it by a number to apply scale up,
       or divide it by a number to apply scale down
     </v-snackbar>
-    <!-- Main Snackbar -->
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="5000"
-      bottom
-      :color="snackbarColor"
-      :multi-line="'multi-line'"
-      class="mb-2"
-    >{{ snackbarContent }}</v-snackbar>
   </v-container>
 </template>
 <script>
@@ -690,10 +681,6 @@ export default {
     //? for errBlackPixel progress
     value: 0,
     errorValue: 0,
-    //? snackbar details ...
-    snackbarContent: "",
-    snackbarColor: "",
-    snackbar: false,
     //? for scale axes info
     scaleAccessSnackbarColor: "info",
     scaleAccessSnackbar: false,
@@ -723,7 +710,13 @@ export default {
     showDrawBtn: false
   }),
   computed: {
-    ...mapState(["isTransmissionProcessActive", "currentActivePort"]),
+    ...mapState([
+      "isTransmissionProcessActive",
+      "currentActivePort",
+      // "sbColor",
+      // "sbContent",
+      // "sbVisibility"
+    ]),
     fromatElapsedTimeValue() {
       if (this.elapsedTime != undefined) {
         if (this.elapsedTime < 60) {
@@ -822,8 +815,10 @@ export default {
   },
   methods: {
     ...mapMutations([
+      "TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE",
       "SET_TRANSMISSION_PROCESS_STATE",
-      "SET_CURRENT_ACTIVE_PORT"
+      "SHOW_SNACKBAR",
+      "TOGGLE_SB_VISIBILITY"
     ]),
     onPortDataCallback(content) {
       if (content.length != 0) {
@@ -1073,16 +1068,20 @@ export default {
     clearTransmissionConsole() {
       this.transmissionConsoleTxt = [];
     },
-    showSuccessSnackbar(content) {
-      this.snackbar = true;
-      this.snackbarColor = "success";
-      this.snackbarContent = content;
+   showSuccessSnackbar(content) {
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({color: "success", content});
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
     },
     showErrorSnackbar(content) {
-      this.snackbar = true;
-      this.snackbarColor = "error";
-      this.snackbarContent = content;
-    }
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({color: "error", content});
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
+    },
   }
 };
 </script>

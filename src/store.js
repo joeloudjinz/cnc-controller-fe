@@ -19,6 +19,10 @@ export default new Vuex.Store({
     doShowSurfaceDimensionsAlert: initializeShowSurfaceDimensionsAlertState(),
     isTransmissionProcessActive: false,
     currentActivePort: undefined,
+    //? sb state
+    sbContent: "",
+    sbColor: "",
+    sbVisibility: false,
   },
   // getters: {
   //   getShowSurfaceDimensionsAlertState: state => {
@@ -37,6 +41,18 @@ export default new Vuex.Store({
     },
     SET_CURRENT_ACTIVE_PORT: (state, port) => {
       state.currentActivePort = port;
+    },
+    SHOW_SNACKBAR: (state, payload) => {
+      // console.log('in SHOW_SNACKBAR mutation');
+      // console.log('color :', payload.color);
+      // console.log('content :', payload.content);
+      // console.log('visibility :', payload.visibility);
+      state.sbColor = payload.color;
+      state.sbContent = payload.content;
+      // state.sbVisibility = payload.visibility;
+    },
+    TOGGLE_SB_VISIBILITY: (state, visibility) => {
+      state.sbVisibility = visibility;
     }
   },
   actions: {

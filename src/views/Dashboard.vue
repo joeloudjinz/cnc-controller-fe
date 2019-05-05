@@ -82,7 +82,6 @@
     </v-flex>
   </v-layout>
 </template>
-
 <script>
 import ConversionServices from "@/services/conversion.js";
 import AgentsServices from "@/services/agent.js";
@@ -95,10 +94,6 @@ export default {
       agentsCount: 0,
       conversionsCount: 0,
       activePortsCount: 0,
-      //? snackbar details ...
-      snackbarContent: "",
-      snackbarColor: "",
-      snackbar: false
     };
   },
   sockets: {
@@ -113,16 +108,6 @@ export default {
     onPortsListChangedCallback(data) {
       this.activePortsCount = Object.keys(data).length;
     },
-    showSuccessSnackbar(content) {
-      this.snackbar = true;
-      this.snackbarColor = "success";
-      this.snackbarContent = content;
-    },
-    showErrorSnackbar(content) {
-      this.snackbar = true;
-      this.snackbarColor = "error";
-      this.snackbarContent = content;
-    }
   },
   created: function() {
     ConversionServices.getConversionsCount()

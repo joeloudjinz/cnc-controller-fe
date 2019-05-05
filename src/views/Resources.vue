@@ -534,21 +534,13 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- Main Snackbar -->
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="5000"
-      bottom
-      :color="snackbarColor"
-      :multi-line="'multi-line'"
-      class="mb-2"
-    >{{ snackbarContent }}</v-snackbar>
   </v-layout>
 </template>
 <script>
 import FileServices from "@/services/files.js";
 import ConversionServices from "@/services/conversion.js";
 import PortsServices from "@/services/ports.js";
+import { mapState, mapMutations } from "vuex";
 import { setTimeout } from "timers";
 
 export default {
@@ -609,7 +601,7 @@ export default {
     portsListProgress: true,
     //? end of ports list data ---------------------
     //? transmission data
-    isTransmissionProcessActive: false,
+    // isTransmissionProcessActive: false,
     //? data in consoles area ------------------------
     consolesArea: false,
     //? this variable is used to operate on the port when the transmission process is going on
@@ -633,10 +625,6 @@ export default {
     showConversionProgress: false,
     conversionProgressInterval: 0,
     //? end
-    //? snackbar details ...
-    snackbarContent: "",
-    snackbarColor: "",
-    snackbar: false
   }),
   sockets: {
     onPortData(data) {
@@ -660,12 +648,11 @@ export default {
     },
     onServerStatusChanged(data) {
       let status = data.status;
-      this.isTransmissionProcessActive = status;
       this.stopSendDis = !status;
       this.pauseSendDis = !status;
       if (!status && data.target == window.localStorage.getItem("id")) {
         this.showSuccessSnackbar(
-          "Transmission of Gcode file Has been completed"
+          "Transmission of file " + this.fileName + " Has been completed"
         );
       }
     },
@@ -706,6 +693,13 @@ export default {
     }
   },
   computed: {
+    ...mapState([
+      "isTransmissionProcessActive",
+      "currentActivePort",
+      // "sbColor",
+      // "sbContent",
+      // "sbVisibility"
+    ]),
     disableConversionCardActionBtns() {
       //? when conversion progress is true, disable action btns
       return this.showConversionProgress;
@@ -755,6 +749,12 @@ export default {
     this.getResourcesDirDetails();
   },
   methods: {
+    ...mapMutations([
+      "TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE",
+      "SET_TRANSMISSION_PROCESS_STATE",
+      "SHOW_SNACKBAR",
+      "TOGGLE_SB_VISIBILITY"
+    ]),
     onPortDataCallback(content) {
       if (content.length == 0) {
         // console.warn("data is empty!");
@@ -997,7 +997,7 @@ export default {
       PortsServices.getConnectedPortsList()
         .then(result => {
           this.portsListProgress = false;
-          this.isTransmissionProcessActive = result.isServerActive;
+          // this.isTransmissionProcessActive = result.isServerActive;
           if (result.count !== 0) {
             this.portsList = result.ports;
           }
@@ -1031,7 +1031,8 @@ export default {
               this.pausePortDis = false;
               this.flushPortDis = false;
               //? activating transmission state variable
-              this.isTransmissionProcessActive = true;
+              // this.isTransmissionProcessActive = true;
+              this.SET_TRANSMISSION_PROCESS_STATE(true);
               this.showSuccessSnackbar(result.success);
             })
             .catch(error => {
@@ -1183,7 +1184,8 @@ export default {
             this.pauseSendDis = true;
             this.resumeSendDis = true;
             this.stopSendDis = true;
-            this.isTransmissionProcessActive = false;
+            // this.isTransmissionProcessActive = false;
+            this.SET_TRANSMISSION_PROCESS_STATE(false)
             this.showSuccessSnackbar(result.success);
           })
           .catch(error => {
@@ -1230,16 +1232,19 @@ export default {
       this.transmissionConsoleTxt = [];
     },
     showSuccessSnackbar(content) {
-      this.snackbar = true;
-      this.snackbarColor = "success";
-      this.snackbarContent = content;
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({color: "success", content});
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
     },
     showErrorSnackbar(content) {
-      this.snackbar = true;
-      this.snackbarColor = "error";
-      this.snackbarContent = content;
-    }
-  }
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({color: "error", content});
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
+    },  }
 };
 </script>
 <style scopped>

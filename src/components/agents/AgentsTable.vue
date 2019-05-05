@@ -127,19 +127,12 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- Main Snackbar -->
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="5000"
-      bottom
-      :color="snackbarColor"
-      :multi-line="'multi-line'"
-      class="mb-2"
-    >{{ snackbarContent }}</v-snackbar>
   </v-card>
 </template>
 <script>
 import AgentServices from "@/services/agent.js";
+import { mapMutations } from "vuex";
+
 export default {
   data() {
     return {
@@ -171,7 +164,14 @@ export default {
   async created() {
     this.refrechAgentsList();
   },
+  computed: {
+    // ...mapState(["sbColor", "sbContent", "sbVisibility"])
+  },
   methods: {
+    ...mapMutations([
+      "SHOW_SNACKBAR",
+      "TOGGLE_SB_VISIBILITY"
+    ]),
     async refrechAgentsList() {
       await AgentServices.getAgents()
         .then(agents => {
@@ -231,18 +231,21 @@ export default {
         });
     },
     showSuccessSnackbar(content) {
-      this.snackbar = true;
-      this.snackbarColor = "success";
-      this.snackbarContent = content;
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({color: "success", content});
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
     },
     showErrorSnackbar(content) {
-      this.snackbar = true;
-      this.snackbarColor = "error";
-      this.snackbarContent = content;
-    }
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({color: "error", content});
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
+    },
   }
 };
 </script>
-
 <style>
 </style>

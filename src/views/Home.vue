@@ -461,15 +461,13 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- Main Snackbar -->
     <v-snackbar
-      v-model="snackbar"
-      :timeout="5000"
+      v-model="sbVisibility"
       bottom
-      :color="snackbarColor"
+      :color="sbColor"
       :multi-line="'multi-line'"
       class="mb-2"
-    >{{ snackbarContent }}</v-snackbar>
+    >{{ sbContent }}</v-snackbar>
   </v-app>
 </template>
 <script>
@@ -482,6 +480,7 @@ import { mapState, mapMutations } from "vuex";
 
 import InfoFormVue from "../components/agents/InfoForm.vue";
 import PassFormVue from "../components/agents/PassForm.vue";
+import { setTimeout } from "timers";
 
 export default {
   components: {
@@ -512,10 +511,7 @@ export default {
     editProfileDialog: false,
     drawer: false,
     right: null,
-    //? snackbar details ...
-    snackbarContent: "",
-    snackbarColor: "",
-    snackbar: false,
+
     //? to show or hide ports console bottom sheet
     doShowPortPanel: false,
     selectedPortObject: undefined,
@@ -538,7 +534,13 @@ export default {
     keepShowingSurfaceDimensionsAlert: true
   }),
   computed: {
-    ...mapState(["doShowSurfaceDimensionsAlert", "isTransmissionProcessActive"]),
+    ...mapState([
+      "doShowSurfaceDimensionsAlert",
+      "isTransmissionProcessActive",
+      "sbColor",
+      "sbContent",
+      "sbVisibility"
+    ]),
     surfaceWidthErrors() {
       const errors = [];
       if (!this.$v.surfaceWidth.$dirty) return errors;
@@ -581,11 +583,15 @@ export default {
     },
     onServerStatusChanged(data) {
       this.SET_TRANSMISSION_PROCESS_STATE(data.status);
-      // console.log("from store", this.isTransmissionProcessActive);
-    },
+    }
   },
   methods: {
-    ...mapMutations(["TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE", "SET_TRANSMISSION_PROCESS_STATE"]),
+    ...mapMutations([
+      "TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE",
+      "SET_TRANSMISSION_PROCESS_STATE",
+      "SHOW_SNACKBAR",
+      "TOGGLE_SB_VISIBILITY"
+    ]),
     onSinglePortDataCallback(data) {
       this.portConsoleTxt.unshift("-> data received: " + data.data);
     },
@@ -702,7 +708,6 @@ export default {
           this.flushPortDis = false;
         })
         .catch(error => {
-          // console.warn(error);
           this.portConsoleTxt.unshift("Error occurred: " + error);
           this.showErrorSnackbar(error);
         });
@@ -778,7 +783,6 @@ export default {
           }
         })
         .catch(error => {
-          // console.warn(error);
           this.showErrorSnackbar(
             "Error while checking port open status!" + error
           );
@@ -788,14 +792,18 @@ export default {
       this.portConsoleTxt = [];
     },
     showSuccessSnackbar(content) {
-      this.snackbar = true;
-      this.snackbarColor = "success";
-      this.snackbarContent = content;
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({ color: "success", content });
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
     },
     showErrorSnackbar(content) {
-      this.snackbar = true;
-      this.snackbarColor = "error";
-      this.snackbarContent = content;
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({ color: "error", content });
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
     },
     closeEditInfoDialog() {
       this.editProfileDialog = false;

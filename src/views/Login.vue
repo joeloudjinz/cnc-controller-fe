@@ -5,10 +5,6 @@
         <v-layout align-center justify-center>
           <v-flex xs11 sm8 md5>
             <v-card class="teal lighten-4 elevation-8">
-              <!-- <v-toolbar dark height="150" color="teal">
-                <v-toolbar-title>Login form</v-toolbar-title>
-                <v-spacer></v-spacer>
-              </v-toolbar>-->
               <v-img :aspect-ratio="16/9" :src="url"></v-img>
               <v-card-text>
                 <v-form>
@@ -49,20 +45,16 @@
         </v-layout>
       </v-container>
     </v-content>
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="5000"
-      :bottom="'bottom'"
-      :color="snackbarColor"
-      :multi-line="'multi-line'"
-    >{{ snackbarContent }}</v-snackbar>
   </v-app>
 </template>
 
 <script>
 import { validationMixin } from "vuelidate";
 import { required, email, minLength } from "vuelidate/lib/validators";
+import { mapMutations } from "vuex";
+
 import AuthServices from "@/services/auth";
+
 export default {
   mixins: [validationMixin],
   validations: {
@@ -73,15 +65,13 @@ export default {
     url: require("@/assets/machine.jpg"),
     drawer: null,
     email: "",
-    password: "",
-    snackbarContent: "",
-    snackbar: false,
-    snackbarColor: ""
+    password: ""
   }),
   props: {
     source: String
   },
   computed: {
+    // ...mapState(["sbColor", "sbContent", "sbVisibility"]),
     emailErrors() {
       const errors = [];
       if (!this.$v.email.$dirty) return errors;
@@ -104,6 +94,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(["SHOW_SNACKBAR", "TOGGLE_SB_VISIBILITY"]),
     submit() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
@@ -123,11 +114,16 @@ export default {
             this.$router.replace("/");
           })
           .catch(error => {
-            this.snackbarColor = "error";
-            this.snackbarContent = error;
-            this.snackbar = true;
+            this.showErrorSnackbar(error);
           });
       }
+    },
+    showErrorSnackbar(content) {
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({ color: "error", content });
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
     }
   }
 };

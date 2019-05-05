@@ -91,15 +91,6 @@
       <v-spacer></v-spacer>
       <v-btn class="white--text" color="teal" @click="submit">Submit</v-btn>
     </v-card-actions>
-    <!-- Main Snackbar -->
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="5000"
-      bottom
-      :color="snackbarColor"
-      :multi-line="'multi-line'"
-      class="mb-2"
-    >{{ snackbarContent }}</v-snackbar>
   </v-card>
 </template>
 <script>
@@ -110,11 +101,12 @@ import {
   email,
   minLength
 } from "vuelidate/lib/validators";
+import { mapMutations } from "vuex";
+
 import AgentServices from "@/services/agent";
 
 export default {
   mixins: [validationMixin],
-
   validations: {
     firstName: { required, maxLength: maxLength(50) },
     lastName: { required, maxLength: maxLength(50) },
@@ -173,6 +165,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(["SHOW_SNACKBAR", "TOGGLE_SB_VISIBILITY"]),
     async submit() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
@@ -184,18 +177,28 @@ export default {
           is_admin: this.isAdminCheckbox
         })
           .then(result => {
-            this.snackbar = true;
-            this.snackbarContent = result;
-            this.snackbarColor = "success";
+            this.showSuccessSnackbar(result);
             this.clear();
           })
           .catch(error => {
-            this.snackbar = true;
-            this.snackbarColor = "error";
-            this.snackbarContent = error;
+            this.showErrorSnackbar(error);
             this.loading = false;
           });
       }
+    },
+    showSuccessSnackbar(content) {
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({ color: "success", content });
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
+    },
+    showErrorSnackbar(content) {
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({ color: "error", content });
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
     },
     clear() {
       this.$v.$reset();
