@@ -663,6 +663,8 @@ export default {
         this.showSuccessSnackbar(
           "Transmission of file " + this.fileName + " Has been completed"
         );
+        //TODO: close the port here
+        this.closePort(this.currentActivePort);
       }
     },
     onGcodeFileAdded(data) {
@@ -705,9 +707,6 @@ export default {
     ...mapState([
       "isTransmissionProcessActive",
       "currentActivePort"
-      // "sbColor",
-      // "sbContent",
-      // "sbVisibility"
     ]),
     disableConversionCardActionBtns() {
       //? when conversion progress is true, disable action btns
@@ -1193,6 +1192,18 @@ export default {
         // console.warn("port is undefined!!");
         this.showErrorSnackbar("No port is defined");
       }
+    },
+    closePort(port) {
+      PortsServices.closePort(port)
+        .then(() => {
+          this.portConsoleTxt.unshift("|Port was closed successfully");
+          this.flushPortDis = true;
+          this.pausePortDis = true;
+        })
+        .catch(error => {
+          this.portConsoleTxt.unshift("Error occurred while closing port: " + error);
+          this.showErrorSnackbar(error);
+        });
     },
     stopSendOperation() {
       if (this.port) {

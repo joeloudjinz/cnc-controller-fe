@@ -565,6 +565,7 @@
               Tranmission process consume to mush time, so be patient until it's successfully completed,
               You can monitor the whole process from the two consoles below after you select the port.
               If the process hang up for some reasons, you can pause and resume it.
+              Note that the port will be closed after the process is completed or stopped.
             </v-alert>
             <p class="title">Chose port:</p>
             <v-alert
@@ -711,10 +712,7 @@ export default {
   computed: {
     ...mapState([
       "isTransmissionProcessActive",
-      "currentActivePort",
-      // "sbColor",
-      // "sbContent",
-      // "sbVisibility"
+      "currentActivePort"
     ]),
     fromatElapsedTimeValue() {
       if (this.elapsedTime != undefined) {
@@ -743,6 +741,7 @@ export default {
   },
   sockets: {
     onPortData(data) {
+      // console.log('data.target :', data.target);
       if (data.target == window.localStorage.getItem("id")) {
         this.onPortDataCallback(data.data);
       }
@@ -760,6 +759,8 @@ export default {
         this.showSuccessSnackbar(
           "Transmission of file " + this.fileName + " Has been completed"
         );
+        //TODO: close the port here
+        this.closePort(this.currentActivePort);
       }
     },
     onConversionEnded(data) {
@@ -937,33 +938,33 @@ export default {
         const splitted = this.fileName.split(".");
         const fileName = splitted[0] + "." + splitted[1];
         this.SET_CURRENT_ACTIVE_PORT(port);
-          this.consolesArea = true;
-          PortsServices.performFullDrawOperation(fileName, port)
-            .then(result => {
-              this.portsListProgress = false;
-              this.pauseSendDis = false;
-              this.stopSendDis = false;
-              this.portsListDialog = false;
-              this.pausePortDis = false;
-              this.flushPortDis = false;
-              this.SET_TRANSMISSION_PROCESS_STATE(true);
-              this.showSuccessSnackbar(result.success);
-            })
-            .catch(error => {
-              this.portsListDialog = false;
-              this.SET_CURRENT_ACTIVE_PORT(undefined);
-              this.pausePortDis = true;
-              this.flushPortDis = true;
-              this.showErrorSnackbar(error.failure.split(":")[1]);
-              //? disabling these lines becuase the consoles are hidden
-              // this.portConsoleTxt.push("Operation: " + error.operation + "|");
-              // this.portConsoleTxt.push("Message: " + error.failure + "|");
-              // if (error.isPortClosed) {
-              //   this.portConsoleTxt.push(
-              //     "Port Status: " + error.isPortClosed ? " Closed|" : " Opened|"
-              //   );
-              // }
-            });
+        this.consolesArea = true;
+        PortsServices.performFullDrawOperation(fileName, port)
+          .then(result => {
+            this.portsListProgress = false;
+            this.pauseSendDis = false;
+            this.stopSendDis = false;
+            this.portsListDialog = false;
+            this.pausePortDis = false;
+            this.flushPortDis = false;
+            this.SET_TRANSMISSION_PROCESS_STATE(true);
+            this.showSuccessSnackbar(result.success);
+          })
+          .catch(error => {
+            this.portsListDialog = false;
+            this.SET_CURRENT_ACTIVE_PORT(undefined);
+            this.pausePortDis = true;
+            this.flushPortDis = true;
+            this.showErrorSnackbar(error.failure.split(":")[1]);
+            //? disabling these lines becuase the consoles are hidden
+            // this.portConsoleTxt.push("Operation: " + error.operation + "|");
+            // this.portConsoleTxt.push("Message: " + error.failure + "|");
+            // if (error.isPortClosed) {
+            //   this.portConsoleTxt.push(
+            //     "Port Status: " + error.isPortClosed ? " Closed|" : " Opened|"
+            //   );
+            // }
+          });
       } else {
         this.portsListDialog = false;
         this.showErrorSnackbar("Gcode file name is missing!");
@@ -1011,6 +1012,18 @@ export default {
       } else {
         this.showErrorSnackbar("No port is defined");
       }
+    },
+    closePort(port) {
+      PortsServices.closePort(port)
+        .then( () => {
+          this.portConsoleTxt.unshift("|Port was closed successfully");
+          this.flushPortDis = true;
+          this.pausePortDis = true;
+        })
+        .catch(error => {
+          this.portConsoleTxt.unshift("Error occurred while closing port: " + error);
+          this.showErrorSnackbar(error);
+        });
     },
     stopSendOperation() {
       if (this.currentActivePort) {
@@ -1068,18 +1081,18 @@ export default {
     },
     showSuccessSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({color: "success", content});
+      this.SHOW_SNACKBAR({ color: "success", content });
       setTimeout(() => {
         this.TOGGLE_SB_VISIBILITY(false);
       }, 5000);
     },
     showErrorSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({color: "error", content});
+      this.SHOW_SNACKBAR({ color: "error", content });
       setTimeout(() => {
         this.TOGGLE_SB_VISIBILITY(false);
       }, 5000);
-    },
+    }
   }
 };
 </script>
