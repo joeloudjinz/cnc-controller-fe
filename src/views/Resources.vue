@@ -33,12 +33,7 @@
     <v-dialog v-model="imagePanel" fullscreen hide-overlay transition="dialog-bottom-transition">
       <v-card>
         <v-toolbar dark color="teal lighten-1">
-          <v-btn
-            :disabled="isTransmissionProcessActive"
-            icon
-            dark
-            @click="prepareToCloseImagePanel()"
-          >
+          <v-btn :disabled="closeImagePanelBtnDis" icon dark @click="prepareToCloseImagePanel()">
             <v-icon>fas fa-times-circle</v-icon>
           </v-btn>
           <v-toolbar-title>{{currentFileName}}</v-toolbar-title>
@@ -82,7 +77,7 @@
                   >
                     <v-toolbar-title>Transmission Process Console</v-toolbar-title>
                     <v-spacer></v-spacer>
-                    <div v-if="port != undefined">
+                    <div v-if="currentActivePort != undefined">
                       <v-tooltip :disabled="stopSendDis" bottom>
                         <template #activator="data">
                           <v-btn
@@ -174,7 +169,7 @@
                   >
                     <v-toolbar-title>Port Data Console</v-toolbar-title>
                     <v-spacer></v-spacer>
-                    <div v-if="port != undefined">
+                    <div v-if="currentActivePort != undefined">
                       <v-tooltip :disabled="flushPortDis" bottom>
                         <template #activator="data">
                           <v-btn :disabled="flushPortDis" v-on="data.on" icon @click="flushPort()">
@@ -632,8 +627,9 @@ export default {
     conversionProgressValue: 0,
     conversionProgressQuery: false,
     showConversionProgress: false,
-    conversionProgressInterval: 0
+    conversionProgressInterval: 0,
     //? end
+    closeImagePanelBtnDis: false
   }),
   sockets: {
     onPortData(data) {
@@ -665,6 +661,7 @@ export default {
         );
         //TODO: close the port here
         this.closePort(this.currentActivePort);
+        this.closeImagePanelBtnDis = false;
       }
     },
     onGcodeFileAdded(data) {
@@ -704,10 +701,7 @@ export default {
     }
   },
   computed: {
-    ...mapState([
-      "isTransmissionProcessActive",
-      "currentActivePort"
-    ]),
+    ...mapState(["isTransmissionProcessActive", "currentActivePort"]),
     disableConversionCardActionBtns() {
       //? when conversion progress is true, disable action btns
       return this.showConversionProgress;
@@ -760,6 +754,7 @@ export default {
     ...mapMutations([
       "TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE",
       "SET_TRANSMISSION_PROCESS_STATE",
+      "SET_CURRENT_ACTIVE_PORT",
       "SHOW_SNACKBAR",
       "TOGGLE_SB_VISIBILITY"
     ]),
@@ -1018,47 +1013,50 @@ export default {
     },
     startTransmitingGCode(portName) {
       this.portsListProgress = true;
-      this.port = portName;
+      // this.port = portName;
       //? ensuring that the current file name is valide gcode file name
       if (this.currentFileName !== undefined && this.currentFileName !== "") {
         //? removing the extension from the fileName because the endpoint function uses gcode file name without ext
         const splitted = this.currentFileName.split(".");
         const fileName = splitted[0] + "." + splitted[1];
-        setTimeout(() => {
-          PortsServices.performFullDrawOperation(fileName, portName)
-            .then(result => {
-              this.portsListProgress = false;
-              //? show consoles area
-              this.consolesArea = true;
-              //? hiding ports list dialog
-              this.showPortsListDialog = false;
-              //? enabling pause & stop tranmission operations btns
-              this.pauseSendDis = false;
-              this.stopSendDis = false;
-              //? enabling pause & flush port data btns
-              this.pausePortDis = false;
-              this.flushPortDis = false;
-              //? activating transmission state variable
-              // this.isTransmissionProcessActive = true;
-              this.SET_TRANSMISSION_PROCESS_STATE(true);
-              this.showSuccessSnackbar(result.success);
-            })
-            .catch(error => {
-              //? hiding ports list dialog
-              this.showPortsListDialog = false;
-              this.port = undefined;
-              //? showing the error about why the transmission process didn't start
-              this.showErrorSnackbar(error.failure.split(":")[1]);
-              //? disabling these lines becuase the consoles are hidden
-              // this.portConsoleTxt.push("Operation: " + error.operation + "|");
-              // this.portConsoleTxt.push("Message: " + error.failure + "|");
-              // if (error.isPortClosed) {
-              //   this.portConsoleTxt.push(
-              //     "Port Status: " + error.isPortClosed ? " Closed|" : " Opened|"
-              //   );
-              // }
-            });
-        }, 500);
+        this.closeImagePanelBtnDis = true;
+        this.SET_CURRENT_ACTIVE_PORT(portName);
+        PortsServices.performFullDrawOperation(fileName, portName)
+          .then(result => {
+            this.portsListProgress = false;
+            //? show consoles area
+            this.consolesArea = true;
+            //? hiding ports list dialog
+            this.showPortsListDialog = false;
+            //? enabling pause & stop tranmission operations btns
+            this.pauseSendDis = false;
+            this.stopSendDis = false;
+            //? enabling pause & flush port data btns
+            this.pausePortDis = false;
+            this.flushPortDis = false;
+            //? activating transmission state variable
+            this.SET_TRANSMISSION_PROCESS_STATE(true);
+            this.showSuccessSnackbar(result.success);
+          })
+          .catch(error => {
+            this.closeImagePanelBtnDis = false;
+            //? hiding ports list dialog
+            this.showPortsListDialog = false;
+            // this.port = undefined;
+            this.SET_CURRENT_ACTIVE_PORT(undefined);
+            //? showing the error about why the transmission process didn't start
+            this.showErrorSnackbar(error.failure.split(":")[1]);
+            //? disabling these lines becuase the consoles are hidden
+            // this.portConsoleTxt.push("Operation: " + error.operation + "|");
+            // this.portConsoleTxt.push("Message: " + error.failure + "|");
+            // if (error.isPortClosed) {
+            //   this.portConsoleTxt.push(
+            //     "Port Status: " + error.isPortClosed ? " Closed|" : " Opened|"
+            //   );
+            // }
+          });
+        // setTimeout(() => {
+        // }, 500);
       } else {
         this.showPortsListDialog = false;
         this.showErrorSnackbar("Gcode file name is missing!");
@@ -1128,26 +1126,27 @@ export default {
         });
     },
     prepareToCloseImagePanel() {
-      if (this.isTransmissionProcessActive) {
-        this.showCloseImagePanelConfirmationDialog = true;
-      } else {
-        //? hide consoles area
-        this.consolesArea = false;
-        //? empty all the consoels data
-        this.portConsoleTxt = [];
-        this.transmissionConsoleTxt = [];
-        this.scaleAxes = 0;
-        this.doShowParamsForm = true;
-        this.proccessBlackPixelsValue = 0;
-        this.unproccessBlackPixelsValue = 0;
-        //? close the panel
-        this.imagePanel = false;
-      }
+      //? hide consoles area
+      this.consolesArea = false;
+      //? empty all the consoels data
+      this.portConsoleTxt = [];
+      this.transmissionConsoleTxt = [];
+      this.scaleAxes = 0;
+      this.doShowParamsForm = true;
+      this.proccessBlackPixelsValue = 0;
+      this.unproccessBlackPixelsValue = 0;
+      //? close the panel
+      this.imagePanel = false;
+      // if (this.isTransmissionProcessActive) {
+      //   this.showCloseImagePanelConfirmationDialog = true;
+      // } else {
+        
+      // }
     },
     pausePort() {
-      if (this.port) {
-        // console.warn("pausePort() is called, port is " + this.port);
-        PortsServices.pauseEmittingPort(this.port)
+      if (this.currentActivePort) {
+        // console.warn("pausePort() is called, port is " + this.currentActivePort);
+        PortsServices.pauseEmittingPort(this.currentActivePort)
           .then(result => {
             this.resumePortDis = false; //! means enable btn
             this.pausePortDis = true; //! means disable btn
@@ -1162,9 +1161,9 @@ export default {
       }
     },
     resumePort() {
-      if (this.port) {
-        // console.warn("resumePort() is called, port is " + this.port);
-        PortsServices.resumeEmittingPort(this.port)
+      if (this.currentActivePort) {
+        // console.warn("resumePort() is called, port is " + this.currentActivePort);
+        PortsServices.resumeEmittingPort(this.currentActivePort)
           .then(result => {
             this.pausePortDis = false;
             this.resumePortDis = true;
@@ -1179,9 +1178,9 @@ export default {
       }
     },
     flushPort() {
-      if (this.port) {
-        // console.warn("flushPort() is called, port is " + this.port);
-        PortsServices.flushPort(this.port)
+      if (this.currentActivePort) {
+        // console.warn("flushPort() is called, port is " + this.currentActivePort);
+        PortsServices.flushPort(this.currentActivePort)
           .then(result => {
             this.showSuccessSnackbar(result.success);
           })
@@ -1201,13 +1200,15 @@ export default {
           this.pausePortDis = true;
         })
         .catch(error => {
-          this.portConsoleTxt.unshift("Error occurred while closing port: " + error);
+          this.portConsoleTxt.unshift(
+            "Error occurred while closing port: " + error
+          );
           this.showErrorSnackbar(error);
         });
     },
     stopSendOperation() {
-      if (this.port) {
-        PortsServices.stopSendOperation(this.port)
+      if (this.currentActivePort) {
+        PortsServices.stopSendOperation(this.currentActivePort)
           .then(result => {
             //? disable all btns
             this.pauseSendDis = true;
@@ -1225,8 +1226,8 @@ export default {
       }
     },
     pauseSendOperation() {
-      if (this.port) {
-        PortsServices.pauseSendOperation(this.port)
+      if (this.currentActivePort) {
+        PortsServices.pauseSendOperation(this.currentActivePort)
           .then(result => {
             this.resumeSendDis = false;
             this.pauseSendDis = true;
@@ -1240,8 +1241,8 @@ export default {
       }
     },
     resumeSendOperation() {
-      if (this.port) {
-        PortsServices.resumeSendOperation(this.port)
+      if (this.currentActivePort) {
+        PortsServices.resumeSendOperation(this.currentActivePort)
           .then(result => {
             this.pauseSendDis = false;
             this.resumeSendDis = true;
