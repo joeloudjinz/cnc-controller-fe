@@ -1,11 +1,12 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
-import Login from "./views/Login.vue";
-import Dashboard from "./views/Dashboard.vue";
-import Agents from "./views/Agents.vue";
-import Images from './views/Images.vue'; //? for converter page
-import Resources from './views/Resources.vue';
+// import Login from "./views/Login.vue";
+// import Home from './views/Home.vue';
+// import Dashboard from "./views/Dashboard.vue";
+// import Agents from "./views/Agents.vue";
+// import Images from './views/Images.vue'; //? for converter page
+// import Resources from './views/Resources.vue';
+// import { Agent } from 'https';
 
 
 Vue.use(Router);
@@ -14,44 +15,39 @@ const router = new Router({
   routes: [{
       path: '/',
       name: 'home',
-      component: Home,
+      component: () => import( /* webpackChunkName: "about" */ './views/Home.vue'),
+      // component: Home,
       meta: {
         requireAuth: true
       },
       // component: Home,
       children: [{
           path: 'dashboard',
-          component: Dashboard
+          component: () => import( /* webpackChunkName: "dashboard" */ "./views/Dashboard.vue"),
+          // component: Dashboard
         },
         {
           path: 'agents',
-          component: Agents
+          component: () => import( /* webpackChunkName: "agents" */ "./views/Agents.vue"),
+          // component: Agents
         },
         {
           path: 'converter',
-          component: Images
+          component: () => import( /* webpackChunkName: "images" */ './views/Images.vue'),
+          // component: Images
         },
         {
           path: 'resources',
-          component: Resources
+          component: () => import( /* webpackChunkName: "resources" */ './views/Resources.vue'),
+          // component: Resources
         }
       ]
     },
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (about.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import( /* webpackChunkName: "about" */ './views/About.vue'),
-    //   meta: {
-    //     requireAuth: true
-    //   },
-    // },
     {
       path: '/login',
       name: 'login',
-      component: Login
+      component: () => import( /* webpackChunkName: "resources" */ "./views/Login.vue"),
+      // component: Login
     }
   ]
 });
