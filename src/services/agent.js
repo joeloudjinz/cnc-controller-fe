@@ -1,5 +1,5 @@
 import axios from 'axios';
-const url = "api/local/agents/";
+const url = "api/local/users/";
 const authURL = 'api/local/auth/';
 //! console.log(error.response.status == 406); true
 //! console.log(error.response.status === '406'); false
@@ -15,7 +15,7 @@ class AgentServices {
             const email = window.localStorage.getItem('email');
             const id = window.localStorage.getItem('id');
             const refresh_token = window.localStorage.getItem('refresh_token');
-            axios.post(authURL + 'token', {
+            axios.post(authURL + 'token/refresh', {
                 email,
                 id,
                 refresh_token
@@ -299,7 +299,7 @@ class AgentServices {
     static getAgentsCount() {
         return new Promise(async (resolve, reject) => {
             await axios
-                .post(url + "count")
+                .get(url + "agents/count")
                 .then(result => {
                     // console.log('result.data :', result.data);
                     resolve(result.data.count);

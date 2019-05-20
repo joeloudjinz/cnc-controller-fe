@@ -1,7 +1,7 @@
 import axios from "axios";
 import AgentServices from "./agent.js";
 
-const url = "api/local/images";
+const url = "api/local/conversions";
 
 const target = window.localStorage.getItem("id");
 
