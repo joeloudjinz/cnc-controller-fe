@@ -44,7 +44,7 @@
               <v-icon left>fas fa-hard-hat</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Agents</v-list-tile-title>
+              <v-list-tile-title>Workers</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile to="/converter">
@@ -60,7 +60,7 @@
               <v-icon left>fas fa-boxes</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Resources</v-list-tile-title>
+              <v-list-tile-title>Files</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click="performLogout()">
@@ -128,9 +128,9 @@
         <!-- Protect it by isAdmin ! -->
         <v-tooltip bottom>
           <template v-if="isAdmin == true" #activator="data">
-            <v-btn v-on="data.on" flat to="/agents" class="m-0">Agents</v-btn>
+            <v-btn v-on="data.on" flat to="/agents" class="m-0">Workers</v-btn>
           </template>
-          <span>Consult agents list and perform same agent account operations</span>
+          <span>Consult workers list and manage there accounts</span>
         </v-tooltip>
         <v-tooltip bottom>
           <template #activator="data">
@@ -140,7 +140,7 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template #activator="data">
-            <v-btn v-on="data.on" flat to="/resources">Resources</v-btn>
+            <v-btn v-on="data.on" flat to="/resources">Files</v-btn>
           </template>
           <span>Consult directory tree of all the resources in the server</span>
         </v-tooltip>
