@@ -161,17 +161,36 @@ export default {
       snackbar: false
     };
   },
+  sockets: {
+    onUserDeleted(data) {
+      this.removeDeletedUser(data.userId);
+    },
+    OnNewUserAdded(data) {
+      this.addNewUser(data.user[0]);
+    }
+  },
   async created() {
     this.refrechAgentsList();
   },
-  computed: {
-    // ...mapState(["sbColor", "sbContent", "sbVisibility"])
-  },
   methods: {
-    ...mapMutations([
-      "SHOW_SNACKBAR",
-      "TOGGLE_SB_VISIBILITY"
-    ]),
+    ...mapMutations(["SHOW_SNACKBAR", "TOGGLE_SB_VISIBILITY"]),
+    addNewUser(user) {
+      this.agents.push(user);
+      this.SHOW_SNACKBAR({
+        color: "success",
+        content: `A new user was added, full name: ${user.firstName} ${
+          user.lastName
+        }`
+      });
+    },
+    removeDeletedUser(id) {
+      for (let i = 0; i < this.agents.length; i++) {
+        if (this.agents[i].id == id) {
+          this.agents.splice(i, 1);
+          break;
+        }
+      }
+    },
     async refrechAgentsList() {
       await AgentServices.getAgents()
         .then(agents => {
@@ -200,11 +219,6 @@ export default {
         AgentServices.deleteAgentById(this.selectedAgentId)
           .then(result => {
             // console.log(this.selectedAgentId);
-            for (let i = 0; i < this.agents.length; i++) {
-              if (this.agents[i].id == this.selectedAgentId) {
-                this.agents.splice(i, 1);
-              }
-            }
             this.cancelConfirmDeleteDialog(); //! just to hide it
             this.showSuccessSnackbar(result);
           })
@@ -232,18 +246,18 @@ export default {
     },
     showSuccessSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({color: "success", content});
+      this.SHOW_SNACKBAR({ color: "success", content });
       setTimeout(() => {
         this.TOGGLE_SB_VISIBILITY(false);
       }, 5000);
     },
     showErrorSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({color: "error", content});
+      this.SHOW_SNACKBAR({ color: "error", content });
       setTimeout(() => {
         this.TOGGLE_SB_VISIBILITY(false);
       }, 5000);
-    },
+    }
   }
 };
 </script>
