@@ -38,11 +38,11 @@ export default {
   },
   methods: {
     mounteAddAgentComponent() {
-      this.title = "Add New Agent";
+      this.title = "Add New Worker";
       this.currentComponent = CreateAgent;
     },
     mounteAgentsTableComponent() {
-      this.title = "Agents List";
+      this.title = "Workers List";
       this.currentComponent = AgentsTableVue;
     }
   }

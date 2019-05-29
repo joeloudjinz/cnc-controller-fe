@@ -35,7 +35,7 @@
           </v-card-text>
           <v-card-actions class="pt-0 pb-1">
             <v-spacer></v-spacer>
-            <h1 class="font-weight-meduim green--text text--lighten-2">Agents</h1>
+            <h1 class="font-weight-meduim green--text text--lighten-2">Workers</h1>
             <v-spacer></v-spacer>
           </v-card-actions>
         </v-card>
