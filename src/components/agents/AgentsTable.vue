@@ -6,7 +6,7 @@
       color="teal darken-1"
       type="info"
       class="mx-3"
-    >Here you can find the list of all the users of the system, both agnets and admins, with there status of activeness</v-alert>
+    >Here you can find the list of all the users of the system, both workers and admins, with there status of activeness</v-alert>
     <v-card-title>
       <v-spacer></v-spacer>
       <v-text-field
@@ -50,7 +50,7 @@
                 <v-icon small>fas fa-eye</v-icon>
               </v-chip>
             </template>
-            <span>Agent is active</span>
+            <span>Worker is active</span>
           </v-tooltip>
         </td>
         <td class="text-lg-center" v-else>
@@ -60,7 +60,7 @@
                 <v-icon small>fas fa-eye-slash</v-icon>
               </v-chip>
             </template>
-            <span>Agent is not active</span>
+            <span>Worker is not active</span>
           </v-tooltip>
         </td>
         <td>{{ props.item.first_name }}</td>
@@ -69,11 +69,11 @@
         <td>
           <v-tooltip bottom>
             <template #activator="data">
-              <v-btn icon @click="resetPassword(props.item.id)" v-on="data.on">
+              <v-btn icon @click="confirmResetingPassword(props.item.id)" v-on="data.on">
                 <v-icon small color="teal darken-2">fas fa-power-off</v-icon>
               </v-btn>
             </template>
-            <span>Reset The Password Of This User Account</span>
+            <span>Reset the password of this user account</span>
           </v-tooltip>
           <v-tooltip bottom>
             <template #activator="data">
@@ -92,7 +92,7 @@
         icon="warning"
       >Your search for "{{ search }}" found no results.</v-alert>
     </v-data-table>
-    <!-- Agent delete confirmation dialog -->
+    <!-- Worker delete confirmation dialog -->
     <v-dialog v-model="confirmeDeleteDialog" persistent width="500">
       <v-card color="teal lighten-5" dark>
         <v-card-title class="teal--text text--darken-2 headline">
@@ -109,21 +109,42 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- New password after reset -->
-    <v-dialog v-model="dialog" persistent width="400">
+    <!-- Reset password confirmation -->
+    <v-dialog v-model="confirmResetingPasswordDialog" persistent width="400">
       <v-card color="teal lighten-5" dark>
-        <v-card-title class="teal--text text--darken-2 headline">Agent Password Reset</v-card-title>
-        <!-- <v-divider></v-divider> -->
+        <v-card-title class="teal--text text--darken-2 headline">Worker Password Reset</v-card-title>
+        <v-card-text class="font-weight-light teal--text text--darken-4">
+          Are you sure you want to reset the password of the user
+          <p class="font-weight-medium">{{selectedUserFullName}}</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn flat @click="confirmResetingPasswordDialog = false" class="teal--text">Close</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="red lighten-1" class="white--text" @click="resetAgentPassword()">Reset</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- Reset password dialog -->
+    <v-dialog v-model="resetingPasswordDialog" persistent width="400">
+      <v-card color="teal lighten-5" dark>
+        <v-card-title class="teal--text text--darken-2 headline">Worker Password Reset</v-card-title>
         <v-progress-linear
           indeterminate
           color="teal darken-2"
           class="pa-0 mb-0"
           :active="loadingPass"
         ></v-progress-linear>
-        <v-card-text class="font-weight-bold black--text">{{dialogContent}}</v-card-text>
+        <v-card-text class="font-weight-light teal--text text--darken-4 py-0 mb-0">
+          The new password:
+          <span class="font-weight-medium red--text">{{newPass}}</span>
+        </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn flat @click="dialog = false" class="teal--text">Ok</v-btn>
+          <v-btn
+            color="teal darken-2"
+            class="white--text"
+            @click="hideResetPasswordDialog()"
+          >Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -137,8 +158,9 @@ export default {
   data() {
     return {
       search: "",
-      dialog: false,
-      dialogContent: "Please stand by",
+      confirmResetingPasswordDialog: false,
+      resetingPasswordDialog: false,
+      newPass: "Reseting ...",
       loadingPass: true,
       loading: true,
       confirmeDeleteDialog: false,
@@ -169,6 +191,20 @@ export default {
       this.addNewUser(data.user[0]);
     }
   },
+  computed: {
+    selectedUserFullName() {
+      let fullName = "";
+      for (let i = 0; i < this.agents.length; i++) {
+        if (this.agents[i].id == this.selectedAgentId) {
+          fullName = `${this.agents[i].last_name.toUpperCase()} ${
+            this.agents[i].first_name
+          }`;
+          break;
+        }
+      }
+      return fullName;
+    }
+  },
   async created() {
     this.refrechAgentsList();
   },
@@ -191,6 +227,14 @@ export default {
         }
       }
     },
+    confirmResetingPassword(id) {
+      this.selectedAgentId = id;
+      this.confirmResetingPasswordDialog = true;
+    },
+    hideResetPasswordDialog(){
+      this.resetingPasswordDialog = false;
+      this.newPass = "Reseting ...";
+    },
     async refrechAgentsList() {
       await AgentServices.getAgents()
         .then(agents => {
@@ -198,9 +242,7 @@ export default {
           this.loading = false;
         })
         .catch(error => {
-          this.snackbar = true;
-          this.snackbarColor = "error";
-          this.snackbarContent = error;
+          this.showErrorSnackbar(error);
           this.loading = false;
         });
     },
@@ -218,7 +260,6 @@ export default {
       } else {
         AgentServices.deleteAgentById(this.selectedAgentId)
           .then(result => {
-            // console.log(this.selectedAgentId);
             this.cancelConfirmDeleteDialog(); //! just to hide it
             this.showSuccessSnackbar(result);
           })
@@ -228,21 +269,22 @@ export default {
           });
       }
     },
-    resetPassword(id) {
-      this.dialog = true;
-      AgentServices.resetAgentPassword(id)
-        .then(result => {
-          this.loadingPass = false;
-          this.snackbar = true;
-          this.snackbarColor = "success";
-          this.snackbarContent = result.data.success;
-          this.dialogContent = "The New Password is: " + result.data.password;
-        })
-        .catch(error => {
-          this.snackbar = true;
-          this.snackbarColor = "error";
-          this.snackbarContent = error;
-        });
+    resetAgentPassword() {
+      this.confirmResetingPasswordDialog = false;
+      this.resetingPasswordDialog = true;
+      if (this.selectedAgentId != -1) {
+        AgentServices.resetAgentPassword(this.selectedAgentId)
+          .then(result => {
+            this.loadingPass = false;
+            this.showSuccessSnackbar(result.data.success);
+            this.newPass = result.data.password;
+          })
+          .catch(error => {
+            this.showErrorSnackbar(error);
+          });
+      } else {
+        this.showErrorSnackbar("No id is selected!!");
+      }
     },
     showSuccessSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
