@@ -266,7 +266,8 @@
       </v-card>
     </v-dialog>
     <!-- Port dialog -->
-    <v-layout row justify-center>
+    <PortPanelDialog ref="portPanelDialogRef"/>
+    <!-- <v-layout row justify-center>
       <v-dialog
         v-model="doShowPortPanel"
         persistent
@@ -427,9 +428,9 @@
           </v-layout>
         </v-card>
       </v-dialog>
-    </v-layout>
+    </v-layout>-->
     <!-- Leave Port panel Dialog -->
-    <v-dialog v-model="leavePortPanelDialog" persistent max-width="600px">
+    <!-- <v-dialog v-model="leavePortPanelDialog" persistent max-width="600px">
       <v-card color="teal lighten-5">
         <v-card-title class="teal--text text--darken-2 headline">
           <v-icon color="teal darken-2" large left>fas fa-exclamation-circle</v-icon>Leave Port Panel
@@ -443,7 +444,7 @@
           <v-btn color="error" class="white--text" @click="closePortPanelDialog()">Yes</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog>-->
     <!-- Edit Profile Data Dialog -->
     <EditProfileInfoVue ref="editProfileInfoRef"/>
   </v-app>
@@ -458,11 +459,13 @@ import { required, minValue, maxValue } from "vuelidate/lib/validators";
 import { mapState, mapMutations } from "vuex";
 const EditProfileInfoVue = () =>
   import("@/components/home/EditProfileInfo.vue");
+const PortPanelDialog = () => import("@/components/home/PortPanelDialog.vue");
 
 import { setTimeout } from "timers";
 export default {
   components: {
-    EditProfileInfoVue
+    EditProfileInfoVue,
+    PortPanelDialog
   },
   mixins: [validationMixin],
   validations: {
@@ -485,24 +488,8 @@ export default {
       " " +
       window.localStorage.getItem("first_name"),
     isAdmin: false,
-    // editProfileDialog: false,
     drawer: false,
     right: null,
-    //? to show or hide ports console bottom sheet
-    doShowPortPanel: false,
-    selectedPortObject: undefined,
-    //? to enable and disable control btns of port console panel
-    leavePortPanelDialog: false,
-    flushPortDis: true,
-    pausePortDis: true,
-    resumePortDis: true,
-    openPortDis: false,
-    closePortDis: true,
-    //? write to port console
-    writeToPortTextField: "",
-    writeToPortProgress: false,
-    writeToPortProgressValue: "",
-    portConsoleTxt: [],
     //? Settings dialog data
     settingsDialog: false,
     surfaceHeight: 0,
@@ -512,7 +499,6 @@ export default {
   computed: {
     ...mapState([
       "doShowSurfaceDimensionsAlert",
-      "isTransmissionProcessActive",
       "sbColor",
       "sbContent",
       "sbVisibility"
@@ -553,10 +539,10 @@ export default {
     onPortsListChanged(newListObject) {
       this.onActiveCallback(newListObject);
     },
-    onSinglePortData(data) {
-      if (data.target === window.localStorage.getItem("id"))
-        this.onSinglePortDataCallback(data);
-    },
+    // onSinglePortData(data) {
+    //   if (data.target === window.localStorage.getItem("id"))
+    //     this.onSinglePortDataCallback(data);
+    // },
     onServerStatusChanged(data) {
       this.SET_TRANSMISSION_PROCESS_STATE(data.status);
     }
@@ -568,9 +554,6 @@ export default {
       "SHOW_SNACKBAR",
       "TOGGLE_SB_VISIBILITY"
     ]),
-    onSinglePortDataCallback(data) {
-      this.portConsoleTxt.unshift("-> data received: " + data.data);
-    },
     onActiveCallback(data) {
       this.portsCount = Object.keys(data).length;
       let newList = [];
@@ -588,22 +571,6 @@ export default {
         this.selectedPortObject = undefined;
       }
       this.portsList = newList;
-    },
-    closePortPanelDialog() {
-      PortsServices.closePort(this.selectedPortObject.comName)
-        .then(() => {
-          this.leavePortPanelDialog = false;
-          this.doShowPortPanel = false;
-          this.openPortDis = true;
-          this.resumePortDis = true;
-          this.closePortDis = false;
-          this.pausePortDis = false;
-          this.flushPortDis = false;
-        })
-        .catch(error => {
-          this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
-        });
     },
     performLogout() {
       let id = localStorage.getItem("id");
@@ -627,145 +594,8 @@ export default {
           this.showErrorSnackbar(error);
         });
     },
-    pausePort(portName) {
-      this.portConsoleTxt.unshift(
-        "-> Pause emitting data on port: " + portName
-      );
-      PortsServices.pauseEmittingPort(portName)
-        .then(result => {
-          this.portConsoleTxt.unshift("-> Emitting data on port is paused");
-          this.resumePortDis = false; //! means enable btn
-          this.pausePortDis = true; //! means disable btn
-          this.showSuccessSnackbar(result.success);
-        })
-        .catch(error => {
-          this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
-        });
-    },
-    resumePort(portName) {
-      this.portConsoleTxt.unshift(
-        "-> Resume emitting data on port: " + portName
-      );
-      PortsServices.resumeEmittingPort(portName)
-        .then(result => {
-          this.portConsoleTxt.unshift("-> Emitting data on port is resumed");
-          this.pausePortDis = false;
-          this.resumePortDis = true;
-          this.showSuccessSnackbar(result.success);
-        })
-        .catch(error => {
-          this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
-        });
-    },
-    flushPort(portName) {
-      this.portConsoleTxt.unshift("-> Flushing data on port: " + portName);
-      PortsServices.flushPort(portName)
-        .then(result => {
-          this.portConsoleTxt.unshift("-> Data is flushed");
-          this.showSuccessSnackbar(result.success);
-        })
-        .catch(error => {
-          this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
-        });
-    },
-    openPort(portName) {
-      this.portConsoleTxt.unshift("-> Opening port: " + portName);
-      PortsServices.openPort(portName)
-        .then(result => {
-          this.portConsoleTxt.unshift("-> Port is opened");
-          this.showSuccessSnackbar(result);
-          this.openPortDis = true;
-          this.resumePortDis = true;
-          this.closePortDis = false;
-          this.pausePortDis = false;
-          this.flushPortDis = false;
-        })
-        .catch(error => {
-          this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
-        });
-    },
-    closePort(portName) {
-      this.portConsoleTxt.unshift("-> Closing port: " + portName);
-      PortsServices.closePort(portName)
-        .then(result => {
-          this.portConsoleTxt.unshift("-> Port is closed");
-          this.showSuccessSnackbar(result);
-          this.openPortDis = false;
-          this.resumePortDis = true;
-          this.closePortDis = true;
-          this.pausePortDis = true;
-          this.flushPortDis = true;
-        })
-        .catch(error => {
-          this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
-        });
-    },
-    sendCommandToPort(portName) {
-      if (
-        this.writeToPortTextField != "" &&
-        this.writeToPortTextField != undefined
-      ) {
-        this.portConsoleTxt.unshift("Writing: " + this.writeToPortTextField);
-        PortsServices.writeToPort(portName, this.writeToPortTextField + "\r")
-          .then(result => {
-            this.writeToPortTextField = "";
-            this.showSuccessSnackbar(result);
-          })
-          .catch(error => {
-            this.portConsoleTxt.unshift("Error occurred: " + error);
-            this.showErrorSnackbar(error);
-          });
-      } else {
-        this.showErrorSnackbar("Can NOT send empty data!!");
-      }
-    },
     showPortPanel(portObject) {
-      this.selectedPortObject = portObject;
-      PortsServices.isPortOpen(portObject.comName)
-        .then(isOpen => {
-          this.isSelectedPortOpened = isOpen;
-          PortsServices.isPortActive(portObject.comName)
-            .then(isPortActive => {
-              if (isPortActive) {
-                this.doShowPortPanel = false;
-                this.showErrorSnackbar(
-                  "The port is already active, you can't use the panel"
-                );
-                // this.flushPortDis = true;
-                // this.pausePortDis = true;
-                // this.resumePortDis = true;
-                // this.openPortDis = true;
-                // this.closePortDis = true;
-              } else {
-                this.doShowPortPanel = true;
-              }
-            })
-            .catch(error => {
-              this.showErrorSnackbar(
-                "Error while checking port activeness status!" + error
-              );
-            });
-          if (isOpen) {
-            this.openPortDis = true;
-            this.closePortDis = false;
-          } else {
-            this.openPortDis = false;
-            this.closePortDis = true;
-          }
-        })
-        .catch(error => {
-          this.showErrorSnackbar(
-            "Error while checking port open status!" + error
-          );
-        });
-    },
-    clearPortConsole() {
-      this.portConsoleTxt = [];
+      this.$refs.portPanelDialogRef.showPortPanel(portObject);
     },
     showSuccessSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
@@ -787,7 +617,7 @@ export default {
       this.surfaceHeight = window.localStorage.getItem("surfaceHeight");
       this.settingsDialog = true;
     },
-    //? form methods
+    //! completed
     launcheEditProfile() {
       //? calling the function to show the modal
       this.$refs.editProfileInfoRef.showModal();
@@ -824,9 +654,6 @@ export default {
       });
     this.$router.replace("/dashboard");
   }
-  // updated() {
-  //   this.$router.replace("/dashboard");
-  // }
 };
 </script>
 <style>
