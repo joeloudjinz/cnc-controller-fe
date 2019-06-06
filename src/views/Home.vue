@@ -445,29 +445,7 @@
       </v-card>
     </v-dialog>
     <!-- Edit Profile Data Dialog -->
-    <v-dialog v-model="editProfileDialog" persistent max-width="600px">
-      <v-card color="teal lighten-5">
-        <v-card-title class="teal--text text--darken-2 headline">
-          <v-icon x-large color="teal darken-2" left>fas fa-user-edit</v-icon>Edit Profile Data
-        </v-card-title>
-        <v-card-text>
-          <InfoFormVue ref="infoFormRef"/>
-          <v-divider></v-divider>
-          <PassFormVue ref="passFormRef"/>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="teal" class="white--text" @click="closeEditInfoDialog()">Close</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-snackbar
-      v-model="sbVisibility"
-      bottom
-      :color="sbColor"
-      :multi-line="'multi-line'"
-      class="mb-2"
-    >{{ sbContent }}</v-snackbar>
+    <EditProfileInfoVue ref="editProfileInfoRef"/>
   </v-app>
 </template>
 <script>
@@ -478,15 +456,13 @@ import PortsServices from "@/services/ports.js";
 import { validationMixin } from "vuelidate";
 import { required, minValue, maxValue } from "vuelidate/lib/validators";
 import { mapState, mapMutations } from "vuex";
-
-const InfoFormVue = () => import("../components/agents/InfoForm.vue");
-const PassFormVue = () => import("../components/agents/PassForm.vue");
+const EditProfileInfoVue = () =>
+  import("@/components/home/EditProfileInfo.vue");
 
 import { setTimeout } from "timers";
 export default {
   components: {
-    InfoFormVue,
-    PassFormVue
+    EditProfileInfoVue
   },
   mixins: [validationMixin],
   validations: {
@@ -509,10 +485,9 @@ export default {
       " " +
       window.localStorage.getItem("first_name"),
     isAdmin: false,
-    editProfileDialog: false,
+    // editProfileDialog: false,
     drawer: false,
     right: null,
-
     //? to show or hide ports console bottom sheet
     doShowPortPanel: false,
     selectedPortObject: undefined,
@@ -806,11 +781,6 @@ export default {
         this.TOGGLE_SB_VISIBILITY(false);
       }, 5000);
     },
-    closeEditInfoDialog() {
-      this.editProfileDialog = false;
-      this.$refs.passFormRef.$v.$reset();
-      this.$refs.infoFormRef.$v.$reset();
-    },
     showSettingsDialog() {
       //? before opening the dialoge, initialize the settings values from the local storage
       this.surfaceWidth = window.localStorage.getItem("surfaceWidth");
@@ -819,7 +789,8 @@ export default {
     },
     //? form methods
     launcheEditProfile() {
-      this.editProfileDialog = true;
+      //? calling the function to show the modal
+      this.$refs.editProfileInfoRef.showModal();
     },
     updateSurfaceDimensions() {
       this.$v.$touch();

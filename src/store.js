@@ -23,6 +23,7 @@ export default new Vuex.Store({
     sbContent: "",
     sbColor: "",
     sbVisibility: false,
+    // editProfileInfoDialogVisibility: false
   },
   mutations: {
     TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE: (state) => {
@@ -43,7 +44,10 @@ export default new Vuex.Store({
     },
     TOGGLE_SB_VISIBILITY: (state, visibility) => {
       state.sbVisibility = visibility;
-    }
+    },
+    // TOGGLE_EDIT_PROFILE_INFO_VISIBILITY: (state) => {
+    //   state.editProfileInfoDialogVisibility = !state.editProfileInfoDialogVisibility;
+    // },
   },
   actions: {
 
