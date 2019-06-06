@@ -219,7 +219,6 @@ export default {
     PortPanelDialog,
     SettingsDialog
   },
-
   data: () => ({
     portsList: [],
     portsCount: 0,
@@ -232,12 +231,7 @@ export default {
     right: null
   }),
   computed: {
-    ...mapState([
-      "doShowSurfaceDimensionsAlert",
-      "sbColor",
-      "sbContent",
-      "sbVisibility"
-    ]),
+    ...mapState(["doShowSurfaceDimensionsAlert"]),
     surfaceWidthErrors() {
       const errors = [];
       if (!this.$v.surfaceWidth.$dirty) return errors;
@@ -263,7 +257,7 @@ export default {
   },
   sockets: {
     connect() {
-      // console.log("socket connected");
+      // TODO: change the state of the user to active from this event
     },
     onPortsListChanged(newListObject) {
       this.onActiveCallback(newListObject);
@@ -273,12 +267,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations([
-      "SET_TRANSMISSION_PROCESS_STATE",
-      "SHOW_SNACKBAR",
-      "TOGGLE_SB_VISIBILITY"
-    ]),
-    //! completed
+    ...mapMutations(["SET_TRANSMISSION_PROCESS_STATE"]),
     onActiveCallback(data) {
       this.portsCount = Object.keys(data).length;
       let newList = [];
@@ -303,6 +292,7 @@ export default {
         .then(() => {
           //? update connexion status
           window.localStorage.setItem("isConnected", false);
+          // TODO: use the store instead of localStorage
           //! remove data from local storage
           window.localStorage.removeItem("id");
           window.localStorage.removeItem("first_name");
@@ -321,20 +311,6 @@ export default {
     },
     showPortPanel(portObject) {
       this.$refs.portPanelDialogRef.showPortPanel(portObject);
-    },
-    showSuccessSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "success", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
-    },
-    showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
     },
     launcheEditProfile() {
       //? calling the function to show the modal
