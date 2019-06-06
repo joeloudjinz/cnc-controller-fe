@@ -24,11 +24,6 @@ export default new Vuex.Store({
     sbColor: "",
     sbVisibility: false,
   },
-  // getters: {
-  //   getShowSurfaceDimensionsAlertState: state => {
-  //     return state.doShowSurfaceDimensionsAlert;
-  //   }
-  // },
   mutations: {
     TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE: (state) => {
       state.doShowSurfaceDimensionsAlert = !state.doShowSurfaceDimensionsAlert;

@@ -475,16 +475,10 @@ import AuthServices from "@/services/auth.js";
 import AgentServices from "@/services/agent.js";
 import PortsServices from "@/services/ports.js";
 
-// const AuthServices = () => import("../services/auth.js");
-// const AgentServices = () => import("../services/agent.js");
-// const PortsServices = () => import("../services/ports.js");
-
 import { validationMixin } from "vuelidate";
 import { required, minValue, maxValue } from "vuelidate/lib/validators";
 import { mapState, mapMutations } from "vuex";
 
-// import InfoFormVue from "../components/agents/InfoForm.vue";
-// import PassFormVue from "../components/agents/PassForm.vue";
 const InfoFormVue = () => import("../components/agents/InfoForm.vue");
 const PassFormVue = () => import("../components/agents/PassForm.vue");
 

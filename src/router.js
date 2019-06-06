@@ -1,13 +1,5 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-// import Login from "./views/Login.vue";
-// import Home from './views/Home.vue';
-// import Dashboard from "./views/Dashboard.vue";
-// import Agents from "./views/Agents.vue";
-// import Images from './views/Images.vue'; //? for converter page
-// import Resources from './views/Resources.vue';
-// import { Agent } from 'https';
-
 
 Vue.use(Router);
 
@@ -16,30 +8,24 @@ const router = new Router({
       path: '/',
       name: 'home',
       component: () => import( /* webpackChunkName: "about" */ './views/Home.vue'),
-      // component: Home,
       meta: {
         requireAuth: true
       },
-      // component: Home,
       children: [{
           path: 'dashboard',
           component: () => import( /* webpackChunkName: "dashboard" */ "./views/Dashboard.vue"),
-          // component: Dashboard
         },
         {
           path: 'agents',
           component: () => import( /* webpackChunkName: "agents" */ "./views/Agents.vue"),
-          // component: Agents
         },
         {
           path: 'converter',
           component: () => import( /* webpackChunkName: "images" */ './views/Images.vue'),
-          // component: Images
         },
         {
           path: 'resources',
           component: () => import( /* webpackChunkName: "resources" */ './views/Resources.vue'),
-          // component: Resources
         }
       ]
     },
@@ -47,7 +33,6 @@ const router = new Router({
       path: '/login',
       name: 'login',
       component: () => import( /* webpackChunkName: "resources" */ "./views/Login.vue"),
-      // component: Login
     }
   ]
 });
