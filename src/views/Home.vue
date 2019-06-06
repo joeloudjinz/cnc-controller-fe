@@ -193,258 +193,9 @@
       </v-container>
     </v-content>
     <!-- Settings dialog -->
-    <v-dialog
-      v-model="settingsDialog"
-      fullscreen
-      hide-overlay
-      transition="dialog-bottom-transition"
-    >
-      <v-card>
-        <v-toolbar dark color="teal">
-          <v-btn
-            icon
-            dark
-            :disabled="doDisableCloseSettingsDialogBtn"
-            @click="settingsDialog = false"
-          >
-            <v-icon>close</v-icon>
-          </v-btn>
-          <v-toolbar-title>Settings</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <!-- <v-toolbar-items>
-            <v-btn dark flat @click="settingsDialog = false">Save</v-btn>
-          </v-toolbar-items>-->
-        </v-toolbar>
-        <v-card-text>
-          <v-layout row wrap>
-            <v-flex xs12>
-              <v-list class="py-0" three-line>
-                <v-list-tile>
-                  <v-list-tile-content>
-                    <v-list-tile-title>The Drawing Surface Dimensions</v-list-tile-title>
-                    <v-list-tile-sub-title>These two values will be used to generate appropriate gcode coordinates according to the drawing surface of the machine</v-list-tile-sub-title>
-                  </v-list-tile-content>
-                </v-list-tile>
-              </v-list>
-            </v-flex>
-          </v-layout>
-          <v-layout row wrap>
-            <v-flex xs12 sm12 md6 lg3 px-2 pl-4>
-              <v-text-field
-                type="number"
-                label="Width"
-                v-model="surfaceWidth"
-                clearable
-                :error-messages="surfaceWidthErrors"
-                @input="$v.surfaceWidth.$touch()"
-                @blur="$v.surfaceWidth.$touch()"
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm12 md6 lg3 px-2>
-              <v-text-field
-                type="number"
-                label="Height"
-                v-model="surfaceHeight"
-                clearable
-                :error-messages="surfaceHeightErrors"
-                @input="$v.surfaceHeight.$touch()"
-                @blur="$v.surfaceHeight.$touch()"
-              ></v-text-field>
-            </v-flex>
-          </v-layout>
-          <v-layout row wrap>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="teal"
-              class="white--text"
-              :disabled="doDisableSurfaceDimensionsUpdateBtn"
-              @click="updateSurfaceDimensions()"
-            >Update</v-btn>
-          </v-layout>
-        </v-card-text>
-        <v-divider></v-divider>
-      </v-card>
-    </v-dialog>
+    <SettingsDialog ref="settingsDialogRef"/>
     <!-- Port dialog -->
     <PortPanelDialog ref="portPanelDialogRef"/>
-    <!-- <v-layout row justify-center>
-      <v-dialog
-        v-model="doShowPortPanel"
-        persistent
-        fullscreen
-        transition="dialog-bottom-transition"
-      >
-        <v-card>
-          <v-toolbar dark color="teal">
-            <v-btn
-              icon
-              dark
-              @click="openPortDis == true ? leavePortPanelDialog = true : doShowPortPanel = false"
-            >
-              <v-icon>close</v-icon>
-            </v-btn>
-            <v-toolbar-title>Port Panel</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-toolbar-items>
-              <v-btn
-                dark
-                flat
-                :disabled="openPortDis"
-                @click="openPort(selectedPortObject.comName)"
-              >
-                <v-icon left>fas fa-door-open</v-icon>Open Port
-              </v-btn>
-            </v-toolbar-items>
-            <v-toolbar-items>
-              <v-btn
-                dark
-                flat
-                :disabled="closePortDis"
-                @click="closePort(selectedPortObject.comName)"
-              >
-                <v-icon left>fas fa-times-circle</v-icon>Close Port
-              </v-btn>
-            </v-toolbar-items>
-            <v-toolbar-items>
-              <v-btn
-                dark
-                flat
-                :disabled="flushPortDis"
-                @click="flushPort(selectedPortObject.comName)"
-              >
-                <v-icon left>fas fa-arrow-alt-circle-down</v-icon>Flush Data
-              </v-btn>
-            </v-toolbar-items>
-            <v-toolbar-items>
-              <v-btn
-                dark
-                flat
-                :disabled="resumePortDis"
-                @click="resumePort(selectedPortObject.comName)"
-              >
-                <v-icon left>fas fa-play-circle</v-icon>Resume Data
-              </v-btn>
-            </v-toolbar-items>
-            <v-toolbar-items>
-              <v-btn
-                dark
-                flat
-                :disabled="pausePortDis"
-                @click="pausePort(selectedPortObject.comName)"
-              >
-                <v-icon left>fas fa-pause-circle</v-icon>Pause Data
-              </v-btn>
-            </v-toolbar-items>
-          </v-toolbar>
-          <v-alert
-            :value="true"
-            type="info"
-            color="teal darken-4"
-            transition="fade-transition"
-            class="mx-3"
-          >Only "Port Name" is guaranteed 100%, other information is related to the connected device of the current port.</v-alert>
-          <v-list v-if="selectedPortObject != undefined">
-            <v-list-tile avatar>
-              <v-list-tile-content>
-                <v-list-tile-title>Port Name</v-list-tile-title>
-                <v-list-tile-sub-title>{{ selectedPortObject.comName }}</v-list-tile-sub-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile avatar>
-              <v-list-tile-content>
-                <v-list-tile-title>Manufacturer</v-list-tile-title>
-                <v-list-tile-sub-title>{{ selectedPortObject.manufacturer }}</v-list-tile-sub-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile avatar>
-              <v-list-tile-content>
-                <v-list-tile-title>Serial Number</v-list-tile-title>
-                <v-list-tile-sub-title>{{ selectedPortObject.serialNumber }}</v-list-tile-sub-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile avatar>
-              <v-list-tile-content>
-                <v-list-tile-title>Plug and Play ID</v-list-tile-title>
-                <v-list-tile-sub-title>{{ selectedPortObject.pnpId }}</v-list-tile-sub-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile avatar>
-              <v-list-tile-content>
-                <v-list-tile-title>Procudt ID</v-list-tile-title>
-                <v-list-tile-sub-title>{{ selectedPortObject.productId }}</v-list-tile-sub-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile avatar>
-              <v-list-tile-content>
-                <v-list-tile-title>Vendor ID</v-list-tile-title>
-                <v-list-tile-sub-title>{{ selectedPortObject.vendorId }}</v-list-tile-sub-title>
-              </v-list-tile-content>
-            </v-list-tile>
-          </v-list>
-          <v-divider></v-divider>
-          <v-layout row wrap>
-            <v-flex xs12 px-3>
-              <v-toolbar
-                color="teal lighten-4"
-                class="elevation-0 mt-2 teal--text text--darken-1"
-                card
-              >
-                <v-text-field
-                  v-model="writeToPortTextField"
-                  label="Commands"
-                  solo
-                  class="pt-2 teal--text text--darken-4"
-                ></v-text-field>
-                <v-fade-transition>
-                  <v-btn
-                    v-if="writeToPortTextField != ''"
-                    icon
-                    @click="sendCommandToPort(selectedPortObject.comName)"
-                  >
-                    <v-icon color="teal darken-4">fas fa-paper-plane</v-icon>
-                  </v-btn>
-                </v-fade-transition>
-                <v-btn icon @click="clearPortConsole()">
-                  <v-icon color="teal darken-4">fas fa-eraser</v-icon>
-                </v-btn>
-              </v-toolbar>
-            </v-flex>
-            <v-flex xs12 pb-3>
-              <v-card
-                height="300px"
-                color="teal lighten-4 elevation-0"
-                class="scroll scrollbar-style mx-3"
-              >
-                <v-card-text class="black--text text-darken-4">
-                  <table>
-                    <tr v-for="(line, index) in portConsoleTxt" :key="index">
-                      <td v-if="line.charAt(1) == '>'" class="font-weight-meduim">{{line}}</td>
-                      <td v-else class="red--text text-darken-1 font-weight-meduim">{{line}}</td>
-                    </tr>
-                  </table>
-                </v-card-text>
-              </v-card>
-            </v-flex>
-          </v-layout>
-        </v-card>
-      </v-dialog>
-    </v-layout>-->
-    <!-- Leave Port panel Dialog -->
-    <!-- <v-dialog v-model="leavePortPanelDialog" persistent max-width="600px">
-      <v-card color="teal lighten-5">
-        <v-card-title class="teal--text text--darken-2 headline">
-          <v-icon color="teal darken-2" large left>fas fa-exclamation-circle</v-icon>Leave Port Panel
-        </v-card-title>
-        <v-card-text>
-          <p>The port will be closed after leaving Port Panel, are you sure you want to leave?</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn flat class="teal--text" @click="leavePortPanelDialog = false">Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn color="error" class="white--text" @click="closePortPanelDialog()">Yes</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>-->
     <!-- Edit Profile Data Dialog -->
     <EditProfileInfoVue ref="editProfileInfoRef"/>
   </v-app>
@@ -454,32 +205,21 @@ import AuthServices from "@/services/auth.js";
 import AgentServices from "@/services/agent.js";
 import PortsServices from "@/services/ports.js";
 
-import { validationMixin } from "vuelidate";
-import { required, minValue, maxValue } from "vuelidate/lib/validators";
 import { mapState, mapMutations } from "vuex";
+
 const EditProfileInfoVue = () =>
   import("@/components/home/EditProfileInfo.vue");
 const PortPanelDialog = () => import("@/components/home/PortPanelDialog.vue");
+const SettingsDialog = () => import("@/components/home/SettingsDialog.vue");
 
 import { setTimeout } from "timers";
 export default {
   components: {
     EditProfileInfoVue,
-    PortPanelDialog
+    PortPanelDialog,
+    SettingsDialog
   },
-  mixins: [validationMixin],
-  validations: {
-    surfaceWidth: {
-      required,
-      minValue: minValue(50),
-      maxValue: maxValue(2000)
-    },
-    surfaceHeight: {
-      required,
-      minValue: minValue(50),
-      maxValue: maxValue(2000)
-    }
-  },
+
   data: () => ({
     portsList: [],
     portsCount: 0,
@@ -489,12 +229,7 @@ export default {
       window.localStorage.getItem("first_name"),
     isAdmin: false,
     drawer: false,
-    right: null,
-    //? Settings dialog data
-    settingsDialog: false,
-    surfaceHeight: 0,
-    surfaceWidth: 0,
-    keepShowingSurfaceDimensionsAlert: true
+    right: null
   }),
   computed: {
     ...mapState([
@@ -524,12 +259,6 @@ export default {
       !this.$v.surfaceHeight.maxValue &&
         errors.push("Surface Height sould be less then 2000mm.");
       return errors;
-    },
-    doDisableSurfaceDimensionsUpdateBtn() {
-      return this.$v.$invalid;
-    },
-    doDisableCloseSettingsDialogBtn() {
-      return this.doDisableSurfaceDimensionsUpdateBtn;
     }
   },
   sockets: {
@@ -539,21 +268,17 @@ export default {
     onPortsListChanged(newListObject) {
       this.onActiveCallback(newListObject);
     },
-    // onSinglePortData(data) {
-    //   if (data.target === window.localStorage.getItem("id"))
-    //     this.onSinglePortDataCallback(data);
-    // },
     onServerStatusChanged(data) {
       this.SET_TRANSMISSION_PROCESS_STATE(data.status);
     }
   },
   methods: {
     ...mapMutations([
-      "TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE",
       "SET_TRANSMISSION_PROCESS_STATE",
       "SHOW_SNACKBAR",
       "TOGGLE_SB_VISIBILITY"
     ]),
+    //! completed
     onActiveCallback(data) {
       this.portsCount = Object.keys(data).length;
       let newList = [];
@@ -611,27 +336,12 @@ export default {
         this.TOGGLE_SB_VISIBILITY(false);
       }, 5000);
     },
-    showSettingsDialog() {
-      //? before opening the dialoge, initialize the settings values from the local storage
-      this.surfaceWidth = window.localStorage.getItem("surfaceWidth");
-      this.surfaceHeight = window.localStorage.getItem("surfaceHeight");
-      this.settingsDialog = true;
-    },
-    //! completed
     launcheEditProfile() {
       //? calling the function to show the modal
       this.$refs.editProfileInfoRef.showModal();
     },
-    updateSurfaceDimensions() {
-      this.$v.$touch();
-      if (!this.$v.$invalid) {
-        window.localStorage.setItem("surfaceWidth", this.surfaceWidth);
-        window.localStorage.setItem("surfaceHeight", this.surfaceHeight);
-        if (this.doShowSurfaceDimensionsAlert) {
-          this.TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE();
-        }
-        this.showSuccessSnackbar("Information Updated Successfully");
-      }
+    showSettingsDialog() {
+      this.$refs.settingsDialogRef.showSettingsDialog();
     }
   },
   //! DON'T use arrow functions here
