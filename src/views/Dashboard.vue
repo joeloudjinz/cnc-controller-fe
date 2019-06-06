@@ -132,9 +132,6 @@ export default {
     };
   },
   sockets: {
-    connect() {
-      // console.log("socket connected");
-    },
     onPortsListChanged(newListObject) {
       this.onPortsListChangedCallback(newListObject);
     }

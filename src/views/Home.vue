@@ -198,6 +198,14 @@
     <PortPanelDialog ref="portPanelDialogRef"/>
     <!-- Edit Profile Data Dialog -->
     <EditProfileInfoVue ref="editProfileInfoRef"/>
+    <!-- DON'T REMOVE THIS SNACKBAR -->
+    <v-snackbar
+      v-model="sbVisibility"
+      bottom
+      :color="sbColor"
+      :multi-line="'multi-line'"
+      class="mb-2"
+    >{{ sbContent }}</v-snackbar>
   </v-app>
 </template>
 <script>
@@ -231,7 +239,12 @@ export default {
     right: null
   }),
   computed: {
-    ...mapState(["doShowSurfaceDimensionsAlert"]),
+    ...mapState([
+      "doShowSurfaceDimensionsAlert",
+      "sbColor",
+      "sbContent",
+      "sbVisibility"
+    ]),
     surfaceWidthErrors() {
       const errors = [];
       if (!this.$v.surfaceWidth.$dirty) return errors;
@@ -318,6 +331,20 @@ export default {
     },
     showSettingsDialog() {
       this.$refs.settingsDialogRef.showSettingsDialog();
+    },
+    showSuccessSnackbar(content) {
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({ color: "success", content });
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
+    },
+    showErrorSnackbar(content) {
+      this.TOGGLE_SB_VISIBILITY(true);
+      this.SHOW_SNACKBAR({ color: "error", content });
+      setTimeout(() => {
+        this.TOGGLE_SB_VISIBILITY(false);
+      }, 5000);
     }
   },
   //! DON'T use arrow functions here

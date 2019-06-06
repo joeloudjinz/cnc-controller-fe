@@ -94,10 +94,7 @@ export default {
   }),
   computed: {
     ...mapState([
-      "doShowSurfaceDimensionsAlert",
-      "sbColor",
-      "sbContent",
-      "sbVisibility"
+      "doShowSurfaceDimensionsAlert"
     ]),
     surfaceWidthErrors() {
       const errors = [];
