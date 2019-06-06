@@ -7,7 +7,7 @@
         <div v-if="doShowDeleteDirectoryBtn">
           <v-tooltip bottom>
             <template #activator="data">
-              <v-btn v-on="data.on" icon @click="showDeleteFileConfirmationDialog = true">
+              <v-btn v-on="data.on" icon @click="displayDeleteFileConfirmationDialog()">
                 <v-icon color="teal darken-2">fas fa-folder-minus</v-icon>
               </v-btn>
             </template>
@@ -17,7 +17,7 @@
         <div v-if="doShowDeleteFileBtn">
           <v-tooltip bottom>
             <template #activator="data">
-              <v-btn v-on="data.on" icon @click="showDeleteFileConfirmationDialog = true">
+              <v-btn v-on="data.on" icon @click="displayDeleteFileConfirmationDialog()">
                 <v-icon color="teal darken-2">fas fa-trash-alt</v-icon>
               </v-btn>
             </template>
@@ -70,70 +70,43 @@
           @click="loadMoreLines()"
         >Load more lines</v-btn>
       </v-card-actions>
+      <DeleteFileConfirmationDialog ref="deleteFileConfirmationDialogRef"/>
     </div>
-    <v-dialog v-model="showDeleteFileConfirmationDialog" persistent width="500">
-      <v-card color="teal lighten-5" dark>
-        <v-card-title class="teal--text text--darken-2 headline">
-          <v-icon color="teal darken-2" large left>fas fa-exclamation-circle</v-icon>Confirm Deletion
-        </v-card-title>
-        <v-divider></v-divider>
-        <v-card-text class="font-weight-bold black--text">
-          <p v-if="isCurrentFileGcode">Are you sure you want to delete this file?</p>
-          <p v-else-if="isCurrentFileLog">Are you sure you want to delete this directory?</p>
-          <p v-else>Are you sure you want to delete this image?</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn
-            flat
-            @click="showDeleteFileConfirmationDialog = false"
-            class="teal--text lighten-1"
-          >Cancel</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn @click="selecteDeletionType()" color="red lighten-1" class="white--text">Yes</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
 <script>
 import FileServices from "@/services/files.js";
 
+import { mapState, mapMutations } from "vuex";
+
+const DeleteFileConfirmationDialog = () =>
+  import("./DeleteFileConfirmationDialog.vue");
+
 export default {
+  components: {
+    DeleteFileConfirmationDialog
+  },
   data: () => ({
-    currentFileName: undefined,
     gcodeData: [],
     fullGcodeData: [],
     logData: [],
     fullLogData: [],
-    stoppedIn: 0,
-    logURL: undefined,
-    showDeleteFileConfirmationDialog: false
+    stoppedIn: 0
   }),
   computed: {
-    isCurrentFileGcode() {
-      return (
-        this.currentFileName != undefined &&
-        this.currentFileName.includes("gcode")
-      );
-    },
-    isCurrentFileLog() {
-      return (
-        this.currentFileName != undefined &&
-        this.currentFileName.includes("log")
-      );
-    },
+    ...mapState(["currentFileName"]),
     doShowDeleteFileBtn() {
       return (
         this.currentFileName != undefined &&
-        this.currentFileName.includes(".gcode") &&
+        this.currentFileName.includes("gcode") &&
         !this.currentFileName.includes("clean")
       );
     },
     doShowDeleteDirectoryBtn() {
       return (
         this.currentFileName != undefined &&
-        this.currentFileName.includes(".log")
+        this.currentFileName.includes("log")
       );
     },
     doShowDisplayCard() {
@@ -144,12 +117,15 @@ export default {
         this.stoppedIn < this.fullGcodeData.length ||
         this.stoppedIn < this.fullLogData.length
       );
+    },
+    showDeleteFileConfirmationDialog() {
+      return this.$refs.deleteFileConfirmationDialogRef.getDialogVisibility();
     }
   },
   methods: {
+    ...mapMutations(["SET_CURRENT_FILE_NAME"]),
     displayGcodeLines(name, path) {
       this.$parent.toggoleInProgress();
-      this.currentFileName = name;
       this.logData = [];
       this.fullLogData = [];
       FileServices.getFileLines(path)
@@ -160,24 +136,23 @@ export default {
           this.stoppedIn = 100;
         })
         .catch(error => {
-          this.inProgress = false;
+          this.$parent.toggoleInProgress();
           this.$parent.showErrorSnackbar(error);
         });
     },
     displayLogFile(name, path) {
-      this.currentFileName = name;
       this.gcodeData = [];
       this.fullGcodeData = [];
-      this.inProgress = true;
+      this.$parent.toggoleInProgress();
       FileServices.getFileLines(path)
         .then(result => {
-          this.inProgress = false;
+          this.$parent.toggoleInProgress();
           this.fullLogData = result.fileLines;
           this.logData = this.fullLogData.slice(0, 100);
           this.stoppedIn = 100;
         })
         .catch(error => {
-          this.inProgress = false;
+          this.$parent.toggoleInProgress();
           this.$parent.showErrorSnackbar(error);
         });
     },
@@ -203,15 +178,16 @@ export default {
         this.stoppedIn = this.fullGcodeData.length;
       }
     },
+    displayDeleteFileConfirmationDialog() {
+      this.$refs.deleteFileConfirmationDialogRef.toggoleDialogVisibility();
+    },
     selecteDeletionType() {
-      if (this.isCurrentFileGcode) {
+      if (this.currentFileName.includes("gcode")) {
         this.deleteGcodeFile(this.currentFileName);
-      } else if (this.isCurrentFileLog) {
-        this.deleteOutputDirectory();
       } else {
-        this.deleteSelectedImage();
+        this.deleteOutputDirectory();
       }
-      this.showDeleteFileConfirmationDialog = false;
+      this.$refs.deleteFileConfirmationDialogRef.toggoleDialogVisibility();
     },
     deleteGcodeFile(gcodeFileName) {
       if (gcodeFileName != undefined) {
@@ -239,6 +215,10 @@ export default {
         .catch(error => {
           this.$parent.showErrorSnackbar(error);
         });
+    },
+    getFileType() {
+      if (this.currentFileName.includes("gcode")) return "gcode";
+      else return "log";
     }
   }
 };
