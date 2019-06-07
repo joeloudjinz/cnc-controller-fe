@@ -363,55 +363,7 @@
       </v-card>
     </v-dialog>
     <!-- Ports List dialoge -->
-    <v-dialog v-model="showPortsListDialog" persistent width="700">
-      <v-card color="teal lighten-5">
-        <v-card-title class="headline teal--text">Ports List</v-card-title>
-        <v-card-text class="py-0 px-0">
-          <v-progress-linear
-            v-if="portsListProgress"
-            :indeterminate="true"
-            color="teal darken-2"
-            class="pa-0"
-          ></v-progress-linear>
-          <v-container grid-list-sm>
-            <v-alert :value="true" color="teal darken-4" type="info" class="mb-2">
-              Tranmission process consume to mush time, so be patient until it's successfully completed,
-              You can monitor the whole process from the two consoles below after you select the port.
-              If the process hang up for some reasons, you can pause and resume it.
-            </v-alert>
-            <p class="title">Chose port:</p>
-            <v-alert
-              :value="isTransmissionProcessActive"
-              type="warning"
-            >There is already a transmission process going on</v-alert>
-            <v-fade-transition>
-              <v-list v-if="portsList.length !== 0">
-                <v-list-tile
-                  v-for="(port, index) in portsList"
-                  :key="index"
-                  :disabled="isTransmissionProcessActive"
-                  @click="startTransmitingGCode(port.comName)"
-                >
-                  <v-list-tile-content>
-                    <v-list-tile-title class="font-weight-bold">{{ port.comName }}</v-list-tile-title>
-                    <v-list-tile-sub-title
-                      class="font-weight-medium font-italic"
-                    >{{ port.manufacturer }}</v-list-tile-sub-title>
-                  </v-list-tile-content>
-                </v-list-tile>
-              </v-list>
-              <v-list v-else>
-                <v-alert :value="true" type="error">No port is connected!</v-alert>
-              </v-list>
-            </v-fade-transition>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn flat color="teal" @click="showPortsListDialog = false">Cancel</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <PortsListDialog ref="portsListDialogRef"/>
     <DeleteFileConfirmationDialog ref="deleteFileConfirmationDialogRef"/>
   </div>
 </template>
@@ -424,10 +376,12 @@ import { mapState, mapMutations } from "vuex";
 
 const DeleteFileConfirmationDialog = () =>
   import("./DeleteFileConfirmationDialog.vue");
+const PortsListDialog = () => import("@/components/ports/PortsListDialog.vue");
 
 export default {
   components: {
-    DeleteFileConfirmationDialog
+    DeleteFileConfirmationDialog,
+    PortsListDialog
   },
   data: () => ({
     imageURL: undefined,
@@ -453,10 +407,10 @@ export default {
     unproccessBlackPixelsValue: 0,
     showConversionResultAlert: false,
     //? end
-    //? ports list data ---------------------
-    showPortsListDialog: false,
-    portsList: [],
-    portsListProgress: true,
+    // //? ports list data ---------------------
+    // showPortsListDialog: false,
+    // portsList: [],
+    // portsListProgress: true,
     //? data in consoles area ------------------------
     consolesArea: false,
     //? this variable is used to operate on the port when the transmission process is going on
@@ -594,14 +548,15 @@ export default {
     prepareQuickDrawOperation() {
       const splitted = this.currentFileName.split(".");
       const gcodeFileName = splitted[0] + "." + splitted[1] + ".gcode";
-      let doesExist = false;
-      //? check the existance of the corresponding gcode file for the image
-      for (let i = 0; i < this.items[1].children.length; i++) {
-        if (this.items[1].children[i].name == gcodeFileName) {
-          doesExist = true;
-          break;
-        }
-      }
+      let doesExist = this.$parent.doesGcodeFileExistInItems(gcodeFileName);
+      // TODO: call parent function to see if gcode file exist
+      // //? check the existance of the corresponding gcode file for the image
+      // for (let i = 0; i < this.items[1].children.length; i++) {
+      //   if (this.items[1].children[i].name == gcodeFileName) {
+      //     doesExist = true;
+      //     break;
+      //   }
+      // }
       if (doesExist) {
         this.showConversionParamsDialog = false;
         this.displayPortsListDialog();
@@ -610,7 +565,7 @@ export default {
       }
     },
     displayPortsListDialog() {
-      this.showPortsListDialog = true;
+      this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
       PortsServices.getConnectedPortsList()
         .then(result => {
           this.portsListProgress = false;
@@ -620,7 +575,7 @@ export default {
         })
         .catch(error => {
           this.portsListProgress = false;
-          this.showPortsListDialog = false;
+          this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
           this.$parent.showErrorSnackbar(error);
         });
     },
@@ -639,7 +594,7 @@ export default {
             //? show consoles area
             this.consolesArea = true;
             //? hiding ports list dialog
-            this.showPortsListDialog = false;
+            this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
             //? enabling pause & stop tranmission operations btns
             this.pauseSendDis = false;
             this.stopSendDis = false;
@@ -653,7 +608,7 @@ export default {
           .catch(error => {
             this.closeImagePanelBtnDis = false;
             //? hiding ports list dialog
-            this.showPortsListDialog = false;
+            this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
             // this.port = undefined;
             this.SET_CURRENT_ACTIVE_PORT(undefined);
             //? showing the error about why the transmission process didn't start
@@ -668,7 +623,7 @@ export default {
             // }
           });
       } else {
-        this.showPortsListDialog = false;
+        this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
         this.$parent.showErrorSnackbar("Gcode file name is missing!");
       }
     },

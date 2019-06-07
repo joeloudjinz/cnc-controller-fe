@@ -208,6 +208,17 @@ export default {
         }
       }
     },
+    doesGcodeFileExistInItems(fileName) {
+      let b = false;
+      //? check the existance of the corresponding gcode file for an image
+      for (let i = 0; i < this.items[1].children.length; i++) {
+        if (this.items[1].children[i].name == fileName) {
+          b = true;
+          break;
+        }
+      }
+      return b;
+    },
     showSuccessSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
       this.SHOW_SNACKBAR({ color: "success", content });
