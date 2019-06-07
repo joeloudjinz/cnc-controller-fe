@@ -213,6 +213,9 @@ export default {
     toggleDialogVisibility() {
       this.showConversionParamsDialog = !this.showConversionParamsDialog;
     },
+    hideDialog() {
+      this.showConversionParamsDialog = false;
+    },
     startConversionProcess() {
       //? checking the value of Scale Axes
       if (this.scaleAxes <= 50) {

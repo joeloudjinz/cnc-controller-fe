@@ -322,7 +322,7 @@ export default {
       FileServices.getImageData(path)
         .then(result => {
           this.$parent.toggoleInProgress();
-          this.SET_CURRENT_FILE_NAME(name);
+          // this.SET_CURRENT_FILE_NAME(name);
           this.imagePanel = true;
           this.imageURL = "data:image/" + result.ext + ";base64," + result.data;
         })
@@ -347,9 +347,9 @@ export default {
     prepareQuickDrawOperation() {
       const splitted = this.currentFileName.split(".");
       const gcodeFileName = splitted[0] + "." + splitted[1] + ".gcode";
-      let doesExist = this.$parent.doesGcodeFileExistInItems(gcodeFileName);
-      if (doesExist) {
-        this.$refs.conversionDialogRef.toggleDialogVisibility();
+      if (this.$parent.doesGcodeFileExistInItems(gcodeFileName)) {
+        //! don't use toggleDialogVisibility() here
+        this.$refs.conversionDialogRef.hideDialog();
         this.displayPortsListDialog();
       } else {
         this.$refs.conversionDialogRef.toggleDialogVisibility();
