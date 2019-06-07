@@ -77,7 +77,7 @@
 <script>
 import FileServices from "@/services/files.js";
 
-import { mapState, mapMutations, mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 const DeleteFileConfirmationDialog = () =>
   import("./DeleteFileConfirmationDialog.vue");
@@ -116,7 +116,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["SET_CURRENT_FILE_NAME"]),
+    // ...mapMutations(["SET_CURRENT_FILE_NAME"]),
     displayGcodeLines(name, path) {
       this.$parent.toggoleInProgress();
       this.logData = [];
