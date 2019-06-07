@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import store from './store.js';
 
 Vue.use(Router);
 
@@ -11,11 +12,12 @@ const router = new Router({
       meta: {
         requireAuth: true
       },
-      children: [{
-          path: 'dashboard',
-          name: 'dashboard',
-          component: () => import( /* webpackChunkName: "dashboard" */ "./views/Dashboard.vue"),
-        },
+    children: [
+      // {
+      //     path: 'dashboard',
+      //     name: 'dashboard',
+      //     component: () => import( /* webpackChunkName: "dashboard" */ "./views/Dashboard.vue"),
+      //   },
         {
           path: 'agents',
           name: 'users',
@@ -48,6 +50,11 @@ const router = new Router({
  *? isConnected variable will be initialized (in the local storage) during login process to 'true', and to 'false' during logout.
  */
 router.beforeEach((to, from, next) => {
+  if (to.name === 'home') {
+    store.commit("SET_IS_HOME_PAGE", true);
+  } else {
+    store.commit("SET_IS_HOME_PAGE", false);
+  }
   if (to.matched.some(record => record.meta.requireAuth)) {
     const isConnected = window.localStorage.getItem('isConnected');
     // console.log(isConnected);

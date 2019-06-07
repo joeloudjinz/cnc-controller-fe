@@ -20,6 +20,7 @@ export default new Vuex.Store({
     isTransmissionProcessActive: false,
     currentActivePort: undefined,
     currentFileName: undefined,
+    isHomePage: false,
     //? snackbar state
     sbContent: "",
     sbColor: "",
@@ -52,6 +53,9 @@ export default new Vuex.Store({
     SET_CURRENT_FILE_NAME: (state, currentFileName) => {
       state.currentFileName = currentFileName;
     },
+    SET_IS_HOME_PAGE: (state, bool) => {
+      state.isHomePage = bool;
+    }
   },
   actions: {
 

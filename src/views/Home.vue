@@ -30,7 +30,7 @@
       <v-divider></v-divider>
       <div class="hidden-md-and-up">
         <v-list dense class="pt-0">
-          <v-list-tile to="/dashboard">
+          <v-list-tile to="/">
             <v-list-tile-action>
               <v-icon left>fas fa-tachometer-alt</v-icon>
             </v-list-tile-action>
@@ -119,7 +119,7 @@
       <v-toolbar-items class="hidden-sm-and-down">
         <v-tooltip bottom>
           <template #activator="data">
-            <v-btn v-on="data.on" flat to="/dashboard" class="m-0">
+            <v-btn v-on="data.on" flat to="/" class="m-0">
               <v-icon left>fas fa-tachometer-alt</v-icon>Dashboard
             </v-btn>
           </template>
@@ -187,9 +187,9 @@
             </v-flex>
           </v-layout>
         </v-fade-transition>
-        <v-card v-if="isHomeRoute">
-          <!-- USE DASHBOARD COMPONENTS HERE -->
-        </v-card>
+        <div v-if="isHomePage">
+          <DashboardVue/>
+        </div>
         <v-layout row wrap>
           <router-view></router-view>
         </v-layout>
@@ -222,13 +222,15 @@ const EditProfileInfoVue = () =>
   import("@/components/home/EditProfileInfo.vue");
 const PortPanelDialog = () => import("@/components/home/PortPanelDialog.vue");
 const SettingsDialog = () => import("@/components/home/SettingsDialog.vue");
+const DashboardVue = () => import("@/components/dashboard/Dashboard.vue");
 
 import { setTimeout } from "timers";
 export default {
   components: {
     EditProfileInfoVue,
     PortPanelDialog,
-    SettingsDialog
+    SettingsDialog,
+    DashboardVue
   },
   data: () => ({
     portsList: [],
@@ -246,11 +248,12 @@ export default {
       "doShowSurfaceDimensionsAlert",
       "sbColor",
       "sbContent",
-      "sbVisibility"
+      "sbVisibility",
+      "isHomePage"
     ]),
-    isHomeRoute() {
-      // console.log('this.$router.currentRoute() :', this.$router.currentRoute.name);
-      return this.$router.currentRoute.name === 'dashboard';
+    isDashboardRoute() {
+      console.log('this.$router.currentRoute() :', this.$router.currentRoute);
+      return this.$router.currentRoute.name === "home";
     },
     surfaceWidthErrors() {
       const errors = [];
@@ -372,7 +375,7 @@ export default {
       .catch(error => {
         this.showErrorSnackbar(error);
       });
-    this.$router.replace("/dashboard");
+    // this.$router.replace("/dashboard");
   }
 };
 </script>
