@@ -5,7 +5,7 @@
       <v-card-title class="headline teal--text">Ports List</v-card-title>
       <v-card-text class="py-0 px-0">
         <v-progress-linear
-          v-if="portsListProgress"
+          v-if="progressStatus"
           :indeterminate="true"
           color="teal darken-2"
           class="pa-0"
@@ -44,14 +44,16 @@
         </v-container>
       </v-card-text>
       <v-card-actions>
-        <v-spacer></v-spacer>
         <v-btn flat color="teal" @click="showPortsListDialog = false">Cancel</v-btn>
+        <v-spacer></v-spacer>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import PortsServices from "@/services/ports.js";
+
 import { mapState } from "vuex";
 
 export default {
@@ -59,16 +61,35 @@ export default {
     //? ports list data ---------------------
     showPortsListDialog: false,
     portsList: [],
-    portsListProgress: true
+    progressStatus: false
   }),
   computed: {
-    ...mapState([
-      "isTransmissionProcessActive"
-    ])
+    ...mapState(["isTransmissionProcessActive"])
   },
   methods: {
     togglePortsListDialogeVisibility() {
       this.showPortsListDialog = !this.showPortsListDialog;
+    },
+    toggleProgressStatus() {
+      this.progressStatus != this.progressStatus;
+    },
+    fetchPortsList() {
+      this.progressStatus = true;
+      PortsServices.getConnectedPortsList()
+        .then(result => {
+          this.progressStatus = false;
+          if (result.count !== 0) {
+            this.portsList = result.ports;
+          }
+        })
+        .catch(error => {
+          this.progressStatus = false;
+          this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
+          this.$parent.showErrorSnackbar(error);
+        });
+    },
+    startTransmitingGCode(portName) {
+      this.$parent.startTransmitingGCode(portName);
     }
   }
 };

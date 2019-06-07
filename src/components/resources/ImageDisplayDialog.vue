@@ -364,6 +364,7 @@
     </v-dialog>
     <!-- Ports List dialoge -->
     <PortsListDialog ref="portsListDialogRef"/>
+    <!-- Delete file dialoge -->
     <DeleteFileConfirmationDialog ref="deleteFileConfirmationDialogRef"/>
   </div>
 </template>
@@ -406,11 +407,6 @@ export default {
     proccessBlackPixelsValue: 0,
     unproccessBlackPixelsValue: 0,
     showConversionResultAlert: false,
-    //? end
-    // //? ports list data ---------------------
-    // showPortsListDialog: false,
-    // portsList: [],
-    // portsListProgress: true,
     //? data in consoles area ------------------------
     consolesArea: false,
     //? this variable is used to operate on the port when the transmission process is going on
@@ -566,31 +562,21 @@ export default {
     },
     displayPortsListDialog() {
       this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
-      PortsServices.getConnectedPortsList()
-        .then(result => {
-          this.portsListProgress = false;
-          if (result.count !== 0) {
-            this.portsList = result.ports;
-          }
-        })
-        .catch(error => {
-          this.portsListProgress = false;
-          this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
-          this.$parent.showErrorSnackbar(error);
-        });
+      this.$refs.portsListDialogRef.fetchPortsList();
     },
     startTransmitingGCode(portName) {
-      this.portsListProgress = true;
+      this.$refs.portsListDialogRef.toggleProgressStatus();
       //? ensuring that the current file name is valide gcode file name
       if (this.currentFileName !== undefined && this.currentFileName !== "") {
         //? removing the extension from the fileName because the endpoint function uses gcode file name without ext
         const splitted = this.currentFileName.split(".");
         const fileName = splitted[0] + "." + splitted[1];
+        //? disabling image panel close btn
         this.closeImagePanelBtnDis = true;
         this.SET_CURRENT_ACTIVE_PORT(portName);
         PortsServices.performFullDrawOperation(fileName, portName)
           .then(result => {
-            this.portsListProgress = false;
+            this.$refs.portsListDialogRef.toggleProgressStatus();
             //? show consoles area
             this.consolesArea = true;
             //? hiding ports list dialog
@@ -609,7 +595,6 @@ export default {
             this.closeImagePanelBtnDis = false;
             //? hiding ports list dialog
             this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
-            // this.port = undefined;
             this.SET_CURRENT_ACTIVE_PORT(undefined);
             //? showing the error about why the transmission process didn't start
             this.$parent.showErrorSnackbar(error.failure.split(":")[1]);
