@@ -6,7 +6,7 @@
         <CountCardVue iconName="fas fa-crown" :count="adminsCount" countType="Admins"/>
       </v-flex>
       <v-flex xs12 sm12 md3 lg3 class="pb-1 mb-0">
-        <CountCardVue iconName="fas fa-hard-hat" :count="agentsCount" countType="Workers"/>
+        <CountCardVue iconName="fas fa-hard-hat" :count="workersCount" countType="Workers"/>
       </v-flex>
       <v-flex xs12 sm12 md3 lg3 class="pb-1 mb-0">
         <CountCardVue iconName="fas fa-recycle" :count="conversionsCount" countType="Conversions"/>
@@ -31,26 +31,34 @@ import ConversionServices from "@/services/conversion.js";
 import AgentsServices from "@/services/agent.js";
 import PortsServices from "@/services/ports.js";
 
+import { mapState, mapMutations } from "vuex";
+
 const CountCardVue = () => import("@/components/dashboard/CountCard.vue");
 const CuationCardVue = () => import("@/components/dashboard/CuationCard.vue");
 
 export default {
   name: "dashboard",
   components: { CountCardVue, CuationCardVue },
-  data() {
-    return {
-      adminsCount: 0,
-      agentsCount: 0,
-      conversionsCount: 0,
-      activePortsCount: 0
-    };
-  },
   sockets: {
     onPortsListChanged(newListObject) {
       this.onPortsListChangedCallback(newListObject);
     }
   },
+  computed: {
+    ...mapState([
+      "adminsCount",
+      "workersCount",
+      "conversionsCount",
+      "activePortsCount"
+    ])
+  },
   methods: {
+    ...mapMutations([
+      "SET_ADMINS_COUNT",
+      "SET_WORKERS_COUNT",
+      "SET_CONVERSIONS_COUNT",
+      "SET_ACTIVE_PORTS_COUNT"
+    ]),
     onPortsListChangedCallback(data) {
       this.activePortsCount = Object.keys(data).length;
     }
@@ -58,33 +66,38 @@ export default {
   created: function() {
     ConversionServices.getConversionsCount()
       .then(conversionsCount => {
-        this.conversionsCount = conversionsCount;
+        if (this.conversionsCount != conversionsCount) {
+          this.SET_CONVERSIONS_COUNT(conversionsCount);
+        }
         AgentsServices.getAdminsCount()
           .then(adminsCount => {
-            this.adminsCount = adminsCount;
-            PortsServices.getConnectedPortsList()
-              .then(result => {
-                this.activePortsCount = result.count;
-              })
-              .catch(error => {
-                this.showErrorSnackbar(error);
-              });
+            if (this.adminsCount != adminsCount) {
+              this.SET_ADMINS_COUNT(adminsCount);
+            }
           })
           .catch(error => {
-            this.adminsCount = "NaN";
+            this.showErrorSnackbar(error);
+          });
+        PortsServices.getConnectedPortsList()
+          .then(result => {
+            if (this.activePortsCount != result.count) {
+              this.SET_ACTIVE_PORTS_COUNT(result.count);
+            }
+          })
+          .catch(error => {
             this.showErrorSnackbar(error);
           });
         AgentsServices.getAgentsCount()
-          .then(result => {
-            this.agentsCount = result;
+          .then(count => {
+            if (this.workersCount != count) {
+              this.SET_WORKERS_COUNT(count);
+            }
           })
           .catch(error => {
-            this.agentsCount = "NaN";
             this.showErrorSnackbar(error);
           });
       })
       .catch(error => {
-        this.conversionsCount = "NaN";
         this.showErrorSnackbar(error);
       });
   }

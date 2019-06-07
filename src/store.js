@@ -21,6 +21,10 @@ export default new Vuex.Store({
     currentActivePort: undefined,
     currentFileName: undefined,
     isHomePage: false,
+    adminsCount: 0,
+    workersCount: 0,
+    conversionsCount: 0,
+    activePortsCount: 0,
     //? snackbar state
     sbContent: "",
     sbColor: "",
@@ -55,6 +59,18 @@ export default new Vuex.Store({
     },
     SET_IS_HOME_PAGE: (state, bool) => {
       state.isHomePage = bool;
+    },
+    SET_ADMINS_COUNT: (state, count) => {
+      state.adminsCount = count;
+    },
+    SET_WORKERS_COUNT: (state, count) => {
+      state.workersCount = count;
+    },
+    SET_CONVERSIONS_COUNT: (state, count) => {
+      state.conversionsCount = count;
+    },
+    SET_ACTIVE_PORTS_COUNT: (state, count) => {
+      state.activePortsCount = count;
     }
   },
   actions: {
