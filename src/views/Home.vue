@@ -251,28 +251,6 @@ export default {
       "sbVisibility",
       "isHomePage"
     ]),
-    surfaceWidthErrors() {
-      const errors = [];
-      if (!this.$v.surfaceWidth.$dirty) return errors;
-      !this.$v.surfaceWidth.required &&
-        errors.push("Surface Width is required.");
-      !this.$v.surfaceWidth.minValue &&
-        errors.push("Surface Width sould be more then 50mm.");
-      !this.$v.surfaceWidth.maxValue &&
-        errors.push("Surface Width sould be less then 2000mm.");
-      return errors;
-    },
-    surfaceHeightErrors() {
-      const errors = [];
-      if (!this.$v.surfaceHeight.$dirty) return errors;
-      !this.$v.surfaceHeight.required &&
-        errors.push("Surface Height is required.");
-      !this.$v.surfaceHeight.minValue &&
-        errors.push("Surface Height sould be more then 50mm.");
-      !this.$v.surfaceHeight.maxValue &&
-        errors.push("Surface Height sould be less then 2000mm.");
-      return errors;
-    }
   },
   sockets: {
     connect() {
