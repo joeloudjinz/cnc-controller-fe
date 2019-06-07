@@ -39,7 +39,7 @@
             </v-list-tile-content>
             <!-- Protect it by isAdmin ! -->
           </v-list-tile>
-          <v-list-tile v-if="isAdmin == true" to="/agents">
+          <v-list-tile v-if="isAdmin == true" to="/users">
             <v-list-tile-action>
               <v-icon left>fas fa-hard-hat</v-icon>
             </v-list-tile-action>
@@ -55,7 +55,7 @@
               <v-list-tile-title>Converter</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
-          <v-list-tile to="/resources">
+          <v-list-tile to="/files">
             <v-list-tile-action>
               <v-icon left>fas fa-boxes</v-icon>
             </v-list-tile-action>
@@ -128,7 +128,7 @@
         <!-- Protect it by isAdmin ! -->
         <v-tooltip bottom>
           <template v-if="isAdmin == true" #activator="data">
-            <v-btn v-on="data.on" flat to="/agents" class="m-0">Workers</v-btn>
+            <v-btn v-on="data.on" flat to="/users" class="m-0">Workers</v-btn>
           </template>
           <span>Consult workers list and manage there accounts</span>
         </v-tooltip>
@@ -140,9 +140,9 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template #activator="data">
-            <v-btn v-on="data.on" flat to="/resources">Files</v-btn>
+            <v-btn v-on="data.on" flat to="/files">Files</v-btn>
           </template>
-          <span>Consult directory tree of all the resources in the server</span>
+          <span>Consult directory tree of all the files in the server</span>
         </v-tooltip>
         <v-tooltip bottom>
           <template #activator="data">

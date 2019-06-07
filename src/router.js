@@ -13,11 +13,10 @@ const router = new Router({
         requireAuth: true
       },
     children: [
-      // TODO: rename these routes 
         {
-          path: 'agents',
+          path: 'users',
           name: 'users',
-          component: () => import( /* webpackChunkName: "agents" */ "./views/Agents.vue"),
+          component: () => import( /* webpackChunkName: "agents" */ "./views/Workers.vue"),
         },
         {
           path: 'converter',
@@ -25,9 +24,9 @@ const router = new Router({
           component: () => import( /* webpackChunkName: "images" */ './views/Images.vue'),
         },
         {
-          path: 'resources',
+          path: 'files',
           name: 'files',
-          component: () => import( /* webpackChunkName: "resources" */ './views/Resources.vue'),
+          component: () => import( /* webpackChunkName: "resources" */ './views/Files.vue'),
         }
       ]
     },
