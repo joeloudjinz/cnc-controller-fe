@@ -24,8 +24,6 @@
   </v-flex>
 </template>
 <script>
-// import AgentsTableVue from "@/components/agents/AgentsTable.vue";
-// import CreateAgent from "@/components/agents/CreateAgent.vue";
 const AgentsTableVue = () => import("../components/agents/AgentsTable.vue");
 const CreateAgent = () => import("../components/agents/CreateAgent.vue");
 export default {

@@ -6,7 +6,6 @@
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text class="font-weight-bold black--text">
-        <!-- FIX FILE NAME DISPLAY -->
         <p v-if="isGcodeFile">Are you sure you want to delete this file?</p>
         <p v-else-if="isLogFile">Are you sure you want to delete this directory?</p>
         <p v-else>Are you sure you want to delete this image?</p>

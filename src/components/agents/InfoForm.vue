@@ -74,7 +74,6 @@ export default {
     firstName: window.localStorage.getItem("first_name"),
     lastName: window.localStorage.getItem("last_name"),
     email: window.localStorage.getItem("email"),
-    //? alert details ...
     alertContent: "",
     alertColor: "",
     alert: false
@@ -113,7 +112,7 @@ export default {
             last_name: this.lastName,
             first_name: this.firstName,
             email: this.email,
-            id: window.localStorage.getItem('id')
+            id: window.localStorage.getItem("id")
           })
             .then(result => {
               window.localStorage.setItem("first_name", this.firstName);
@@ -127,9 +126,6 @@ export default {
               this.showErrorAlert(error);
               this.disableAlert();
             });
-          // console.log("Is valid");
-        } else {
-          // console.warn("Is NOT valid");
         }
       }
     },

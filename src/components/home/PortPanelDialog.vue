@@ -335,11 +335,6 @@ export default {
                 this.showErrorSnackbar(
                   "The port is already active, you can't use the panel"
                 );
-                // this.flushPortDis = true;
-                // this.pausePortDis = true;
-                // this.resumePortDis = true;
-                // this.openPortDis = true;
-                // this.closePortDis = true;
               } else {
                 this.doShowPortPanel = true;
               }

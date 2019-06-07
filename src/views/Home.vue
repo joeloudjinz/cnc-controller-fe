@@ -251,10 +251,6 @@ export default {
       "sbVisibility",
       "isHomePage"
     ]),
-    isDashboardRoute() {
-      console.log('this.$router.currentRoute() :', this.$router.currentRoute);
-      return this.$router.currentRoute.name === "home";
-    },
     surfaceWidthErrors() {
       const errors = [];
       if (!this.$v.surfaceWidth.$dirty) return errors;
@@ -375,7 +371,6 @@ export default {
       .catch(error => {
         this.showErrorSnackbar(error);
       });
-    // this.$router.replace("/dashboard");
   }
 };
 </script>

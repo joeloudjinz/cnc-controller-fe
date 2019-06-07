@@ -524,7 +524,11 @@ export default {
     }
   },
   computed: {
-    ...mapState(["isTransmissionProcessActive", "currentActivePort", "currentFileName"]),
+    ...mapState([
+      "isTransmissionProcessActive",
+      "currentActivePort",
+      "currentFileName"
+    ]),
     disableConversionCardActionBtns() {
       //? when conversion progress is true, disable action btns
       return this.showConversionProgress;
@@ -534,7 +538,7 @@ export default {
     },
     disableImagePanelToolbarBtns() {
       return this.isTransmissionProcessActive;
-    },
+    }
   },
   methods: {
     ...mapMutations([
@@ -610,7 +614,6 @@ export default {
       PortsServices.getConnectedPortsList()
         .then(result => {
           this.portsListProgress = false;
-          // this.isTransmissionProcessActive = result.isServerActive;
           if (result.count !== 0) {
             this.portsList = result.ports;
           }
@@ -623,7 +626,6 @@ export default {
     },
     startTransmitingGCode(portName) {
       this.portsListProgress = true;
-      // this.port = portName;
       //? ensuring that the current file name is valide gcode file name
       if (this.currentFileName !== undefined && this.currentFileName !== "") {
         //? removing the extension from the fileName because the endpoint function uses gcode file name without ext
@@ -665,8 +667,6 @@ export default {
             //   );
             // }
           });
-        // setTimeout(() => {
-        // }, 500);
       } else {
         this.showPortsListDialog = false;
         this.$parent.showErrorSnackbar("Gcode file name is missing!");
@@ -747,15 +747,9 @@ export default {
       this.unproccessBlackPixelsValue = 0;
       //? close the panel
       this.imagePanel = false;
-      // if (this.isTransmissionProcessActive) {
-      //   this.showCloseImagePanelConfirmationDialog = true;
-      // } else {
-
-      // }
     },
     pausePort() {
       if (this.currentActivePort) {
-        // console.warn("pausePort() is called, port is " + this.currentActivePort);
         PortsServices.pauseEmittingPort(this.currentActivePort)
           .then(result => {
             this.resumePortDis = false; //! means enable btn
@@ -766,13 +760,11 @@ export default {
             this.$parent.showErrorSnackbar(error);
           });
       } else {
-        // console.warn("port is undefined!!");
         this.$parent.showErrorSnackbar("No port is defined");
       }
     },
     resumePort() {
       if (this.currentActivePort) {
-        // console.warn("resumePort() is called, port is " + this.currentActivePort);
         PortsServices.resumeEmittingPort(this.currentActivePort)
           .then(result => {
             this.pausePortDis = false;
@@ -783,13 +775,11 @@ export default {
             this.$parent.showErrorSnackbar(error);
           });
       } else {
-        // console.warn("port is undefined!!");
         this.$parent.showErrorSnackbar("No port is defined");
       }
     },
     flushPort() {
       if (this.currentActivePort) {
-        // console.warn("flushPort() is called, port is " + this.currentActivePort);
         PortsServices.flushPort(this.currentActivePort)
           .then(result => {
             this.$parent.showSuccessSnackbar(result.success);
@@ -798,7 +788,6 @@ export default {
             this.$parent.showErrorSnackbar(error);
           });
       } else {
-        // console.warn("port is undefined!!");
         this.$parent.showErrorSnackbar("No port is defined");
       }
     },
@@ -824,7 +813,6 @@ export default {
             this.pauseSendDis = true;
             this.resumeSendDis = true;
             this.stopSendDis = true;
-            // this.isTransmissionProcessActive = false;
             this.SET_TRANSMISSION_PROCESS_STATE(false);
             this.$parent.showSuccessSnackbar(result.success);
           })

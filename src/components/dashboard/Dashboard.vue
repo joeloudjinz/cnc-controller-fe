@@ -76,7 +76,6 @@ export default {
           });
         AgentsServices.getAgentsCount()
           .then(result => {
-            // console.log('agentsCount :', result);
             this.agentsCount = result;
           })
           .catch(error => {

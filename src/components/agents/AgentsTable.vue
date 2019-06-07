@@ -140,11 +140,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-            color="teal darken-2"
-            class="white--text"
-            @click="hideResetPasswordDialog()"
-          >Ok</v-btn>
+          <v-btn color="teal darken-2" class="white--text" @click="hideResetPasswordDialog()">Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -166,7 +162,6 @@ export default {
       confirmeDeleteDialog: false,
       headers: [
         { text: "#", value: "index" },
-        // { text: "Priviliges", value: "is_admin" },
         { text: "Activeness", value: "is_active" },
         {
           text: "First Name",
@@ -231,7 +226,7 @@ export default {
       this.selectedAgentId = id;
       this.confirmResetingPasswordDialog = true;
     },
-    hideResetPasswordDialog(){
+    hideResetPasswordDialog() {
       this.resetingPasswordDialog = false;
       this.newPass = "Reseting ...";
     },
@@ -286,6 +281,7 @@ export default {
         this.showErrorSnackbar("No id is selected!!");
       }
     },
+    // TODO: use the function of the parent
     showSuccessSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
       this.SHOW_SNACKBAR({ color: "success", content });
@@ -293,6 +289,7 @@ export default {
         this.TOGGLE_SB_VISIBILITY(false);
       }, 5000);
     },
+    // TODO: use the function of the parent
     showErrorSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
       this.SHOW_SNACKBAR({ color: "error", content });

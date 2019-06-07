@@ -13,11 +13,7 @@ const router = new Router({
         requireAuth: true
       },
     children: [
-      // {
-      //     path: 'dashboard',
-      //     name: 'dashboard',
-      //     component: () => import( /* webpackChunkName: "dashboard" */ "./views/Dashboard.vue"),
-      //   },
+      // TODO: rename these routes 
         {
           path: 'agents',
           name: 'users',
@@ -57,9 +53,7 @@ router.beforeEach((to, from, next) => {
   }
   if (to.matched.some(record => record.meta.requireAuth)) {
     const isConnected = window.localStorage.getItem('isConnected');
-    // console.log(isConnected);
     if (isConnected === 'true') {
-      // console.log(to.name);
       next();
     } else {
       router.replace('/login');

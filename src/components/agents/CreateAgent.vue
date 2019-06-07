@@ -186,6 +186,7 @@ export default {
           });
       }
     },
+    // TODO: use parent function
     showSuccessSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
       this.SHOW_SNACKBAR({ color: "success", content });
@@ -193,6 +194,7 @@ export default {
         this.TOGGLE_SB_VISIBILITY(false);
       }, 5000);
     },
+    // TODO: use parent function
     showErrorSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
       this.SHOW_SNACKBAR({ color: "error", content });

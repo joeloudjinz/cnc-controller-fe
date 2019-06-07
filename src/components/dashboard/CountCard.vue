@@ -12,7 +12,6 @@
     </v-card-text>
     <v-card-actions class="pt-0 pb-1">
       <v-spacer></v-spacer>
-      <!-- Administrators -->
       <h1 class="font-weight-meduim green--text text--lighten-2">{{countType}}</h1>
       <v-spacer></v-spacer>
     </v-card-actions>

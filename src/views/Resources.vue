@@ -110,7 +110,6 @@ export default {
       "TOGGLE_SB_VISIBILITY",
       "SET_CURRENT_FILE_NAME"
     ]),
-    // ! DONE
     getResourcesDirDetails() {
       FileServices.getDirectoryTree()
         .then(result => {
@@ -174,7 +173,6 @@ export default {
     },
     displayImage(name, path) {
       this.SET_CURRENT_FILE_NAME(name);
-      // TODO: empty the file content arrays in fileContentDisplayCardRef to hide this component
       this.$refs.fileContentDisplayCardRef.emptyCardContent();
       this.$refs.imageDisplayDialog.displayImage(name, path);
     },

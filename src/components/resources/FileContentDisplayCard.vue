@@ -116,7 +116,6 @@ export default {
     }
   },
   methods: {
-    // ...mapMutations(["SET_CURRENT_FILE_NAME"]),
     displayGcodeLines(name, path) {
       this.$parent.toggoleInProgress();
       this.logData = [];
