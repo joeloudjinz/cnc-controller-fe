@@ -187,6 +187,9 @@
             </v-flex>
           </v-layout>
         </v-fade-transition>
+        <v-card v-if="isHomeRoute">
+          <!-- USE DASHBOARD COMPONENTS HERE -->
+        </v-card>
         <v-layout row wrap>
           <router-view></router-view>
         </v-layout>
@@ -245,6 +248,10 @@ export default {
       "sbContent",
       "sbVisibility"
     ]),
+    isHomeRoute() {
+      // console.log('this.$router.currentRoute() :', this.$router.currentRoute.name);
+      return this.$router.currentRoute.name === 'dashboard';
+    },
     surfaceWidthErrors() {
       const errors = [];
       if (!this.$v.surfaceWidth.$dirty) return errors;

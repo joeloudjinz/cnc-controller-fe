@@ -13,18 +13,22 @@ const router = new Router({
       },
       children: [{
           path: 'dashboard',
+          name: 'dashboard',
           component: () => import( /* webpackChunkName: "dashboard" */ "./views/Dashboard.vue"),
         },
         {
           path: 'agents',
+          name: 'users',
           component: () => import( /* webpackChunkName: "agents" */ "./views/Agents.vue"),
         },
         {
           path: 'converter',
+          name: 'converter',
           component: () => import( /* webpackChunkName: "images" */ './views/Images.vue'),
         },
         {
           path: 'resources',
+          name: 'files',
           component: () => import( /* webpackChunkName: "resources" */ './views/Resources.vue'),
         }
       ]
