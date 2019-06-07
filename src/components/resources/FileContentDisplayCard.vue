@@ -77,7 +77,7 @@
 <script>
 import FileServices from "@/services/files.js";
 
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapGetters } from "vuex";
 
 const DeleteFileConfirmationDialog = () =>
   import("./DeleteFileConfirmationDialog.vue");
@@ -95,18 +95,12 @@ export default {
   }),
   computed: {
     ...mapState(["currentFileName"]),
+    ...mapGetters(["isLogFile", "isGcodeFile"]),
     doShowDeleteFileBtn() {
-      return (
-        this.currentFileName != undefined &&
-        this.currentFileName.includes("gcode") &&
-        !this.currentFileName.includes("clean")
-      );
+      return this.isGcodeFile && !this.currentFileName.includes("clean");
     },
     doShowDeleteDirectoryBtn() {
-      return (
-        this.currentFileName != undefined &&
-        this.currentFileName.includes("log")
-      );
+      return this.isLogFile;
     },
     doShowDisplayCard() {
       return this.gcodeData.length != 0 || this.logData.length != 0;
@@ -157,21 +151,21 @@ export default {
     },
     loadMoreLines() {
       const stopline = this.stoppedIn + 100;
-      if (this.currentFileName.includes(".log")) {
+      if (this.isLogFile) {
         const newLines = this.fullLogData.slice(this.stoppedIn, stopline);
         this.logData.push(...newLines);
-      } else if (this.currentFileName.includes(".gcode")) {
+      } else if (this.isGcodeFile) {
         const newLines = this.fullGcodeData.slice(this.stoppedIn, stopline);
         this.gcodeData.push(...newLines);
       }
       this.stoppedIn = stopline;
     },
     loadAllLines() {
-      if (this.currentFileName.includes(".log")) {
+      if (this.isLogFile) {
         const newLines = this.fullLogData.slice(this.stoppedIn);
         this.logData.push(...newLines);
         this.stoppedIn = this.fullLogData.length;
-      } else if (this.currentFileName.includes(".gcode")) {
+      } else if (this.isGcodeFile) {
         const newLines = this.fullGcodeData.slice(this.stoppedIn);
         this.gcodeData.push(...newLines);
         this.stoppedIn = this.fullGcodeData.length;
@@ -181,7 +175,7 @@ export default {
       this.$refs.deleteFileConfirmationDialogRef.toggoleDialogVisibility();
     },
     selecteDeletionType() {
-      if (this.currentFileName.includes("gcode")) {
+      if (this.isGcodeFile) {
         this.deleteGcodeFile(this.currentFileName);
       } else {
         this.deleteOutputDirectory();
@@ -190,7 +184,7 @@ export default {
     },
     deleteGcodeFile(gcodeFileName) {
       if (gcodeFileName != undefined) {
-        if (this.currentFileName.includes(".gcode")) {
+        if (this.isGcodeFile) {
           FileServices.deleteGcodeFile(gcodeFileName)
             .then(() => {
               this.gcodeData = [];
@@ -220,10 +214,6 @@ export default {
       this.gcodeData = [];
       this.fullLogData = [];
       this.fullGcodeData = [];
-    },
-    getFileType() {
-      if (this.currentFileName.includes("gcode")) return "gcode";
-      else return "log";
     }
   }
 };
