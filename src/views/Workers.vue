@@ -24,24 +24,24 @@
   </v-flex>
 </template>
 <script>
-const AgentsTableVue = () => import("../components/agents/AgentsTable.vue");
-const CreateAgent = () => import("../components/agents/CreateAgent.vue");
+const WorkersTable = () => import("../components/agents/WorkersTable.vue");
+const CreateWorker = () => import("../components/agents/CreateWorker.vue");
 export default {
   data: () => {
     return {
-      title: "Agents List",
+      title: "Workers List",
       disableAddBtn: true,
-      currentComponent: AgentsTableVue
+      currentComponent: WorkersTable
     };
   },
   methods: {
     mounteAddAgentComponent() {
       this.title = "Add New Worker";
-      this.currentComponent = CreateAgent;
+      this.currentComponent = CreateWorker;
     },
     mounteAgentsTableComponent() {
       this.title = "Workers List";
-      this.currentComponent = AgentsTableVue;
+      this.currentComponent = WorkersTable;
     }
   }
 };

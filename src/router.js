@@ -8,7 +8,7 @@ const router = new Router({
   routes: [{
       path: '/',
       name: 'home',
-      component: () => import( /* webpackChunkName: "about" */ './views/Home.vue'),
+      component: () => import( /* webpackChunkName: "home" */ './views/Home.vue'),
       meta: {
         requireAuth: true
       },
@@ -16,7 +16,7 @@ const router = new Router({
         {
           path: 'users',
           name: 'users',
-          component: () => import( /* webpackChunkName: "agents" */ "./views/Workers.vue"),
+          component: () => import( /* webpackChunkName: "users" */ "./views/Workers.vue"),
         },
         {
           path: 'converter',
@@ -26,14 +26,14 @@ const router = new Router({
         {
           path: 'files',
           name: 'files',
-          component: () => import( /* webpackChunkName: "resources" */ './views/Files.vue'),
+          component: () => import( /* webpackChunkName: "files" */ './views/Files.vue'),
         }
       ]
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import( /* webpackChunkName: "resources" */ "./views/Login.vue"),
+      component: () => import( /* webpackChunkName: "login" */ "./views/Login.vue"),
     }
   ]
 });
