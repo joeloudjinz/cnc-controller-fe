@@ -7,8 +7,8 @@
       <v-divider></v-divider>
       <v-card-text class="font-weight-bold black--text">
         <!-- FIX FILE NAME DISPLAY -->
-        <p v-if="isFileGcode()">Are you sure you want to delete this file?</p>
-        <p v-else-if="isFileLog()">Are you sure you want to delete this directory?</p>
+        <p v-if="isGcodeFile">Are you sure you want to delete this file?</p>
+        <p v-else-if="isLogFile">Are you sure you want to delete this directory?</p>
         <p v-else>Are you sure you want to delete this image?</p>
       </v-card-text>
       <v-card-actions>
@@ -25,30 +25,17 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 export default {
   data: () => ({
     showDeleteFileConfirmationDialog: false
   }),
   computed: {
-    ...mapState(["currentFileName"])
+    ...mapState(["currentFileName"]),
+    ...mapGetters(["isLogFile", "isGcodeFile"])
   },
   methods: {
-    isFileGcode() {
-      if (this.currenFileName) {
-        return this.currenFileName.includes("gcode");
-      } else {
-        return false;
-      }
-    },
-    isFileLog() {
-      if (this.currenFileName) {
-        return this.currenFileName.includes("log");
-      } else {
-        return false;
-      }
-    },
     selecteDeletionType() {
       this.$parent.selecteDeletionType();
     },

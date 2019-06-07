@@ -562,10 +562,6 @@ export default {
     },
     displayImage(name, path) {
       this.$parent.toggoleInProgress();
-      this.logData = [];
-      this.gcodeData = [];
-      this.fullLogData = [];
-      this.fullGcodeData = [];
       FileServices.getImageData(path)
         .then(result => {
           this.$parent.toggoleInProgress();

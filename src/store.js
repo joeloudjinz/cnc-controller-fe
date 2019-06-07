@@ -20,10 +20,14 @@ export default new Vuex.Store({
     isTransmissionProcessActive: false,
     currentActivePort: undefined,
     currentFileName: undefined,
-    //? sb state
+    //? snackbar state
     sbContent: "",
     sbColor: "",
     sbVisibility: false,
+  },
+  getters: {
+    isGcodeFile: state => state.currentFileName != undefined ? state.currentFileName.includes("gcode") : false,
+    isLogFile: state => state.currentFileName != undefined ? state.currentFileName.includes("log") : false,
   },
   mutations: {
     TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE: (state) => {
@@ -47,7 +51,7 @@ export default new Vuex.Store({
     },
     SET_CURRENT_FILE_NAME: (state, currentFileName) => {
       state.currentFileName = currentFileName;
-    }, 
+    },
   },
   actions: {
 

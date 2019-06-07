@@ -74,7 +74,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import FileServices from "@/services/files.js";
 
@@ -216,6 +215,12 @@ export default {
           this.$parent.showErrorSnackbar(error);
         });
     },
+    emptyCardContent() {
+      this.logData = [];
+      this.gcodeData = [];
+      this.fullLogData = [];
+      this.fullGcodeData = [];
+    },
     getFileType() {
       if (this.currentFileName.includes("gcode")) return "gcode";
       else return "log";
@@ -223,6 +228,5 @@ export default {
   }
 };
 </script>
-
 <style>
 </style>

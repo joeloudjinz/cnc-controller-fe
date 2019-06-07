@@ -174,6 +174,8 @@ export default {
     },
     displayImage(name, path) {
       this.SET_CURRENT_FILE_NAME(name);
+      // TODO: empty the file content arrays in fileContentDisplayCardRef to hide this component
+      this.$refs.fileContentDisplayCardRef.emptyCardContent();
       this.$refs.imageDisplayDialog.displayImage(name, path);
     },
     removeImageFromItems(imageName) {
@@ -208,12 +210,6 @@ export default {
         }
       }
     },
-    // getCurrentFileName() {
-    //   if (this.currentFileName) {
-    //     console.log('this.currentFileName :', this.currentFileName);
-    //     return this.getCurrentFileName;
-    //   } else console.log("file name is undefined");
-    // },
     showSuccessSnackbar(content) {
       this.TOGGLE_SB_VISIBILITY(true);
       this.SHOW_SNACKBAR({ color: "success", content });
