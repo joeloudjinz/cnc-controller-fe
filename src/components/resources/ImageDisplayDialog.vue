@@ -545,14 +545,6 @@ export default {
       const splitted = this.currentFileName.split(".");
       const gcodeFileName = splitted[0] + "." + splitted[1] + ".gcode";
       let doesExist = this.$parent.doesGcodeFileExistInItems(gcodeFileName);
-      // TODO: call parent function to see if gcode file exist
-      // //? check the existance of the corresponding gcode file for the image
-      // for (let i = 0; i < this.items[1].children.length; i++) {
-      //   if (this.items[1].children[i].name == gcodeFileName) {
-      //     doesExist = true;
-      //     break;
-      //   }
-      // }
       if (doesExist) {
         this.showConversionParamsDialog = false;
         this.displayPortsListDialog();
