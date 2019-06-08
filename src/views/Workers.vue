@@ -21,17 +21,29 @@
       </v-tooltip>
     </v-toolbar>
     <v-card :is="currentComponent"></v-card>
+    <SnackBar :color="color" :content="content" :visibility="visibility"/>
   </v-flex>
 </template>
 <script>
 const WorkersTable = () => import("../components/agents/WorkersTable.vue");
 const CreateWorker = () => import("../components/agents/CreateWorker.vue");
+
+import SnackBar from "@/components/app/SnackBar.vue";
+
+import { setTimeout } from "timers";
+
 export default {
+  components: {
+    SnackBar
+  },
   data: () => {
     return {
       title: "Workers List",
       disableAddBtn: true,
-      currentComponent: WorkersTable
+      currentComponent: WorkersTable,
+      color: "teal",
+      content: "",
+      visibility: false
     };
   },
   methods: {
@@ -42,6 +54,22 @@ export default {
     mounteAgentsTableComponent() {
       this.title = "Workers List";
       this.currentComponent = WorkersTable;
+    },
+    showSuccessSnackbar(content) {
+      this.color = "success";
+      this.content = content;
+      this.visibility = true;
+      setTimeout(() => {
+        this.visibility = false;
+      }, 5000);
+    },
+    showErrorSnackbar(content) {
+      this.color = "error";
+      this.content = content;
+      this.visibility = true;
+      setTimeout(() => {
+        this.visibility = false;
+      }, 5000);
     }
   }
 };

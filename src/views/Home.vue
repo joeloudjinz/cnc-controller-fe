@@ -202,13 +202,7 @@
     <!-- Edit Profile Data Dialog -->
     <EditProfileInfoVue ref="editProfileInfoRef"/>
     <!-- DON'T REMOVE THIS SNACKBAR -->
-    <v-snackbar
-      v-show="sbVisibility"
-      bottom
-      :color="sbColor"
-      :multi-line="'multi-line'"
-      class="mb-2"
-    >{{ sbContent }}</v-snackbar>
+    <SnackBar :color="color" :content="content" :visibility="visibility"/>
   </v-app>
 </template>
 <script>
@@ -223,14 +217,17 @@ const EditProfileInfoVue = () =>
 const PortPanelDialog = () => import("@/components/home/PortPanelDialog.vue");
 const SettingsDialog = () => import("@/components/home/SettingsDialog.vue");
 const DashboardVue = () => import("@/components/dashboard/Dashboard.vue");
-
+import SnackBar from "@/components/app/SnackBar.vue";
 import { setTimeout } from "timers";
+
 export default {
+  name: 'home',
   components: {
     EditProfileInfoVue,
     PortPanelDialog,
     SettingsDialog,
-    DashboardVue
+    DashboardVue,
+    SnackBar
   },
   data: () => ({
     portsList: [],
@@ -238,21 +235,16 @@ export default {
     isAdmin: false,
     drawer: false,
     right: null,
-    // first
+    color: "teal",
+    content: "",
+    visibility: false
   }),
   computed: {
-    ...mapState([
-      "doShowSurfaceDimensionsAlert",
-      "sbColor",
-      "sbContent",
-      "sbVisibility",
-      "isHomePage"
-      // "first_name",
-      // "last_name",
-      // "id"
-    ]),
+    ...mapState(["doShowSurfaceDimensionsAlert", "isHomePage"]),
     fullName() {
-      return `${localStorage.last_name.toUpperCase()} ${localStorage.first_name}`;
+      return `${localStorage.last_name.toUpperCase()} ${
+        localStorage.first_name
+      }`;
     }
   },
   sockets: {
@@ -269,7 +261,7 @@ export default {
   methods: {
     ...mapMutations([
       "SET_TRANSMISSION_PROCESS_STATE",
-      "TOGGLE_SB_VISIBILITY",
+      // "TOGGLE_SB_VISIBILITY",
       "TOGGLE_IS_CONNECTED_STATE"
     ]),
     onActiveCallback(data) {
@@ -321,37 +313,44 @@ export default {
       this.$refs.settingsDialogRef.showSettingsDialog();
     },
     showSuccessSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "success", content });
+      this.color = "success";
+      this.content = content;
+      this.visibility = true;
       setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
+        this.visibility = false;
       }, 5000);
     },
     showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
+      this.color = "error";
+      this.content = content;
+      this.visibility = true;
       setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
+        this.visibility = false;
       }, 5000);
     }
   },
   //! DON'T use arrow functions here
   created() {
-    PortsServices.getConnectedPortsList()
-      .then(result => {
-        this.portsCount = result.count;
-        if (result.count != 0) this.portsList = result.ports;
-      })
-      .catch(error => {
-        this.showErrorSnackbar(error);
-      });
-    AgentServices.getRole(localStorage.id)
-      .then(result => {
-        this.isAdmin = result.data.result;
-      })
-      .catch(error => {
-        this.showErrorSnackbar(error);
-      });
+    if (this.$store.state.token === "") {
+      this.showErrorSnackbar("Session has expired, login agina please");
+      this.$router.replace("/login");
+    } else {
+      PortsServices.getConnectedPortsList()
+        .then(result => {
+          this.portsCount = result.count;
+          if (result.count != 0) this.portsList = result.ports;
+        })
+        .catch(error => {
+          this.showErrorSnackbar(error);
+        });
+      AgentServices.getRole(localStorage.id)
+        .then(result => {
+          this.isAdmin = result.data.result;
+        })
+        .catch(error => {
+          this.showErrorSnackbar(error);
+        });
+    }
   }
 };
 </script>

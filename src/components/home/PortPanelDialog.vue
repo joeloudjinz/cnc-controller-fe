@@ -172,7 +172,7 @@
 
 <script>
 import PortsServices from "@/services/ports.js";
-import { mapState, mapMutations } from "vuex";
+import { mapMutations } from "vuex";
 
 export default {
   data: () => ({
@@ -193,12 +193,12 @@ export default {
     portConsoleTxt: []
   }),
   computed: {
-    ...mapState([
-      "sbColor",
-      "sbContent",
-      "sbVisibility"
-      // "id"
-    ])
+    // ...mapState([
+    //   "sbColor",
+    //   "sbContent",
+    //   "sbVisibility"
+    //   // "id"
+    // ])
   },
   sockets: {
     onSinglePortData(data) {
@@ -208,8 +208,8 @@ export default {
   methods: {
     ...mapMutations([
       "SET_TRANSMISSION_PROCESS_STATE",
-      "SHOW_SNACKBAR",
-      "TOGGLE_SB_VISIBILITY"
+      // "SHOW_SNACKBAR",
+      // "TOGGLE_SB_VISIBILITY"
     ]),
     onSinglePortDataCallback(data) {
       this.portConsoleTxt.unshift("-> data received: " + data.data);
@@ -223,11 +223,11 @@ export default {
           this.portConsoleTxt.unshift("-> Emitting data on port is paused");
           this.resumePortDis = false; //! means enable btn
           this.pausePortDis = true; //! means disable btn
-          this.showSuccessSnackbar(result.success);
+          this.$parent.showSuccessSnackbar(result.success);
         })
         .catch(error => {
           this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
+          this.$parent.showErrorSnackbar(error);
         });
     },
     resumePort(portName) {
@@ -239,11 +239,11 @@ export default {
           this.portConsoleTxt.unshift("-> Emitting data on port is resumed");
           this.pausePortDis = false;
           this.resumePortDis = true;
-          this.showSuccessSnackbar(result.success);
+          this.$parent.showSuccessSnackbar(result.success);
         })
         .catch(error => {
           this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
+          this.$parent.showErrorSnackbar(error);
         });
     },
     flushPort(portName) {
@@ -251,11 +251,11 @@ export default {
       PortsServices.flushPort(portName)
         .then(result => {
           this.portConsoleTxt.unshift("-> Data is flushed");
-          this.showSuccessSnackbar(result.success);
+          this.$parent.showSuccessSnackbar(result.success);
         })
         .catch(error => {
           this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
+          this.$parent.showErrorSnackbar(error);
         });
     },
     openPort(portName) {
@@ -263,7 +263,7 @@ export default {
       PortsServices.openPort(portName)
         .then(result => {
           this.portConsoleTxt.unshift("-> Port is opened");
-          this.showSuccessSnackbar(result);
+          this.$parent.showSuccessSnackbar(result);
           this.openPortDis = true;
           this.resumePortDis = true;
           this.closePortDis = false;
@@ -272,7 +272,7 @@ export default {
         })
         .catch(error => {
           this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
+          this.$parent.showErrorSnackbar(error);
         });
     },
     closePort(portName) {
@@ -280,7 +280,7 @@ export default {
       PortsServices.closePort(portName)
         .then(result => {
           this.portConsoleTxt.unshift("-> Port is closed");
-          this.showSuccessSnackbar(result);
+          this.$parent.showSuccessSnackbar(result);
           this.openPortDis = false;
           this.resumePortDis = true;
           this.closePortDis = true;
@@ -289,7 +289,7 @@ export default {
         })
         .catch(error => {
           this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
+          this.$parent.showErrorSnackbar(error);
         });
     },
     sendCommandToPort(portName) {
@@ -301,14 +301,14 @@ export default {
         PortsServices.writeToPort(portName, this.writeToPortTextField + "\r")
           .then(result => {
             this.writeToPortTextField = "";
-            this.showSuccessSnackbar(result);
+            this.$parent.showSuccessSnackbar(result);
           })
           .catch(error => {
             this.portConsoleTxt.unshift("Error occurred: " + error);
-            this.showErrorSnackbar(error);
+            this.$parent.showErrorSnackbar(error);
           });
       } else {
-        this.showErrorSnackbar("Can NOT send empty data!!");
+        this.$parent.showErrorSnackbar("Can NOT send empty data!!");
       }
     },
     closePortPanelDialog() {
@@ -324,7 +324,7 @@ export default {
         })
         .catch(error => {
           this.portConsoleTxt.unshift("Error occurred: " + error);
-          this.showErrorSnackbar(error);
+          this.$parent.showErrorSnackbar(error);
         });
     },
     showPortPanel(portObject) {
@@ -336,7 +336,7 @@ export default {
             .then(isPortActive => {
               if (isPortActive) {
                 this.doShowPortPanel = false;
-                this.showErrorSnackbar(
+                this.$parent.showErrorSnackbar(
                   "The port is already active, you can't use the panel"
                 );
               } else {
@@ -344,7 +344,7 @@ export default {
               }
             })
             .catch(error => {
-              this.showErrorSnackbar(
+              this.$parent.showErrorSnackbar(
                 "Error while checking port activeness status!" + error
               );
             });
@@ -357,7 +357,7 @@ export default {
           }
         })
         .catch(error => {
-          this.showErrorSnackbar(
+          this.$parent.showErrorSnackbar(
             "Error while checking port open status!" + error
           );
         });
@@ -365,20 +365,20 @@ export default {
     clearPortConsole() {
       this.portConsoleTxt = [];
     },
-    showSuccessSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "success", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
-    },
-    showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
-    }
+    // showSuccessSnackbar(content) {
+    //   this.TOGGLE_SB_VISIBILITY(true);
+    //   this.SHOW_SNACKBAR({ color: "success", content });
+    //   setTimeout(() => {
+    //     this.TOGGLE_SB_VISIBILITY(false);
+    //   }, 5000);
+    // },
+    // showErrorSnackbar(content) {
+    //   this.TOGGLE_SB_VISIBILITY(true);
+    //   this.SHOW_SNACKBAR({ color: "error", content });
+    //   setTimeout(() => {
+    //     this.TOGGLE_SB_VISIBILITY(false);
+    //   }, 5000);
+    // }
   }
 };
 </script>

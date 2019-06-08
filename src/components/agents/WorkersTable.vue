@@ -237,7 +237,7 @@ export default {
           this.loading = false;
         })
         .catch(error => {
-          this.showErrorSnackbar(error);
+          this.$parent.showErrorSnackbar(error);
           this.loading = false;
         });
     },
@@ -251,15 +251,15 @@ export default {
     },
     deleteAgent() {
       if (this.selectedAgentId == -1) {
-        this.showErrorSnackbar("Invalide agent id!");
+        this.$parent.showErrorSnackbar("Invalide agent id!");
       } else {
         AgentServices.deleteAgentById(this.selectedAgentId)
           .then(result => {
             this.cancelConfirmDeleteDialog(); //! just to hide it
-            this.showSuccessSnackbar(result);
+            this.$parent.showSuccessSnackbar(result);
           })
           .catch(error => {
-            this.showErrorSnackbar(error);
+            this.$parent.showErrorSnackbar(error);
             this.loading = false;
           });
       }
@@ -271,31 +271,15 @@ export default {
         AgentServices.resetAgentPassword(this.selectedAgentId)
           .then(result => {
             this.loadingPass = false;
-            this.showSuccessSnackbar(result.data.success);
+            this.$parent.showSuccessSnackbar(result.data.success);
             this.newPass = result.data.password;
           })
           .catch(error => {
-            this.showErrorSnackbar(error);
+            this.$parent.showErrorSnackbar(error);
           });
       } else {
-        this.showErrorSnackbar("No id is selected!!");
+        this.$parent.showErrorSnackbar("No id is selected!!");
       }
-    },
-    // TODO: use the function of the parent
-    showSuccessSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "success", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
-    },
-    // TODO: use the function of the parent
-    showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
     }
   }
 };

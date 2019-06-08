@@ -45,6 +45,7 @@
         </v-layout>
       </v-container>
     </v-content>
+    <SnackBar :color="color" :content="content" :visibility="visibility"/>
   </v-app>
 </template>
 
@@ -54,18 +55,28 @@ import { required, email, minLength } from "vuelidate/lib/validators";
 import { mapMutations } from "vuex";
 
 import AuthServices from "@/services/auth";
+// import SnackBar from "@/components/app/SnackBar.vue";
+import SnackBar from "@/components/app/SnackBar.vue";
+import { setTimeout } from "timers";
 
 export default {
+  name: 'login',
   mixins: [validationMixin],
   validations: {
     email: { required, email },
     password: { required, minLength: minLength(6) }
   },
+  components: {
+    SnackBar
+  },
   data: () => ({
     url: require("@/assets/machine.jpg"),
     drawer: null,
     email: "",
-    password: ""
+    password: "",
+    color: "teal",
+    content: "",
+    visibility: false
   }),
   props: {
     source: String
@@ -87,19 +98,13 @@ export default {
       return errors;
     }
   },
-  mounted() {
-    if (localStorage.getItem("isConnected") === "true") {
-      this.$router.replace("/");
-    }
-  },
+  // mounted() {
+  //   if (localStorage.getItem("isConnected") === "true") {
+  //     this.$router.replace("/");
+  //   }
+  // },
   methods: {
     ...mapMutations([
-      "SHOW_SNACKBAR",
-      "TOGGLE_SB_VISIBILITY",
-      // "SET_FIRST_NAME",
-      // "SET_LAST_NAME",
-      // "SET_EMAIL",
-      // "SET_ID",
       "SET_TOKEN",
       "SET_REFRESH_TOKEN",
       "TOGGLE_IS_CONNECTED_STATE"
@@ -121,7 +126,7 @@ export default {
             // this.SET_LAST_NAME(data.agent.last_name);
             localStorage.last_name = data.agent.last_name;
             // this.SET_FIRST_NAME(data.agent.first_name);
-            localStorage.first_name = data.agent.first_name
+            localStorage.first_name = data.agent.first_name;
             this.TOGGLE_IS_CONNECTED_STATE();
             this.SET_TOKEN(data.token);
             this.SET_REFRESH_TOKEN(data.refresh_token);
@@ -133,10 +138,11 @@ export default {
       }
     },
     showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
+      this.color = "error";
+      this.content = content;
+      this.visibility = true;
       setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
+        this.visibility = false;
       }, 5000);
     }
   }

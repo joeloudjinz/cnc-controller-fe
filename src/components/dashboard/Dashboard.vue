@@ -98,8 +98,7 @@ export default {
           });
       })
       .catch(error => {
-        console.log('error :', error);
-        // this.$parent.showErrorSnackbar(error);
+        this.$parent.showErrorSnackbar(error);
       });
   }
 };

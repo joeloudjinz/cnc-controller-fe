@@ -246,7 +246,7 @@ export default {
             .catch(error => {
               this.showConversionProgress = false;
               this.doShowParamsForm = true;
-              console.log(error);
+              // console.log(error);
               this.$parent.showErrorSnackbar(error);
             });
         } else {

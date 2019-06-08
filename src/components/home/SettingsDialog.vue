@@ -93,9 +93,7 @@ export default {
     keepShowingSurfaceDimensionsAlert: true
   }),
   computed: {
-    ...mapState([
-      "doShowSurfaceDimensionsAlert"
-    ]),
+    ...mapState(["doShowSurfaceDimensionsAlert"]),
     surfaceWidthErrors() {
       const errors = [];
       if (!this.$v.surfaceWidth.$dirty) return errors;
@@ -126,11 +124,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations([
-      "TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE",
-      "SHOW_SNACKBAR",
-      "TOGGLE_SB_VISIBILITY"
-    ]),
+    ...mapMutations(["TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE"]),
     showSettingsDialog() {
       //? before opening the dialoge, initialize the settings values from the local storage
       this.surfaceWidth = window.localStorage.getItem("surfaceWidth");
@@ -145,22 +139,8 @@ export default {
         if (this.doShowSurfaceDimensionsAlert) {
           this.TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE();
         }
-        this.showSuccessSnackbar("Information Updated Successfully");
+        this.$parent.showSuccessSnackbar("Information Updated Successfully");
       }
-    },
-    showSuccessSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "success", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
-    },
-    showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
     }
   }
 };

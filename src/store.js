@@ -59,9 +59,12 @@ export default new Vuex.Store({
     SHOW_SNACKBAR: (state, payload) => {
       state.sbColor = payload.color;
       state.sbContent = payload.content;
+      // console.log(state.sbColor, state.sbContent);
     },
     TOGGLE_SB_VISIBILITY: (state, visibility) => {
+      // console.log('commited !!!!! :', state.sbVisibility);
       state.sbVisibility = visibility;
+      // console.log('commited !!!!! :', state.sbVisibility);
     },
     SET_CURRENT_FILE_NAME: (state, currentFileName) => {
       state.currentFileName = currentFileName;
