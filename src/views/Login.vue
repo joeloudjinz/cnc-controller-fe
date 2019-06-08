@@ -96,10 +96,10 @@ export default {
     ...mapMutations([
       "SHOW_SNACKBAR",
       "TOGGLE_SB_VISIBILITY",
-      "SET_FIRST_NAME",
-      "SET_LAST_NAME",
-      "SET_EMAIL",
-      "SET_ID",
+      // "SET_FIRST_NAME",
+      // "SET_LAST_NAME",
+      // "SET_EMAIL",
+      // "SET_ID",
       "SET_TOKEN",
       "SET_REFRESH_TOKEN",
       "TOGGLE_IS_CONNECTED_STATE"
@@ -113,14 +113,18 @@ export default {
         })
           //? data contains agent, token and refresh_token and success message
           .then(data => {
-            console.log("data :", data);
+            // console.log("data :", data);
+            // this.SET_ID(data.agent.id);
+            localStorage.id = data.agent.id;
+            // this.SET_EMAIL(data.agent.email);
+            localStorage.email = data.agent.email;
+            // this.SET_LAST_NAME(data.agent.last_name);
+            localStorage.last_name = data.agent.last_name;
+            // this.SET_FIRST_NAME(data.agent.first_name);
+            localStorage.first_name = data.agent.first_name
             this.TOGGLE_IS_CONNECTED_STATE();
             this.SET_TOKEN(data.token);
             this.SET_REFRESH_TOKEN(data.refresh_token);
-            this.SET_ID(data.agent.id);
-            this.SET_EMAIL(data.agent.email);
-            this.SET_LAST_NAME(data.agent.last_name);
-            this.SET_FIRST_NAME(data.agent.first_name);
             this.$router.replace("/");
           })
           .catch(error => {

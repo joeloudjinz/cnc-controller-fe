@@ -16,16 +16,25 @@ const router = new Router({
           path: 'users',
           name: 'users',
           component: () => import( /* webpackChunkName: "users" */ "./views/Workers.vue"),
+          meta: {
+            requireAuth: true
+          }
         },
         {
           path: 'converter',
           name: 'converter',
           component: () => import( /* webpackChunkName: "images" */ './views/Images.vue'),
+          meta: {
+            requireAuth: true
+          }
         },
         {
           path: 'files',
           name: 'files',
           component: () => import( /* webpackChunkName: "files" */ './views/Files.vue'),
+          meta: {
+            requireAuth: true
+          }
         }
       ]
     },
@@ -49,8 +58,15 @@ router.beforeEach((to, from, next) => {
   } else {
     store.commit("SET_IS_HOME_PAGE", false);
   }
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (store.state.isConnected) {
+  // console.log('localStorage.id :', localStorage.id);
+  if (to.matched.some(record => {
+    // console.log('record.meta :', record.meta);
+    return record.meta.requireAuth
+  })) {
+    // // console.log('store.state.isConnected :', store.state.isConnected);
+    // if (store.state.isConnected) {
+    console.log('localStorage.id :', localStorage.id);
+    if (localStorage.id != undefined) {
       next()
       return
     }

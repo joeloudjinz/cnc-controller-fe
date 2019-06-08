@@ -1,6 +1,6 @@
 import axios from "axios";
 import AgentServices from "./agent.js";
-import store from '../store.js';
+// import store from '../store.js';
 
 const url = "api/local/ports";
 
@@ -140,7 +140,7 @@ class PortServices {
             axios.post(url + "/draw", {
                 fileName,
                 portName,
-                target: store.state.id
+                target: localStorage.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -261,7 +261,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/pause", {
                 portName,
-                target: store.state.id
+                target: localStorage.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -292,7 +292,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/resume", {
                 portName,
-                target: store.state.id
+                target: localStorage.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -323,7 +323,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/stop", {
                 portName,
-                target: store.state.id
+                target: localStorage.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -354,7 +354,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/open", {
                 portName,
-                target: store.state.id
+                target: localStorage.id
             }).then((result) => {
                 resolve(result.data.success);
             }).catch((error) => {

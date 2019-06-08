@@ -716,7 +716,7 @@ export default {
     ...mapState([
       "isTransmissionProcessActive",
       "currentActivePort",
-      "id"
+      // "id"
     ]),
     fromatElapsedTimeValue() {
       if (this.elapsedTime != undefined) {
@@ -746,12 +746,12 @@ export default {
   sockets: {
     onPortData(data) {
       // console.log('data.target :', data.target);
-      if (data.target == this.id) {
+      if (data.target == localStorage.id) {
         this.onPortDataCallback(data.data);
       }
     },
     onTransmissionLog(data) {
-      if (data.target == this.id) {
+      if (data.target == localStorage.id) {
         this.onTransmissionLogCallback(data.data);
       }
     },
@@ -759,7 +759,7 @@ export default {
       let status = data.status;
       this.stopSendDis = !status;
       this.pauseSendDis = !status;
-      if (!status && data.target == this.id) {
+      if (!status && data.target == localStorage.id) {
         this.showSuccessSnackbar(
           "Transmission of file " + this.fileName + " Has been completed"
         );
@@ -768,7 +768,7 @@ export default {
       }
     },
     onConversionEnded(data) {
-      if (data.target == this.id) {
+      if (data.target == localStorage.id) {
         const result = data.conversionDetails;
         this.showDrawBtn = true;
         this.isConversionActive = false;
@@ -795,7 +795,7 @@ export default {
       }
     },
     onConversionErrorOccur(data) {
-      if (data.target == this.id) {
+      if (data.target == localStorage.id) {
         this.showDrawBtn = false;
         this.isConversionActive = false;
         this.displayResultsPanel = false;
@@ -896,7 +896,7 @@ export default {
                 idle: this.idle
               })
             );
-            fd.append("target", this.id);
+            fd.append("target", localStorage.id);
             this.isConversionActive = true;
             ConversionServices.ConvertImage(fd)
               .then(result => {

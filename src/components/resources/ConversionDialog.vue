@@ -180,8 +180,8 @@ export default {
   }),
   sockets: {
     onQuickConversionEnded(data) {
-      //   console.log("data :", data);
-      if (data.target == this.id) {
+      //! if you use store state here, import 'id' state;
+      if (data.target == localStorage.id) {
         this.showConversionProgress = false;
         this.showConversionResultAlert = true;
         this.proccessBlackPixelsValue = 100 - data.conversionDetails;
@@ -190,7 +190,7 @@ export default {
       }
     },
     onQuickConversionErrorOccur(data) {
-      if (data.target == this.id) {
+      if (data.target == localStorage.id) {
         this.doShowParamsForm = true;
         this.showConversionProgress = false;
         this.showConversionResultAlert = false;

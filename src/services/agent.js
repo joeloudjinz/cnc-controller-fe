@@ -16,7 +16,8 @@ class AgentServices {
     static RefreshToken() {
         return new Promise((resolve, reject) => {
             const email = store.state.email;
-            const id = store.state.id;
+            // const id = store.state.id;
+            const id = localStorage.id;
             const refresh_token = store.state.refresh_token;
             axios.post(authURL + 'token/refresh', {
                 email,
@@ -24,8 +25,8 @@ class AgentServices {
                 refresh_token
             }).then((result) => {
                 //? result.data holds refresh_token and token
-                store.commit('SET_REFRESH_TOKEN',result.data.refresh_token);
-                store.commit('SET_TOKEN',result.data.token);
+                store.commit('SET_REFRESH_TOKEN', result.data.refresh_token);
+                store.commit('SET_TOKEN', result.data.token);
                 resolve(true);
             }).catch((error) => {
                 if (error.response) {
@@ -44,7 +45,8 @@ class AgentServices {
      * protected by auth middleware
      */
     static getAgents() {
-        const id = store.state.id;
+        // const id = store.state.id;
+        const id = localStorage.id;
         return new Promise(async (resolve, reject) => {
             await axios
                 .get(url + id, {
@@ -203,7 +205,8 @@ class AgentServices {
     static UpdatePassword(password) {
         return new Promise((resolve, reject) => {
             // const id = window.localStorage.getItem('id');
-            const id = store.state.id;
+            // const id = store.state.id;
+            const id = localStorage.id;
             if (id) {
                 axios.put(url + "password/" + id, {
                         password

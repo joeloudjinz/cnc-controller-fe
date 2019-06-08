@@ -45,7 +45,7 @@ class ConversionServices {
       await axios
         .post(url + "/convert/quick", {
           parameters: params,
-          target: store.state.id
+          target: localStorage.id
         }, {
           params: {
             imageName,

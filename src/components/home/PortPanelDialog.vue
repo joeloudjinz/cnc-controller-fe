@@ -193,12 +193,16 @@ export default {
     portConsoleTxt: []
   }),
   computed: {
-    ...mapState(["sbColor", "sbContent", "sbVisibility", "id"])
+    ...mapState([
+      "sbColor",
+      "sbContent",
+      "sbVisibility"
+      // "id"
+    ])
   },
   sockets: {
     onSinglePortData(data) {
-      if (data.target === this.id)
-        this.onSinglePortDataCallback(data);
+      if (data.target === localStorage.id) this.onSinglePortDataCallback(data);
     }
   },
   methods: {

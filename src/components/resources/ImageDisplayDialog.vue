@@ -261,12 +261,12 @@ export default {
   }),
   sockets: {
     onPortData(data) {
-      if (data.target == this.id) {
+      if (data.target == localStorage.id) {
         this.onPortDataCallback(data.data);
       }
     },
     onTransmissionLog(data) {
-      if (data.target == this.id) {
+      if (data.target == localStorage.id) {
         this.onTransmissionLogCallback(data.data);
       }
     },
@@ -274,7 +274,7 @@ export default {
       let status = data.status;
       this.stopSendDis = !status;
       this.pauseSendDis = !status;
-      if (!status && data.target == this.id) {
+      if (!status && data.target == localStorage.id) {
         this.$parent.showSuccessSnackbar(
           "Transmission of file " + this.fileName + " Has been completed"
         );
@@ -288,7 +288,7 @@ export default {
       "isTransmissionProcessActive",
       "currentActivePort",
       "currentFileName",
-      "id"
+      // "id"
     ]),
     disableImagePanelToolbarBtns() {
       return this.isTransmissionProcessActive;

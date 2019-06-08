@@ -237,7 +237,8 @@ export default {
     portsCount: 0,
     isAdmin: false,
     drawer: false,
-    right: null
+    right: null,
+    // first
   }),
   computed: {
     ...mapState([
@@ -245,13 +246,13 @@ export default {
       "sbColor",
       "sbContent",
       "sbVisibility",
-      "isHomePage",
-      "first_name",
-      "last_name",
-      "id"
+      "isHomePage"
+      // "first_name",
+      // "last_name",
+      // "id"
     ]),
     fullName() {
-      return `${this.last_name.toUpperCase()} ${this.first_name}`;
+      return `${localStorage.last_name.toUpperCase()} ${localStorage.first_name}`;
     }
   },
   sockets: {
@@ -290,11 +291,16 @@ export default {
       this.portsList = newList;
     },
     performLogout() {
-      let id = localStorage.getItem("id");
-      AuthServices.Logout(id)
+      AuthServices.Logout(localStorage.id)
         .then(() => {
           //? update connexion status
           this.TOGGLE_IS_CONNECTED_STATE();
+          localStorage.removeItem("id");
+          localStorage.removeItem("first_name");
+          localStorage.removeItem("last_name");
+          localStorage.removeItem("email");
+          // window.localStorage.removeItem("token");
+          // window.localStorage.removeItem("refresh_token");
           //? update local variable isConnected
           this.isConnected = false;
           //? display login component
@@ -339,7 +345,7 @@ export default {
       .catch(error => {
         this.showErrorSnackbar(error);
       });
-    AgentServices.getRole(this.id)
+    AgentServices.getRole(localStorage.id)
       .then(result => {
         this.isAdmin = result.data.result;
       })
