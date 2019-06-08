@@ -32,10 +32,6 @@ export default new Vuex.Store({
     workersCount: 0,
     conversionsCount: 0,
     activePortsCount: 0,
-    //? snackbar state
-    sbContent: "",
-    sbColor: "",
-    sbVisibility: false,
   },
   getters: {
     isGcodeFile: state => state.currentFileName != undefined ? state.currentFileName.includes("gcode") : false,
@@ -55,16 +51,6 @@ export default new Vuex.Store({
     },
     SET_CURRENT_ACTIVE_PORT: (state, port) => {
       state.currentActivePort = port;
-    },
-    SHOW_SNACKBAR: (state, payload) => {
-      state.sbColor = payload.color;
-      state.sbContent = payload.content;
-      // console.log(state.sbColor, state.sbContent);
-    },
-    TOGGLE_SB_VISIBILITY: (state, visibility) => {
-      // console.log('commited !!!!! :', state.sbVisibility);
-      state.sbVisibility = visibility;
-      // console.log('commited !!!!! :', state.sbVisibility);
     },
     SET_CURRENT_FILE_NAME: (state, currentFileName) => {
       state.currentFileName = currentFileName;
