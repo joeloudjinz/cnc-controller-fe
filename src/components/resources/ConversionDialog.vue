@@ -181,7 +181,7 @@ export default {
   sockets: {
     onQuickConversionEnded(data) {
       //   console.log("data :", data);
-      if (data.target == window.localStorage.getItem("id")) {
+      if (data.target == this.id) {
         this.showConversionProgress = false;
         this.showConversionResultAlert = true;
         this.proccessBlackPixelsValue = 100 - data.conversionDetails;
@@ -190,7 +190,7 @@ export default {
       }
     },
     onQuickConversionErrorOccur(data) {
-      if (data.target == window.localStorage.getItem("id")) {
+      if (data.target == this.id) {
         this.doShowParamsForm = true;
         this.showConversionProgress = false;
         this.showConversionResultAlert = false;

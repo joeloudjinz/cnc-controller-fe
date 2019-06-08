@@ -1,9 +1,8 @@
 import axios from "axios";
 import AgentServices from "./agent.js";
+import store from '../store.js';
 
 const url = "api/local/conversions";
-
-const target = window.localStorage.getItem("id");
 
 class ConversionServices {
   static ConvertImage(formData) {
@@ -11,7 +10,7 @@ class ConversionServices {
       await axios
         .post(url + "/convert", formData, {
           headers: {
-            Authorization: "Bearer " + window.localStorage.token
+            Authorization: "Bearer " + store.state.token
           }
         })
         .then(result => {
@@ -45,13 +44,14 @@ class ConversionServices {
     return new Promise(async (resolve, reject) => {
       await axios
         .post(url + "/convert/quick", {
-          parameters: params, target
+          parameters: params,
+          target: store.state.id
         }, {
           params: {
             imageName,
           },
           headers: {
-            Authorization: "Bearer " + window.localStorage.token
+            Authorization: "Bearer " + store.state.token
           }
         })
         .then(result => {
@@ -86,7 +86,7 @@ class ConversionServices {
       await axios
         .get(url + "/count", {
           headers: {
-            Authorization: "Bearer " + window.localStorage.token
+            Authorization: "Bearer " + store.state.token
           }
         })
         .then(result => {

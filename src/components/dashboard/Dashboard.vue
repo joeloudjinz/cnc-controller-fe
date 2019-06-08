@@ -76,7 +76,7 @@ export default {
             }
           })
           .catch(error => {
-            this.showErrorSnackbar(error);
+            this.$parent.showErrorSnackbar(error);
           });
         PortsServices.getConnectedPortsList()
           .then(result => {
@@ -85,7 +85,7 @@ export default {
             }
           })
           .catch(error => {
-            this.showErrorSnackbar(error);
+            this.$parent.showErrorSnackbar(error);
           });
         AgentsServices.getAgentsCount()
           .then(count => {
@@ -94,11 +94,12 @@ export default {
             }
           })
           .catch(error => {
-            this.showErrorSnackbar(error);
+            this.$parent.showErrorSnackbar(error);
           });
       })
       .catch(error => {
-        this.showErrorSnackbar(error);
+        console.log('error :', error);
+        // this.$parent.showErrorSnackbar(error);
       });
   }
 };

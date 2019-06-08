@@ -203,7 +203,7 @@
     <EditProfileInfoVue ref="editProfileInfoRef"/>
     <!-- DON'T REMOVE THIS SNACKBAR -->
     <v-snackbar
-      v-model="sbVisibility"
+      v-show="sbVisibility"
       bottom
       :color="sbColor"
       :multi-line="'multi-line'"
@@ -235,10 +235,6 @@ export default {
   data: () => ({
     portsList: [],
     portsCount: 0,
-    fullName:
-      window.localStorage.getItem("last_name").toUpperCase() +
-      " " +
-      window.localStorage.getItem("first_name"),
     isAdmin: false,
     drawer: false,
     right: null
@@ -249,8 +245,14 @@ export default {
       "sbColor",
       "sbContent",
       "sbVisibility",
-      "isHomePage"
+      "isHomePage",
+      "first_name",
+      "last_name",
+      "id"
     ]),
+    fullName() {
+      return `${this.last_name.toUpperCase()} ${this.first_name}`;
+    }
   },
   sockets: {
     connect() {
@@ -264,7 +266,11 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["SET_TRANSMISSION_PROCESS_STATE"]),
+    ...mapMutations([
+      "SET_TRANSMISSION_PROCESS_STATE",
+      "TOGGLE_SB_VISIBILITY",
+      "TOGGLE_IS_CONNECTED_STATE"
+    ]),
     onActiveCallback(data) {
       this.portsCount = Object.keys(data).length;
       let newList = [];
@@ -288,15 +294,7 @@ export default {
       AuthServices.Logout(id)
         .then(() => {
           //? update connexion status
-          window.localStorage.setItem("isConnected", false);
-          // TODO: use the store instead of localStorage
-          //! remove data from local storage
-          window.localStorage.removeItem("id");
-          window.localStorage.removeItem("first_name");
-          window.localStorage.removeItem("last_name");
-          window.localStorage.removeItem("email");
-          window.localStorage.removeItem("token");
-          window.localStorage.removeItem("refresh_token");
+          this.TOGGLE_IS_CONNECTED_STATE();
           //? update local variable isConnected
           this.isConnected = false;
           //? display login component
@@ -333,18 +331,18 @@ export default {
   },
   //! DON'T use arrow functions here
   created() {
-    const id = window.localStorage.getItem("id");
-    AgentServices.getRole(id)
-      .then(result => {
-        this.isAdmin = result.data.result;
-      })
-      .catch(error => {
-        this.showErrorSnackbar(error);
-      });
+    // console.log('this.id :', this.$store.state.id);
     PortsServices.getConnectedPortsList()
       .then(result => {
         this.portsCount = result.count;
         if (result.count != 0) this.portsList = result.ports;
+      })
+      .catch(error => {
+        this.showErrorSnackbar(error);
+      });
+    AgentServices.getRole(this.id)
+      .then(result => {
+        this.isAdmin = result.data.result;
       })
       .catch(error => {
         this.showErrorSnackbar(error);

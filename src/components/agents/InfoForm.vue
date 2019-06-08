@@ -59,10 +59,8 @@
 
 <script>
 import AgentServices from "@/services/agent.js";
-
 import { validationMixin } from "vuelidate";
 import { required, maxLength, email } from "vuelidate/lib/validators";
-
 export default {
   mixins: [validationMixin],
   validations: {
@@ -74,6 +72,7 @@ export default {
     firstName: window.localStorage.getItem("first_name"),
     lastName: window.localStorage.getItem("last_name"),
     email: window.localStorage.getItem("email"),
+    //? alert details ...
     alertContent: "",
     alertColor: "",
     alert: false
@@ -126,6 +125,9 @@ export default {
               this.showErrorAlert(error);
               this.disableAlert();
             });
+          // console.log("Is valid");
+        } else {
+          // console.warn("Is NOT valid");
         }
       }
     },

@@ -1,9 +1,9 @@
 import axios from "axios";
 import AgentServices from "./agent.js";
+import store from '../store.js';
 
 const url = "api/local/ports";
 
-const target = window.localStorage.getItem("id");
 class PortServices {
     /**
      * TODO: add token to header
@@ -141,7 +141,7 @@ class PortServices {
             axios.post(url + "/draw", {
                 fileName,
                 portName,
-                target
+                target: store.state.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -262,7 +262,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/pause", {
                 portName,
-                target
+                target: store.state.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -293,7 +293,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/resume", {
                 portName,
-                target
+                target: store.state.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -324,7 +324,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/stop", {
                 portName,
-                target
+                target: store.state.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -355,7 +355,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/open", {
                 portName,
-                target
+                target: store.state.id
             }).then((result) => {
                 resolve(result.data.success);
             }).catch((error) => {

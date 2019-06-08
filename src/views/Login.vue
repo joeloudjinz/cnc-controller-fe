@@ -94,7 +94,17 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["SHOW_SNACKBAR", "TOGGLE_SB_VISIBILITY"]),
+    ...mapMutations([
+      "SHOW_SNACKBAR",
+      "TOGGLE_SB_VISIBILITY",
+      "SET_FIRST_NAME",
+      "SET_LAST_NAME",
+      "SET_EMAIL",
+      "SET_ID",
+      "SET_TOKEN",
+      "SET_REFRESH_TOKEN",
+      "TOGGLE_IS_CONNECTED_STATE"
+    ]),
     submit() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
@@ -104,13 +114,14 @@ export default {
         })
           //? data contains agent, token and refresh_token and success message
           .then(data => {
-            window.localStorage.setItem("isConnected", true);
-            window.localStorage.setItem("token", data.token);
-            window.localStorage.setItem("refresh_token", data.refresh_token);
-            window.localStorage.setItem("id", data.agent.id);
-            window.localStorage.setItem("email", data.agent.email);
-            window.localStorage.setItem("last_name", data.agent.last_name);
-            window.localStorage.setItem("first_name", data.agent.first_name);
+            console.log('data :', data);
+            this.TOGGLE_IS_CONNECTED_STATE();
+            this.SET_TOKEN(data.token);
+            this.SET_REFRESH_TOKEN(data.refresh_token);
+            this.SET_ID(data.agent.id);
+            this.SET_EMAIL(data.agent.email);
+            this.SET_LAST_NAME(data.agent.last_name);
+            this.SET_FIRST_NAME(data.agent.first_name);
             this.$router.replace("/");
           })
           .catch(error => {

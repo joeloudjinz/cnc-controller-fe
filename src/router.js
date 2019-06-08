@@ -12,8 +12,7 @@ const router = new Router({
       meta: {
         requireAuth: true
       },
-    children: [
-        {
+      children: [{
           path: 'users',
           name: 'users',
           component: () => import( /* webpackChunkName: "users" */ "./views/Workers.vue"),
@@ -50,15 +49,14 @@ router.beforeEach((to, from, next) => {
   } else {
     store.commit("SET_IS_HOME_PAGE", false);
   }
-  if (to.matched.some(record => record.meta.requireAuth)) {
-    const isConnected = window.localStorage.getItem('isConnected');
-    if (isConnected === 'true') {
-      next();
-    } else {
-      router.replace('/login');
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (store.state.isConnected) {
+      next()
+      return
     }
+    next('/login')
   } else {
-    next();
+    next()
   }
 });
 

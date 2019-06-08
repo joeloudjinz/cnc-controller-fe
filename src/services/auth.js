@@ -1,4 +1,5 @@
 import axios from 'axios';
+import store from '../store.js';
 
 const url = 'api/local/auth/';
 
@@ -32,12 +33,11 @@ class AuthServices {
      */
     static Logout(id) {
         return new Promise((resolve, reject) => {
-            // console.log(window.localStorage.getItem('token'));
             axios.post(url + 'logout', {
                 id
             }, {
                 headers: {
-                    Authorization: "Bearer " + window.localStorage.token
+                    Authorization: "Bearer " + store.state.token
                 }
             }).then(() => {
                 resolve(true);

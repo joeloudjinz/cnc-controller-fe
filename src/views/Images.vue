@@ -715,7 +715,8 @@ export default {
   computed: {
     ...mapState([
       "isTransmissionProcessActive",
-      "currentActivePort"
+      "currentActivePort",
+      "id"
     ]),
     fromatElapsedTimeValue() {
       if (this.elapsedTime != undefined) {
@@ -745,12 +746,12 @@ export default {
   sockets: {
     onPortData(data) {
       // console.log('data.target :', data.target);
-      if (data.target == window.localStorage.getItem("id")) {
+      if (data.target == this.id) {
         this.onPortDataCallback(data.data);
       }
     },
     onTransmissionLog(data) {
-      if (data.target == window.localStorage.getItem("id")) {
+      if (data.target == this.id) {
         this.onTransmissionLogCallback(data.data);
       }
     },
@@ -758,7 +759,7 @@ export default {
       let status = data.status;
       this.stopSendDis = !status;
       this.pauseSendDis = !status;
-      if (!status && data.target == window.localStorage.getItem("id")) {
+      if (!status && data.target == this.id) {
         this.showSuccessSnackbar(
           "Transmission of file " + this.fileName + " Has been completed"
         );
@@ -767,7 +768,7 @@ export default {
       }
     },
     onConversionEnded(data) {
-      if (data.target == window.localStorage.getItem("id")) {
+      if (data.target == this.id) {
         const result = data.conversionDetails;
         this.showDrawBtn = true;
         this.isConversionActive = false;
@@ -794,7 +795,7 @@ export default {
       }
     },
     onConversionErrorOccur(data) {
-      if (data.target == window.localStorage.getItem("id")) {
+      if (data.target == this.id) {
         this.showDrawBtn = false;
         this.isConversionActive = false;
         this.displayResultsPanel = false;
@@ -895,7 +896,7 @@ export default {
                 idle: this.idle
               })
             );
-            fd.append("target", window.localStorage.getItem("id"));
+            fd.append("target", this.id);
             this.isConversionActive = true;
             ConversionServices.ConvertImage(fd)
               .then(result => {

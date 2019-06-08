@@ -1,6 +1,9 @@
 import axios from 'axios';
+import store from '../store.js';
+
 const url = "api/local/users/";
 const authURL = 'api/local/auth/';
+
 //! console.log(error.response.status == 406); true
 //! console.log(error.response.status === '406'); false
 //! console.log(error.response.status === 406); true
@@ -12,18 +15,18 @@ class AgentServices {
      */
     static RefreshToken() {
         return new Promise((resolve, reject) => {
-            const email = window.localStorage.getItem('email');
-            const id = window.localStorage.getItem('id');
-            const refresh_token = window.localStorage.getItem('refresh_token');
+            const email = store.state.email;
+            const id = store.state.id;
+            const refresh_token = store.state.refresh_token;
             axios.post(authURL + 'token/refresh', {
                 email,
                 id,
                 refresh_token
             }).then((result) => {
                 //? result.data holds refresh_token and token
-                // console.log(result.data)
-                window.localStorage.setItem('refresh_token', result.data.refresh_token);
-                window.localStorage.setItem('token', result.data.token);
+                console.log(result.data)
+                store.commit('SET_REFRESH_TOKEN',result.data.refresh_token);
+                store.commit('SET_TOKEN',result.data.token);
                 resolve(true);
             }).catch((error) => {
                 if (error.response) {
@@ -41,12 +44,12 @@ class AgentServices {
      * protected by auth middleware
      */
     static getAgents() {
-        const id = window.localStorage.getItem("id");
+        const id = store.state.id;
         return new Promise(async (resolve, reject) => {
             await axios
                 .get(url + id, {
                     headers: {
-                        Authorization: "Bearer " + window.localStorage.token
+                        Authorization: "Bearer " + store.state.token
                     }
                 })
                 .then(result => {
@@ -95,7 +98,7 @@ class AgentServices {
             await axios
                 .delete(url + id, {
                     headers: {
-                        Authorization: "Bearer " + window.localStorage.token
+                        Authorization: "Bearer " + store.state.token
                     }
                 })
                 .then(result => {
@@ -133,7 +136,7 @@ class AgentServices {
                     ...agent
                 }, {
                     headers: {
-                        Authorization: "Bearer " + window.localStorage.token
+                        Authorization: "Bearer " + store.state.token
                     }
                 })
                 .then(response => {
@@ -169,7 +172,7 @@ class AgentServices {
         return new Promise((resolve, reject) => {
             axios.put(url + agent.id, agent, {
                 headers: {
-                    Authorization: "Bearer " + window.localStorage.token
+                    Authorization: "Bearer " + store.state.token
                 }
             }).then((response) => {
                 resolve(response.data.success);
@@ -199,13 +202,14 @@ class AgentServices {
      */
     static UpdatePassword(password) {
         return new Promise((resolve, reject) => {
-            const id = window.localStorage.getItem('id');
+            // const id = window.localStorage.getItem('id');
+            const id = store.state.id;
             if (id) {
                 axios.put(url + "password/" + id, {
                         password
                     }, {
                         headers: {
-                            Authorization: "Bearer " + window.localStorage.token
+                            Authorization: "Bearer " + store.state.token
                         }
                     })
                     .then((result) => {
@@ -242,7 +246,7 @@ class AgentServices {
         return new Promise((resolve, reject) => {
             axios.get(url + "reset/" + id, {
                     headers: {
-                        Authorization: "Bearer " + window.localStorage.token
+                        Authorization: "Bearer " + store.state.token
                     }
                 })
                 .then((result) => {
@@ -333,7 +337,7 @@ class AgentServices {
             await axios
                 .get(url + "admins/count", {
                     headers: {
-                        Authorization: "Bearer " + window.localStorage.token
+                        Authorization: "Bearer " + store.state.token
                     }
                 })
                 .then(result => {
