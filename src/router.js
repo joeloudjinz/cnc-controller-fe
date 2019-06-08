@@ -59,13 +59,7 @@ router.beforeEach((to, from, next) => {
     store.commit("SET_IS_HOME_PAGE", false);
   }
   // console.log('localStorage.id :', localStorage.id);
-  if (to.matched.some(record => {
-    // console.log('record.meta :', record.meta);
-    return record.meta.requireAuth
-  })) {
-    // // console.log('store.state.isConnected :', store.state.isConnected);
-    // if (store.state.isConnected) {
-    console.log('localStorage.id :', localStorage.id);
+  if (to.matched.some(record => record.meta.requireAuth)) {
     if (localStorage.id != undefined) {
       next()
       return
