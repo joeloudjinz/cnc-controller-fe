@@ -71,7 +71,6 @@ export default {
     source: String
   },
   computed: {
-    // ...mapState(["sbColor", "sbContent", "sbVisibility"]),
     emailErrors() {
       const errors = [];
       if (!this.$v.email.$dirty) return errors;
@@ -114,7 +113,7 @@ export default {
         })
           //? data contains agent, token and refresh_token and success message
           .then(data => {
-            console.log('data :', data);
+            console.log("data :", data);
             this.TOGGLE_IS_CONNECTED_STATE();
             this.SET_TOKEN(data.token);
             this.SET_REFRESH_TOKEN(data.refresh_token);

@@ -331,7 +331,6 @@ export default {
   },
   //! DON'T use arrow functions here
   created() {
-    // console.log('this.id :', this.$store.state.id);
     PortsServices.getConnectedPortsList()
       .then(result => {
         this.portsCount = result.count;

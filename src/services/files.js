@@ -2,8 +2,6 @@ import axios from "axios";
 import AgentServices from "./agent.js";
 // import store from '../store.js';
 
-// const token = store.getters.getToken;
-
 const url = "api/local/files";
 
 class FileServices {

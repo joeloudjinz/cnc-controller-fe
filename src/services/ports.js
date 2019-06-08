@@ -109,7 +109,6 @@ class PortServices {
         return new Promise(async (resolve, reject) => {
             await axios.get(url + '/draw/isActive')
                 .then((result) => {
-                    // console.log(result.data.status);
                     resolve(result.data.status);
                 })
                 .catch((error) => {

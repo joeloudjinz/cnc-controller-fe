@@ -13,7 +13,6 @@ class AuthServices {
             axios
                 .post(url + "login", credentials)
                 .then(result => {
-                    // console.log(result);
                     resolve(result.data);
                 })
                 .catch(err => {

@@ -24,12 +24,12 @@ class AgentServices {
                 refresh_token
             }).then((result) => {
                 //? result.data holds refresh_token and token
-                console.log(result.data)
                 store.commit('SET_REFRESH_TOKEN',result.data.refresh_token);
                 store.commit('SET_TOKEN',result.data.token);
                 resolve(true);
             }).catch((error) => {
                 if (error.response) {
+                    // if refresh token expired, revisit /login endpoint
                     reject(error.response.data.failure);
                 } else if (error.request) {
                     reject(error.request);
