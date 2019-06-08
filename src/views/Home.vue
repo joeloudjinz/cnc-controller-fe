@@ -261,7 +261,6 @@ export default {
   methods: {
     ...mapMutations([
       "SET_TRANSMISSION_PROCESS_STATE",
-      // "TOGGLE_SB_VISIBILITY",
       "TOGGLE_IS_CONNECTED_STATE"
     ]),
     onActiveCallback(data) {

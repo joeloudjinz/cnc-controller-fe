@@ -183,10 +183,11 @@ export default {
       //! if you use store state here, import 'id' state;
       if (data.target == localStorage.id) {
         this.showConversionProgress = false;
+        this.doShowParamsForm = false;
         this.showConversionResultAlert = true;
         this.proccessBlackPixelsValue = 100 - data.conversionDetails;
         this.unproccessBlackPixelsValue = data.conversionDetails;
-        this.$parent.showSuccessSnackbar("Converted successfully");
+        this.$parent.$parent.showSuccessSnackbar("Converted successfully");
       }
     },
     onQuickConversionErrorOccur(data) {
@@ -195,7 +196,7 @@ export default {
         this.showConversionProgress = false;
         this.showConversionResultAlert = false;
         this.showBeforConversionAlert = true;
-        this.$parent.showErrorSnackbar(data.errorData);
+        this.$parent.$parent.showErrorSnackbar(data.errorData);
       }
     }
   },
@@ -222,8 +223,11 @@ export default {
         this.scaleAxesErrorState = true;
         this.scaleAxesErrorContent = "Scale Axes must be superior of 50";
       } else {
-        const surfaceHeight = window.localStorage.getItem("surfaceHeight");
-        if (this.scaleAxes > surfaceHeight) {
+        const surfaceHeight = parseInt(
+          window.localStorage.getItem("surfaceHeight")
+        );
+        // console.log(this.scaleAxes < surfaceHeight);
+        if (this.scaleAxes < surfaceHeight) {
           this.showConversionProgress = true;
           this.showBeforConversionAlert = false;
           this.doShowParamsForm = false;
@@ -241,13 +245,13 @@ export default {
             idle: this.idle
           })
             .then(result => {
-              this.$parent.showSuccessSnackbar(result.success);
+              this.$parent.$parent.showSuccessSnackbar(result.success);
             })
             .catch(error => {
               this.showConversionProgress = false;
               this.doShowParamsForm = true;
               // console.log(error);
-              this.$parent.showErrorSnackbar(error);
+              this.$parent.$parent.showErrorSnackbar(error);
             });
         } else {
           this.scaleAxesErrorState = true;

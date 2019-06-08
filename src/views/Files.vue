@@ -36,13 +36,16 @@
       </v-fade-transition>
     </v-flex>
     <ImageDisplayDialog ref="imageDisplayDialog"/>
+    <SnackBar :color="color" :content="content" :visibility="visibility"/>
   </v-layout>
 </template>
 <script>
 import FileServices from "@/services/files.js";
 
-import { setTimeout } from "timers";
 import { mapState, mapMutations } from "vuex";
+import { setTimeout } from "timers";
+
+import SnackBar from "@/components/app/SnackBar.vue";
 
 const FileContentDisplayCard = () =>
   import("@/components/resources/FileContentDisplayCard.vue");
@@ -50,7 +53,7 @@ const ImageDisplayDialog = () =>
   import("@/components/resources/ImageDisplayDialog.vue");
 
 export default {
-  components: { FileContentDisplayCard, ImageDisplayDialog },
+  components: { FileContentDisplayCard, ImageDisplayDialog, SnackBar },
   data: () => ({
     items: [
       {
@@ -69,7 +72,10 @@ export default {
         children: []
       }
     ],
-    inProgress: false
+    inProgress: false,
+    color: "teal",
+    content: "",
+    visibility: false
   }),
   sockets: {
     onGcodeFileDeleted(data) {
@@ -105,11 +111,7 @@ export default {
     ...mapState(["currentFileName"])
   },
   methods: {
-    ...mapMutations([
-      "SHOW_SNACKBAR",
-      "TOGGLE_SB_VISIBILITY",
-      "SET_CURRENT_FILE_NAME"
-    ]),
+    ...mapMutations(["SET_CURRENT_FILE_NAME"]),
     getResourcesDirDetails() {
       FileServices.getDirectoryTree()
         .then(result => {
@@ -220,17 +222,19 @@ export default {
       return b;
     },
     showSuccessSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "success", content });
+      this.color = "success";
+      this.content = content;
+      this.visibility = true;
       setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
+        this.visibility = false;
       }, 5000);
     },
     showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
+      this.color = "error";
+      this.content = content;
+      this.visibility = true;
       setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
+        this.visibility = false;
       }, 5000);
     }
   }
