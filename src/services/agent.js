@@ -1,23 +1,14 @@
 import axios from 'axios';
 import store from '../store.js';
-// import router from '../router.js';
+import router from '../router.js';
 
 const url = "api/local/users/";
 const authURL = 'api/local/auth/';
 
 //! console.log(error.response.status == 406); true
-//! console.log(error.response.status === '406'); false
 //! console.log(error.response.status === 406); true
+//! console.log(error.response.status === '406'); false
 
-// else if (error.response.status == 400) { // Bad request, no access token
-//     // redirect to login
-//     store.commit('TOGGLE_SB_VISIBILITY', true);
-//     store.commit('SHOW_SNACKBAR', {
-//         color: 'error',
-//         content: 'Session has expired, login again please'
-//     });
-//     router.replace('/login');
-// }
 class AgentServices {
     /**
      * perform token refresh process by consuming /token endpoint
@@ -25,22 +16,32 @@ class AgentServices {
      */
     static RefreshToken() {
         return new Promise((resolve, reject) => {
-            const email = store.state.email;
+            // const email = store.state.email;
+            const email = localStorage.email;
             // const id = store.state.id;
             const id = localStorage.id;
-            const refresh_token = store.state.refresh_token;
+            // const refresh_token = store.state.refresh_token;
+            const refresh_token = localStorage.refresh_token;
             axios.post(authURL + 'token/refresh', {
                 email,
                 id,
                 refresh_token
             }).then((result) => {
                 //? result.data holds refresh_token and token
-                store.commit('SET_REFRESH_TOKEN', result.data.refresh_token);
-                store.commit('SET_TOKEN', result.data.token);
+                // store.commit('SET_REFRESH_TOKEN', result.data.refresh_token);
+                localStorage.refresh_token = result.data.refresh_token;
+                // store.commit('SET_TOKEN', result.data.token);
+                localStorage.token = result.data.token;
                 resolve(true);
             }).catch((error) => {
                 if (error.response) {
-                    // if refresh token expired, revisit /login endpoint
+                    //! 401 Unauthorized, invalid refresh token
+                    //! 406 Not Acceptable, refresh token has expired
+                    //! 409 Conflict, old refresh token
+                    store.commit('SHOW_LOGIN_ALERT_VALUE', 'Session has expired, login agina please')
+                    router.replace('/login');
+                    // if (error.response.status == 406 && error.response.status == 406) {
+                    // }
                     reject(error.response.data.failure);
                 } else if (error.request) {
                     reject(error.request);
@@ -61,7 +62,7 @@ class AgentServices {
             await axios
                 .get(url + id, {
                     headers: {
-                        Authorization: "Bearer " + store.state.token
+                        Authorization: "Bearer " + localStorage.token
                     }
                 })
                 .then(result => {
@@ -110,7 +111,7 @@ class AgentServices {
             await axios
                 .delete(url + id, {
                     headers: {
-                        Authorization: "Bearer " + store.state.token
+                        Authorization: "Bearer " + localStorage.token
                     }
                 })
                 .then(result => {
@@ -148,7 +149,7 @@ class AgentServices {
                     ...agent
                 }, {
                     headers: {
-                        Authorization: "Bearer " + store.state.token
+                        Authorization: "Bearer " + localStorage.token
                     }
                 })
                 .then(response => {
@@ -184,7 +185,7 @@ class AgentServices {
         return new Promise((resolve, reject) => {
             axios.put(url + agent.id, agent, {
                 headers: {
-                    Authorization: "Bearer " + store.state.token
+                    Authorization: "Bearer " + localStorage.token
                 }
             }).then((response) => {
                 resolve(response.data.success);
@@ -222,7 +223,7 @@ class AgentServices {
                         password
                     }, {
                         headers: {
-                            Authorization: "Bearer " + store.state.token
+                            Authorization: "Bearer " + localStorage.token
                         }
                     })
                     .then((result) => {
@@ -259,7 +260,7 @@ class AgentServices {
         return new Promise((resolve, reject) => {
             axios.get(url + "reset/" + id, {
                     headers: {
-                        Authorization: "Bearer " + store.state.token
+                        Authorization: "Bearer " + localStorage.token
                     }
                 })
                 .then((result) => {
@@ -350,7 +351,7 @@ class AgentServices {
             await axios
                 .get(url + "admins/count", {
                     headers: {
-                        Authorization: "Bearer " + store.state.token
+                        Authorization: "Bearer " + localStorage.token
                     }
                 })
                 .then(result => {

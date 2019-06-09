@@ -1,6 +1,6 @@
 import axios from "axios";
 import AgentServices from "./agent.js";
-import store from '../store.js';
+// import store from '../store.js';
 
 const url = "api/local/conversions";
 
@@ -10,7 +10,7 @@ class ConversionServices {
       await axios
         .post(url + "/convert", formData, {
           headers: {
-            Authorization: "Bearer " + store.state.token
+            Authorization: "Bearer " + localStorage.token
           }
         })
         .then(result => {
@@ -51,7 +51,7 @@ class ConversionServices {
             imageName,
           },
           headers: {
-            Authorization: "Bearer " + store.state.token
+            Authorization: "Bearer " + localStorage.token
           }
         })
         .then(result => {
@@ -86,7 +86,7 @@ class ConversionServices {
       await axios
         .get(url + "/count", {
           headers: {
-            Authorization: "Bearer " + store.state.token
+            Authorization: "Bearer " + localStorage.token
           }
         })
         .then(result => {

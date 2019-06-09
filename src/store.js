@@ -32,6 +32,8 @@ export default new Vuex.Store({
     workersCount: 0,
     conversionsCount: 0,
     activePortsCount: 0,
+    loginAlertContent: "",
+    loginAlertValue: false,
   },
   getters: {
     isGcodeFile: state => state.currentFileName != undefined ? state.currentFileName.includes("gcode") : false,
@@ -90,6 +92,10 @@ export default new Vuex.Store({
     },
     TOGGLE_IS_CONNECTED_STATE: (state) => {
       state.isConnected = !state.isConnected;
+    },
+    SHOW_LOGIN_ALERT_VALUE: (state, content) => {
+      state.loginAlertContent = content;
+      state.loginAlertValue = true;
     }
   },
   actions: {

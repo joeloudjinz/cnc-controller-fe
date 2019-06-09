@@ -1,5 +1,5 @@
 import axios from 'axios';
-import store from '../store.js';
+// import store from '../store.js';
 
 const url = 'api/local/auth/';
 
@@ -36,7 +36,7 @@ class AuthServices {
                 id
             }, {
                 headers: {
-                    Authorization: "Bearer " + store.state.token
+                    Authorization: "Bearer " + localStorage.token
                 }
             }).then(() => {
                 resolve(true);

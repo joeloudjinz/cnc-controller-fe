@@ -6,6 +6,12 @@
           <v-flex xs11 sm8 md5>
             <v-card class="teal lighten-4 elevation-8">
               <v-img :aspect-ratio="16/9" :src="url"></v-img>
+              <v-alert
+                :value="alertValue"
+                type="error"
+                dismissible
+                transition="fade-transition"
+              >{{ alertContent }}</v-alert>
               <v-card-text>
                 <v-form>
                   <v-text-field
@@ -60,7 +66,7 @@ import SnackBar from "@/components/app/SnackBar.vue";
 import { setTimeout } from "timers";
 
 export default {
-  name: 'login',
+  name: "login",
   mixins: [validationMixin],
   validations: {
     email: { required, email },
@@ -82,6 +88,12 @@ export default {
     source: String
   },
   computed: {
+    alertValue() {
+      return this.$store.state.loginAlertValue;
+    },
+    alertContent() {
+      return this.$store.state.loginAlertContent;
+    },
     emailErrors() {
       const errors = [];
       if (!this.$v.email.$dirty) return errors;
@@ -107,7 +119,8 @@ export default {
     ...mapMutations([
       "SET_TOKEN",
       "SET_REFRESH_TOKEN",
-      "TOGGLE_IS_CONNECTED_STATE"
+      "TOGGLE_IS_CONNECTED_STATE",
+      "SHOW_LOGIN_ALERT_VALUE"
     ]),
     submit() {
       this.$v.$touch();
@@ -118,18 +131,15 @@ export default {
         })
           //? data contains agent, token and refresh_token and success message
           .then(data => {
-            // console.log("data :", data);
-            // this.SET_ID(data.agent.id);
             localStorage.id = data.agent.id;
-            // this.SET_EMAIL(data.agent.email);
             localStorage.email = data.agent.email;
-            // this.SET_LAST_NAME(data.agent.last_name);
             localStorage.last_name = data.agent.last_name;
-            // this.SET_FIRST_NAME(data.agent.first_name);
             localStorage.first_name = data.agent.first_name;
             this.TOGGLE_IS_CONNECTED_STATE();
-            this.SET_TOKEN(data.token);
-            this.SET_REFRESH_TOKEN(data.refresh_token);
+            // this.SET_TOKEN(data.token);
+            localStorage.token = data.token;
+            // this.SET_REFRESH_TOKEN(data.refresh_token);
+            localStorage.refresh_token = data.refresh_token;
             this.$router.replace("/");
           })
           .catch(error => {

@@ -221,7 +221,7 @@ import SnackBar from "@/components/app/SnackBar.vue";
 import { setTimeout } from "timers";
 
 export default {
-  name: 'home',
+  name: "home",
   components: {
     EditProfileInfoVue,
     PortPanelDialog,
@@ -290,8 +290,8 @@ export default {
           localStorage.removeItem("first_name");
           localStorage.removeItem("last_name");
           localStorage.removeItem("email");
-          // window.localStorage.removeItem("token");
-          // window.localStorage.removeItem("refresh_token");
+          window.localStorage.removeItem("token");
+          window.localStorage.removeItem("refresh_token");
           //? update local variable isConnected
           this.isConnected = false;
           //? display login component
@@ -330,8 +330,12 @@ export default {
   },
   //! DON'T use arrow functions here
   created() {
-    if (this.$store.state.token === "") {
-      this.showErrorSnackbar("Session has expired, login agina please");
+    if (localStorage.token === "") {
+      this.$store.commit(
+        "SHOW_LOGIN_ALERT_VALUE",
+        "Session has expired, login again please"
+      );
+      // this.showErrorSnackbar("Session has expired, login agina please");
       this.$router.replace("/login");
     } else {
       PortsServices.getConnectedPortsList()

@@ -99,6 +99,8 @@ export default {
           });
       })
       .catch(error => {
+        console.log('this.$root :', this.$root);
+        console.log('this.$parent :', this.$parent);
         this.$parent.showErrorSnackbar(error);
       });
   }
