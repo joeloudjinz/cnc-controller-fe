@@ -98,27 +98,62 @@
                   ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md6 lg6>
-                  <v-text-field label="Deep Step" v-model="deepStep" class="mt-0" type="number"
-                  color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="Deep Step"
+                    v-model="deepStep"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
               </v-layout>
               <v-layout justify-center row wrap>
                 <v-flex xs12 sm12 md4 lg4>
-                  <v-text-field label="White Z" v-model="whiteZ" class="mt-0" type="number" color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="White Z"
+                    v-model="whiteZ"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md4 lg4>
-                  <v-text-field label="Black Z" v-model="blackZ" class="mt-0" type="number" color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="Black Z"
+                    v-model="blackZ"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md4 lg4>
-                  <v-text-field label="Safe Z" v-model="safeZ" class="mt-0" type="number" color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="Safe Z"
+                    v-model="safeZ"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
               </v-layout>Feed Rate
               <v-layout justify-center row wrap>
                 <v-flex xs12 sm12 md6 lg6>
-                  <v-text-field label="Work" v-model="work" class="mt-0" type="number" color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="Work"
+                    v-model="work"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md6 lg6>
-                  <v-text-field label="Idle" v-model="idle" class="mt-0" type="number" color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="Idle"
+                    v-model="idle"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -627,14 +662,20 @@
       For Scale Axes use the height value of the image, you can multiply it by a number to apply scale up,
       or divide it by a number to apply scale down
     </v-snackbar>
+    <SnackBar :color="color" :content="content" :visibility="visibility"/>
   </v-container>
 </template>
 <script>
 import ConversionServices from "@/services/conversion.js";
 import PortsServices from "@/services/ports.js";
+
+import SnackBar from "@/components/app/SnackBar.vue";
+
 import { setTimeout } from "timers";
 import { mapState, mapMutations } from "vuex";
+
 export default {
+  components: {SnackBar},
   data: () => ({
     //? to display the results section
     displayResultsPanel: false,
@@ -710,14 +751,13 @@ export default {
     flushPortDis: false,
     pausePortDis: false,
     resumePortDis: true,
-    showDrawBtn: false
+    showDrawBtn: false,
+    color: "teal",
+    content: "",
+    visibility: false
   }),
   computed: {
-    ...mapState([
-      "isTransmissionProcessActive",
-      "currentActivePort",
-      // "id"
-    ]),
+    ...mapState(["isTransmissionProcessActive", "currentActivePort"]),
     fromatElapsedTimeValue() {
       if (this.elapsedTime != undefined) {
         if (this.elapsedTime < 60) {
@@ -821,9 +861,7 @@ export default {
     ...mapMutations([
       "TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE",
       "SET_TRANSMISSION_PROCESS_STATE",
-      "SET_CURRENT_ACTIVE_PORT",
-      "SHOW_SNACKBAR",
-      "TOGGLE_SB_VISIBILITY"
+      "SET_CURRENT_ACTIVE_PORT"
     ]),
     onPortDataCallback(content) {
       if (content.length != 0) {
@@ -876,7 +914,9 @@ export default {
         this.scaleAxesErrorState = true;
         this.scaleAxesErrorContent = "Scale Axes must be superior then 50";
       } else {
-        const surfaceHeight = window.localStorage.getItem("surfaceHeight");
+        const surfaceHeight = parseInt(
+          window.localStorage.getItem("surfaceHeight")
+        );
         if (this.scaleAxes < surfaceHeight) {
           if (this.selectedFile != null) {
             this.conversionProgressDialog = true;
@@ -1019,13 +1059,15 @@ export default {
     },
     closePort(port) {
       PortsServices.closePort(port)
-        .then( () => {
+        .then(() => {
           this.portConsoleTxt.unshift("|Port was closed successfully");
           this.flushPortDis = true;
           this.pausePortDis = true;
         })
         .catch(error => {
-          this.portConsoleTxt.unshift("Error occurred while closing port: " + error);
+          this.portConsoleTxt.unshift(
+            "Error occurred while closing port: " + error
+          );
           this.showErrorSnackbar(error);
         });
     },
@@ -1084,17 +1126,19 @@ export default {
       this.transmissionConsoleTxt = [];
     },
     showSuccessSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "success", content });
+      this.color = "success";
+      this.content = content;
+      this.visibility = true;
       setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
+        this.visibility = false;
       }, 5000);
     },
     showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
+      this.color = "error";
+      this.content = content;
+      this.visibility = true;
       setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
+        this.visibility = false;
       }, 5000);
     }
   }

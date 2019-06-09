@@ -139,7 +139,8 @@ export default {
         if (this.doShowSurfaceDimensionsAlert) {
           this.TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE();
         }
-        this.$parent.showSuccessSnackbar("Information Updated Successfully");
+        console.log('this.$parent :', this.$parent);
+        this.$parent.$parent.showSuccessSnackbar("Information Updated Successfully");
       }
     }
   }

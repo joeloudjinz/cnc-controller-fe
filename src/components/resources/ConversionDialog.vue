@@ -226,7 +226,6 @@ export default {
         const surfaceHeight = parseInt(
           window.localStorage.getItem("surfaceHeight")
         );
-        // console.log(this.scaleAxes < surfaceHeight);
         if (this.scaleAxes < surfaceHeight) {
           this.showConversionProgress = true;
           this.showBeforConversionAlert = false;
