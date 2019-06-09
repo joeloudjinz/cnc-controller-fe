@@ -1,6 +1,6 @@
 import axios from 'axios';
 import store from '../store.js';
-import router from '../router.js';
+// import router from '../router.js';
 
 const url = "api/local/users/";
 const authURL = 'api/local/auth/';
@@ -9,6 +9,15 @@ const authURL = 'api/local/auth/';
 //! console.log(error.response.status === '406'); false
 //! console.log(error.response.status === 406); true
 
+// else if (error.response.status == 400) { // Bad request, no access token
+//     // redirect to login
+//     store.commit('TOGGLE_SB_VISIBILITY', true);
+//     store.commit('SHOW_SNACKBAR', {
+//         color: 'error',
+//         content: 'Session has expired, login again please'
+//     });
+//     router.replace('/login');
+// }
 class AgentServices {
     /**
      * perform token refresh process by consuming /token endpoint
@@ -77,14 +86,6 @@ class AgentServices {
                                 }).catch((error) => {
                                     reject(error);
                                 });
-                        } else if (error.response.status == 400) { // Bad request, no access token
-                            // redirect to login
-                            store.commit('TOGGLE_SB_VISIBILITY', true);
-                            store.commit('SHOW_SNACKBAR', {
-                                color: 'error',
-                                content: 'Session has expired, login again please'
-                            });
-                            router.replace('/login');
                         } else {
                             //? The request was made and the server responded with a status code
                             //? that falls out of the range of 2xx
