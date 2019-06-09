@@ -58,9 +58,19 @@ router.beforeEach((to, from, next) => {
   } else {
     store.commit("SET_IS_HOME_PAGE", false);
   }
-  // console.log('localStorage.id :', localStorage.id);
   if (to.matched.some(record => record.meta.requireAuth)) {
+    //? if the id is defined, means that the user is connected, because when he/she logout user data will be wiped out
     if (localStorage.id != undefined) {
+      //? ensuring that the tokens are defined and not empty
+      console.log(localStorage.token === "" || localStorage.refresh_token === "");
+      if (localStorage.token === "" || localStorage.refresh_token === "") {
+        store.commit(
+          "SHOW_LOGIN_ALERT_VALUE",
+          "Session has expired, login again please"
+        );
+        next("/login");
+        return;
+      } 
       next()
       return
     }

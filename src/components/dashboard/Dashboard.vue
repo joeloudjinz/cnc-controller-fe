@@ -65,6 +65,8 @@ export default {
     }
   },
   created: function() {
+    // ! this is fucking none sense -_-, really
+    const parent = this.$parent.$parent.$parent;
     ConversionServices.getConversionsCount()
       .then(conversionsCount => {
         if (this.conversionsCount != conversionsCount) {
@@ -77,7 +79,7 @@ export default {
             }
           })
           .catch(error => {
-            this.$parent.showErrorSnackbar(error);
+            parent.showErrorSnackbar(error);
           });
         PortsServices.getConnectedPortsList()
           .then(result => {
@@ -86,7 +88,7 @@ export default {
             }
           })
           .catch(error => {
-            this.$parent.showErrorSnackbar(error);
+            parent.showErrorSnackbar(error);
           });
         AgentsServices.getAgentsCount()
           .then(count => {
@@ -95,13 +97,11 @@ export default {
             }
           })
           .catch(error => {
-            this.$parent.showErrorSnackbar(error);
+            parent.showErrorSnackbar(error);
           });
       })
       .catch(error => {
-        console.log('this.$root :', this.$root);
-        console.log('this.$parent :', this.$parent);
-        this.$parent.showErrorSnackbar(error);
+        parent.showErrorSnackbar(error);
       });
   }
 };

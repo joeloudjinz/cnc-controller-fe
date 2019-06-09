@@ -293,7 +293,7 @@ export default {
           window.localStorage.removeItem("token");
           window.localStorage.removeItem("refresh_token");
           //? update local variable isConnected
-          this.isConnected = false;
+          // this.isConnected = false;
           //? display login component
           this.$router.replace("/login");
         })
@@ -328,32 +328,26 @@ export default {
       }, 5000);
     }
   },
+  // beforeMount() {
+    
+  // },
   //! DON'T use arrow functions here
   created() {
-    if (localStorage.token === "") {
-      this.$store.commit(
-        "SHOW_LOGIN_ALERT_VALUE",
-        "Session has expired, login again please"
-      );
-      // this.showErrorSnackbar("Session has expired, login agina please");
-      this.$router.replace("/login");
-    } else {
-      PortsServices.getConnectedPortsList()
-        .then(result => {
-          this.portsCount = result.count;
-          if (result.count != 0) this.portsList = result.ports;
-        })
-        .catch(error => {
-          this.showErrorSnackbar(error);
-        });
-      AgentServices.getRole(localStorage.id)
-        .then(result => {
-          this.isAdmin = result.data.result;
-        })
-        .catch(error => {
-          this.showErrorSnackbar(error);
-        });
-    }
+    PortsServices.getConnectedPortsList()
+      .then(result => {
+        this.portsCount = result.count;
+        if (result.count != 0) this.portsList = result.ports;
+      })
+      .catch(error => {
+        this.showErrorSnackbar(error);
+      });
+    AgentServices.getRole(localStorage.id)
+      .then(result => {
+        this.isAdmin = result.data.result;
+      })
+      .catch(error => {
+        this.showErrorSnackbar(error);
+      });
   }
 };
 </script>
