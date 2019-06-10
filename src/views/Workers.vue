@@ -9,7 +9,7 @@
             <v-icon color="teal darken-2">fas fa-list-alt</v-icon>
           </v-btn>
         </template>
-        <span>list of all the agents</span>
+        <span>List of all the workers of the system</span>
       </v-tooltip>
       <v-tooltip bottom>
         <template #activator="data">
@@ -17,7 +17,7 @@
             <v-icon color="teal darken-2">fas fa-plus-circle</v-icon>
           </v-btn>
         </template>
-        <span>add new agnet</span>
+        <span>Create a new worker in the system</span>
       </v-tooltip>
     </v-toolbar>
     <v-card :is="currentComponent"></v-card>
