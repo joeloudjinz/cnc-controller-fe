@@ -18,7 +18,7 @@ export default new Vuex.Store({
   state: {
     token: '',
     refresh_token: '',
-    isConnected: false,
+    // isConnected: false,
     doShowSurfaceDimensionsAlert: initializeShowSurfaceDimensionsAlertState(),
     isTransmissionProcessActive: false,
     currentActivePort: undefined,
@@ -68,9 +68,9 @@ export default new Vuex.Store({
     SET_ACTIVE_PORTS_COUNT: (state, count) => {
       state.activePortsCount = count;
     },
-    TOGGLE_IS_CONNECTED_STATE: (state) => {
-      state.isConnected = !state.isConnected;
-    },
+    // TOGGLE_IS_CONNECTED_STATE: (state) => {
+    //   state.isConnected = !state.isConnected;
+    // },
     SHOW_LOGIN_ALERT_VALUE: (state, content) => {
       state.loginAlertContent = content;
       state.loginAlertValue = true;

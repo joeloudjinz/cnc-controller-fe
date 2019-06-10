@@ -285,7 +285,7 @@ export default {
       AuthServices.Logout(localStorage.id)
         .then(() => {
           //? update connexion status
-          this.TOGGLE_IS_CONNECTED_STATE();
+          // this.TOGGLE_IS_CONNECTED_STATE();
           localStorage.removeItem("id");
           localStorage.removeItem("first_name");
           localStorage.removeItem("last_name");
