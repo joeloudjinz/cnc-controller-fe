@@ -53,13 +53,8 @@ const router = new Router({
  *? isConnected variable will be initialized (in the local storage) during login process to 'true', and to 'false' during logout.
  */
 router.beforeEach((to, from, next) => {
-  if (to.name === 'home') {
-    store.commit("SET_IS_HOME_PAGE", true);
-  } else {
-    store.commit("SET_IS_HOME_PAGE", false);
-  }
   if (to.matched.some(record => record.meta.requireAuth)) {
-    //? if the id is defined, means that the user is connected, because when he/she logout user data will be wiped out
+    //? if the id is defined, means that the user is connected, because when he/she logout data will be wiped out
     if (localStorage.id != undefined) {
       //? ensuring that the tokens are defined and not empty
       if (localStorage.token === "" || localStorage.refresh_token === "") {
@@ -80,6 +75,11 @@ router.beforeEach((to, from, next) => {
     }
     next('/login')
   } else {
+    if (to.name === 'home') {
+      store.commit("SET_IS_HOME_PAGE", true);
+    } else {
+      store.commit("SET_IS_HOME_PAGE", false);
+    }
     next()
   }
 });
