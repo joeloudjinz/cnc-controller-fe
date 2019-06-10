@@ -328,9 +328,6 @@ export default {
       }, 5000);
     }
   },
-  // beforeMount() {
-    
-  // },
   //! DON'T use arrow functions here
   created() {
     PortsServices.getConnectedPortsList()
@@ -343,6 +340,7 @@ export default {
       });
     AgentServices.getRole(localStorage.id)
       .then(result => {
+        // TODO: use the store to cache isAdmin variable
         this.isAdmin = result.data.result;
       })
       .catch(error => {

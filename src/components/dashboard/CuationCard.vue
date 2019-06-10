@@ -12,7 +12,7 @@
           </div>
         </v-card-title>
         <v-card-text>
-          <p>At Lowell using CNC machines is part of the daily routine, but it is extremely important that everyone remembers the proper safety rules while operating the machines. This will be a rundown of the basic safety rules that should be followed while working with or around a CNC machine.</p>
+          <p>It is extremely important that everyone remembers the proper safety rules while operating the machines. This will be a rundown of the basic safety rules that should be followed while working with or around a CNC machine.</p>
           <ul>
             <li>Always ensure that you wear proper ear protection and a good pair of safety glasses when operating a CNC machine.</li>
             <li>Ensure that your safety glasses are firmly in place every time you are closely observing the cutting tools.</li>

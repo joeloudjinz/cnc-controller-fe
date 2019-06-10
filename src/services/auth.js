@@ -15,13 +15,13 @@ class AuthServices {
                 .then(result => {
                     resolve(result.data);
                 })
-                .catch(err => {
-                    if (err.response) {
-                        reject(err.response.data.failure);
-                    } else if (err.request) {
-                        reject(err.request);
+                .catch(error => {
+                    if (error.response) {
+                        reject(error.response.data.failure);
+                    } else if (error.request) {
+                        reject(error.request);
                     } else {
-                        reject(err.message);
+                        reject(error.message);
                     }
                 });
         });
