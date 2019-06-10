@@ -241,7 +241,7 @@ export default {
   data: () => ({
     imageURL: undefined,
     imagePanel: false,
-    //? data in consoles area ------------------------
+    //? data of consoles area
     consolesArea: false,
     //? this variable is used to operate on the port when the transmission process is going on
     port: undefined,
@@ -275,9 +275,7 @@ export default {
       this.stopSendDis = !status;
       this.pauseSendDis = !status;
       if (!status && data.target == localStorage.id) {
-        this.$parent.showSuccessSnackbar(
-          "Transmission Has been completed"
-        );
+        this.$parent.showSuccessSnackbar("Transmission Has been completed");
         this.closePort(this.currentActivePort);
         this.closeImagePanelBtnDis = false;
       }
@@ -293,12 +291,26 @@ export default {
       return this.isTransmissionProcessActive;
     }
   },
+  created() {
+    window.addEventListener("beforeunload", event =>
+      this.handleOnBeforeUnload(event)
+    );
+  },
   methods: {
     ...mapMutations([
       "SET_TRANSMISSION_PROCESS_STATE",
       "SET_CURRENT_ACTIVE_PORT",
       "SET_CURRENT_FILE_NAME"
     ]),
+    handleOnBeforeUnload(event) {
+      // || this.isConversionActive
+      if (this.isTransmissionProcessActive) {
+        // Cancel the event as stated by the standard.
+        event.preventDefault();
+        // Chrome requires returnValue to be set.
+        event.returnValue = "";
+      }
+    },
     onPortDataCallback(content) {
       if (content.length == 0) {
         // console.warn("data is empty!");

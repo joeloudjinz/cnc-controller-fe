@@ -844,6 +844,7 @@ export default {
     }
   },
   created() {
+    // listen to window closing
     window.addEventListener("beforeunload", event =>
       this.handleOnBeforeUnload(event)
     );
