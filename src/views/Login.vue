@@ -117,10 +117,8 @@ export default {
   // },
   methods: {
     ...mapMutations([
-      "SET_TOKEN",
-      "SET_REFRESH_TOKEN",
       "TOGGLE_IS_CONNECTED_STATE",
-      "SHOW_LOGIN_ALERT_VALUE"
+      "HIDE_LOGIN_ALERT_VALUE"
     ]),
     submit() {
       this.$v.$touch();
@@ -131,6 +129,7 @@ export default {
         })
           //? data contains agent, token and refresh_token and success message
           .then(data => {
+            this.HIDE_LOGIN_ALERT_VALUE();
             localStorage.id = data.agent.id;
             localStorage.email = data.agent.email;
             localStorage.last_name = data.agent.last_name;
