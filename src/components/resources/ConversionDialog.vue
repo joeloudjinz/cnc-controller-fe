@@ -49,32 +49,69 @@
                 hint="This field is required"
                 v-model="scaleAxes"
                 class="mt-0"
+                color="teal darken-2"
                 type="number"
                 :error="scaleAxesErrorState"
                 :error-messages="scaleAxesErrorContent"
               ></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md6 lg6>
-              <v-text-field label="Deep Step" v-model="deepStep" class="mt-0" type="number"></v-text-field>
+              <v-text-field
+                label="Deep Step"
+                v-model="deepStep"
+                color="teal darken-2"
+                class="mt-0"
+                type="number"
+              ></v-text-field>
             </v-flex>
           </v-layout>
           <v-layout justify-center row wrap>
             <v-flex xs12 sm12 md4 lg4>
-              <v-text-field label="White Z" v-model="whiteZ" class="mt-0" type="number"></v-text-field>
+              <v-text-field
+                label="White Z"
+                v-model="whiteZ"
+                color="teal darken-2"
+                class="mt-0"
+                type="number"
+              ></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md4 lg4>
-              <v-text-field label="Black Z" v-model="blackZ" class="mt-0" type="number"></v-text-field>
+              <v-text-field
+                label="Black Z"
+                v-model="blackZ"
+                color="teal darken-2"
+                class="mt-0"
+                type="number"
+              ></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md4 lg4>
-              <v-text-field label="Safe Z" v-model="safeZ" class="mt-0" type="number"></v-text-field>
+              <v-text-field
+                label="Safe Z"
+                v-model="safeZ"
+                color="teal darken-2"
+                class="mt-0"
+                type="number"
+              ></v-text-field>
             </v-flex>
           </v-layout>Feed Rate
           <v-layout justify-center row wrap>
             <v-flex xs12 sm12 md6 lg6>
-              <v-text-field label="Work" v-model="work" class="mt-0" type="number"></v-text-field>
+              <v-text-field
+                label="Work"
+                v-model="work"
+                color="teal darken-2"
+                class="mt-0"
+                type="number"
+              ></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md6 lg6>
-              <v-text-field label="Idle" v-model="idle" class="mt-0" type="number"></v-text-field>
+              <v-text-field
+                label="Idle"
+                v-model="idle"
+                color="teal darken-2"
+                class="mt-0"
+                type="number"
+              ></v-text-field>
             </v-flex>
           </v-layout>
         </v-container>
