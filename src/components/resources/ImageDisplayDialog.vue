@@ -276,7 +276,7 @@ export default {
       this.pauseSendDis = !status;
       if (!status && data.target == localStorage.id) {
         this.$parent.showSuccessSnackbar(
-          "Transmission of file " + this.fileName + " Has been completed"
+          "Transmission Has been completed"
         );
         this.closePort(this.currentActivePort);
         this.closeImagePanelBtnDis = false;
@@ -287,7 +287,7 @@ export default {
     ...mapState([
       "isTransmissionProcessActive",
       "currentActivePort",
-      "currentFileName",
+      "currentFileName"
       // "id"
     ]),
     disableImagePanelToolbarBtns() {
@@ -361,18 +361,19 @@ export default {
       this.$refs.portsListDialogRef.fetchPortsList();
     },
     startTransmitingGCode(portName) {
-      this.$refs.portsListDialogRef.toggleProgressStatus();
+      this.$refs.portsListDialogRef.showProgress();
       //? ensuring that the current file name is valide gcode file name
       if (this.currentFileName !== undefined && this.currentFileName !== "") {
         //? removing the extension from the fileName because the endpoint function uses gcode file name without ext
         const splitted = this.currentFileName.split(".");
         const fileName = splitted[0] + "." + splitted[1];
+        // this.fileName = fileName+".gcode";
         //? disabling image panel close btn
         this.closeImagePanelBtnDis = true;
         this.SET_CURRENT_ACTIVE_PORT(portName);
         PortsServices.performFullDrawOperation(fileName, portName)
           .then(result => {
-            this.$refs.portsListDialogRef.toggleProgressStatus();
+            this.$refs.portsListDialogRef.hideProgress();
             //? show consoles area
             this.consolesArea = true;
             //? hiding ports list dialog
@@ -437,12 +438,7 @@ export default {
       //? empty all the consoels data
       this.portConsoleTxt = [];
       this.transmissionConsoleTxt = [];
-      // TODO: call a child function
-      this.scaleAxes = 0;
-      // this.$refs.conversionDialogRef.showParamsForm();
-      this.doShowParamsForm = true;
-      this.proccessBlackPixelsValue = 0;
-      this.unproccessBlackPixelsValue = 0;
+      this.$refs.conversionDialogRef.initializeDialog();
       //? close the panel
       this.imagePanel = false;
     },

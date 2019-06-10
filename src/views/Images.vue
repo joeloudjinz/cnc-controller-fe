@@ -803,7 +803,6 @@ export default {
         this.showSuccessSnackbar(
           "Transmission of file " + this.fileName + " Has been completed"
         );
-        //TODO: close the port here
         this.closePort(this.currentActivePort);
       }
     },

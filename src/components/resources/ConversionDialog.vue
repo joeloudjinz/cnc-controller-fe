@@ -261,6 +261,12 @@ export default {
         }
       }
     },
+    initializeDialog() {
+      this.scaleAxes = 0;
+      this.doShowParamsForm = true;
+      this.proccessBlackPixelsValue = 0;
+      this.unproccessBlackPixelsValue = 0;
+    },
     showParamsForm() {
       this.doShowParamsForm = true;
     },
