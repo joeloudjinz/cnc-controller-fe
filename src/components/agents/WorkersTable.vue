@@ -100,8 +100,8 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text
-          class="font-weight-bold teal lighten-5 teal--text text--darken-2"
-        >Confirm the deletion of this agent?</v-card-text>
+          class="font-weight-meduim teal lighten-5 teal--text text--darken-2"
+        >Confirm the deletion of user <span class="font-weight-bold">{{selectedUserFullName}}</span> ?</v-card-text>
         <v-card-actions>
           <v-btn flat @click="cancelConfirmDeleteDialog()" class="teal--text lighten-1">Cancel</v-btn>
           <v-spacer></v-spacer>
@@ -110,12 +110,12 @@
       </v-card>
     </v-dialog>
     <!-- Reset password confirmation -->
-    <v-dialog v-model="confirmResetingPasswordDialog" persistent width="400">
+    <v-dialog v-model="confirmResetingPasswordDialog" persistent width="500">
       <v-card color="teal lighten-5" dark>
         <v-card-title class="teal--text text--darken-2 headline">Worker Password Reset</v-card-title>
         <v-card-text class="font-weight-light teal--text text--darken-4">
           Are you sure you want to reset the password of the user
-          <p class="font-weight-medium">{{selectedUserFullName}}</p>
+          <span class="font-weight-medium">{{selectedUserFullName}}</span>?
         </v-card-text>
         <v-card-actions>
           <v-btn flat @click="confirmResetingPasswordDialog = false" class="teal--text">Close</v-btn>
@@ -125,7 +125,7 @@
       </v-card>
     </v-dialog>
     <!-- Reset password dialog -->
-    <v-dialog v-model="resetingPasswordDialog" persistent width="400">
+    <v-dialog v-model="resetingPasswordDialog" persistent width="500">
       <v-card color="teal lighten-5" dark>
         <v-card-title class="teal--text text--darken-2 headline">Worker Password Reset</v-card-title>
         <v-progress-linear
