@@ -220,7 +220,7 @@ export default {
       //? checking the value of Scale Axes
       if (this.scaleAxes <= 50) {
         this.scaleAxesErrorState = true;
-        this.scaleAxesErrorContent = "Scale Axes must be superior of 50";
+        this.scaleAxesErrorContent = "Scale Axes must be superior of 50mm";
       } else {
         const surfaceHeight = parseInt(
           window.localStorage.getItem("surfaceHeight")
@@ -255,7 +255,7 @@ export default {
           this.scaleAxesErrorContent =
             "Scale Axes must be less then the height of the surface (" +
             surfaceHeight +
-            ")";
+            "mm)";
         }
       }
     },
