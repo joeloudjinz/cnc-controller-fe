@@ -125,10 +125,7 @@ export default {
               this.showErrorAlert(error);
               this.disableAlert();
             });
-          // console.log("Is valid");
-        } else {
-          // console.warn("Is NOT valid");
-        }
+        } 
       }
     },
     showSuccessAlert(content) {

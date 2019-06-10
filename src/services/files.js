@@ -1,6 +1,5 @@
 import axios from "axios";
 import AgentServices from "./agent.js";
-// import store from '../store.js';
 
 const url = "api/local/files";
 

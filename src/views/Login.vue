@@ -135,10 +135,9 @@ export default {
             localStorage.email = data.agent.email;
             localStorage.last_name = data.agent.last_name;
             localStorage.first_name = data.agent.first_name;
+            // TODO: remove the use of isconnected variable
             this.TOGGLE_IS_CONNECTED_STATE();
-            // this.SET_TOKEN(data.token);
             localStorage.token = data.token;
-            // this.SET_REFRESH_TOKEN(data.refresh_token);
             localStorage.refresh_token = data.refresh_token;
             this.$router.replace("/");
           })

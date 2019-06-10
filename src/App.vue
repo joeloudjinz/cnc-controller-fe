@@ -5,27 +5,8 @@
   </div>
 </template>
 <script>
-// import { setTimeout } from "timers";
-// import { mapState } from "vuex";
-// const SnackBar = () => import("./components/app/SnackBar.vue");
-// import SnackBar from '@/components/app/SnackBar.vue'
 export default {
   name: 'app',
-  // components: {
-  //   SnackBar
-  // },
-  // created() {
-    
-  // },
-  methods: {
-    // showErrorSnackbar(content) {
-    //   this.TOGGLE_SB_VISIBILITY(true);
-    //   this.SHOW_SNACKBAR({ color: "error", content });
-    //   setTimeout(() => {
-    //     this.TOGGLE_SB_VISIBILITY(false);
-    //   }, 5000);
-    // }
-  }
 };
 </script>
 

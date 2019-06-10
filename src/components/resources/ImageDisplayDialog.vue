@@ -288,7 +288,6 @@ export default {
       "isTransmissionProcessActive",
       "currentActivePort",
       "currentFileName"
-      // "id"
     ]),
     disableImagePanelToolbarBtns() {
       return this.isTransmissionProcessActive;

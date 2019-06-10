@@ -16,10 +16,6 @@ const initializeShowSurfaceDimensionsAlertState = () => {
 
 export default new Vuex.Store({
   state: {
-    first_name: 'system',
-    last_name: 'user',
-    id: 0,
-    email: 'system.user@email.com',
     token: '',
     refresh_token: '',
     isConnected: false,
@@ -71,24 +67,6 @@ export default new Vuex.Store({
     },
     SET_ACTIVE_PORTS_COUNT: (state, count) => {
       state.activePortsCount = count;
-    },
-    SET_FIRST_NAME: (state, value) => {
-      state.first_name = value;
-    },
-    SET_LAST_NAME: (state, value) => {
-      state.last_name = value;
-    },
-    SET_EMAIL: (state, value) => {
-      state.email = value;
-    },
-    SET_ID: (state, value) => {
-      state.id = value;
-    },
-    SET_TOKEN: (state, value) => {
-      state.token = value;
-    },
-    SET_REFRESH_TOKEN: (state, value) => {
-      state.refresh_token = value;
     },
     TOGGLE_IS_CONNECTED_STATE: (state) => {
       state.isConnected = !state.isConnected;

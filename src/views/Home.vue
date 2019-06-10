@@ -211,6 +211,7 @@ import AgentServices from "@/services/agent.js";
 import PortsServices from "@/services/ports.js";
 
 import { mapState, mapMutations } from "vuex";
+import { setTimeout } from "timers";
 
 const EditProfileInfoVue = () =>
   import("@/components/home/EditProfileInfo.vue");
@@ -218,7 +219,6 @@ const PortPanelDialog = () => import("@/components/home/PortPanelDialog.vue");
 const SettingsDialog = () => import("@/components/home/SettingsDialog.vue");
 const DashboardVue = () => import("@/components/dashboard/Dashboard.vue");
 import SnackBar from "@/components/app/SnackBar.vue";
-import { setTimeout } from "timers";
 
 export default {
   name: "home",
@@ -292,8 +292,6 @@ export default {
           localStorage.removeItem("email");
           window.localStorage.removeItem("token");
           window.localStorage.removeItem("refresh_token");
-          //? update local variable isConnected
-          // this.isConnected = false;
           //? display login component
           this.$router.replace("/login");
         })

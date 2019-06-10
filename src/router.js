@@ -62,9 +62,7 @@ router.beforeEach((to, from, next) => {
     //? if the id is defined, means that the user is connected, because when he/she logout user data will be wiped out
     if (localStorage.id != undefined) {
       //? ensuring that the tokens are defined and not empty
-      // console.log(localStorage.token === "" || localStorage.refresh_token === "");
       if (localStorage.token === "" || localStorage.refresh_token === "") {
-        // console.log('tokens are empty');
         store.commit(
           "SHOW_LOGIN_ALERT_VALUE",
           "Session has expired, login again please"
@@ -72,8 +70,6 @@ router.beforeEach((to, from, next) => {
         next("/login");
         return;
       }
-      // console.log('to.name :', to.name);
-      // console.log('from.name :', from.name);
       if (to.name === "login") {
         next('/');
         return;

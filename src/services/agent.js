@@ -210,8 +210,6 @@ class AgentServices {
      */
     static UpdatePassword(password) {
         return new Promise((resolve, reject) => {
-            // const id = window.localStorage.getItem('id');
-            // const id = store.state.id;
             const id = localStorage.id;
             if (id) {
                 axios.put(url + "password/" + id, {
@@ -314,7 +312,6 @@ class AgentServices {
             await axios
                 .get(url + "agents/count")
                 .then(result => {
-                    // console.log('result.data :', result.data);
                     resolve(result.data.count);
                 })
                 .catch(error => {

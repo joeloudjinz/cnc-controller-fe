@@ -152,7 +152,6 @@ import { mapState } from "vuex";
 
 export default {
   data: () => ({
-    //? for params dialog --------------------
     showConversionParamsDialog: false,
     //? conversion params section ...
     doShowParamsForm: true,
@@ -249,7 +248,6 @@ export default {
             .catch(error => {
               this.showConversionProgress = false;
               this.doShowParamsForm = true;
-              // console.log(error);
               this.$parent.$parent.showErrorSnackbar(error);
             });
         } else {

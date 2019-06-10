@@ -70,10 +70,6 @@ export default {
     togglePortsListDialogeVisibility() {
       this.showPortsListDialog = !this.showPortsListDialog;
     },
-    // toggleProgressStatus() {
-    //   console.log("in toggleProgressStatus()");
-    //   this.progressStatus != this.progressStatus;
-    // },
     showProgress() {
       this.progressStatus = true;
     },

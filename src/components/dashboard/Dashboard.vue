@@ -61,7 +61,6 @@ export default {
     ]),
     onPortsListChangedCallback(data) {
       this.SET_ACTIVE_PORTS_COUNT(Object.keys(data).length);
-      // this.activePortsCount = Object.keys(data).length;
     }
   },
   created: function() {
