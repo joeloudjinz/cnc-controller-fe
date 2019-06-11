@@ -87,7 +87,6 @@ export default {
         })
         .catch(error => {
           this.progressStatus = false;
-          this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
           this.$parent.showErrorSnackbar(error);
         });
     },

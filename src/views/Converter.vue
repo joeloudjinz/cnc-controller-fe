@@ -587,56 +587,7 @@
       </v-flex>
     </v-layout>
     <!-- Ports List dialoge -->
-    <v-dialog v-model="portsListDialog" persistent width="700px">
-      <v-card color="teal lighten-5">
-        <v-card-title class="headline teal--text">Ports List</v-card-title>
-        <v-card-text class="py-0 px-0">
-          <v-progress-linear
-            v-if="portsListProgress"
-            :indeterminate="true"
-            color="teal darken-2"
-            class="pa-0"
-          ></v-progress-linear>
-          <v-container grid-list-sm>
-            <v-alert :value="true" color="teal darken-4" type="info" class="mb-2">
-              Tranmission process consume to mush time, so be patient until it's successfully completed,
-              You can monitor the whole process from the two consoles below after you select the port.
-              If the process hang up for some reasons, you can pause and resume it.
-              Note that the port will be closed after the process is completed or stopped.
-            </v-alert>
-            <p class="title">Chose port:</p>
-            <v-alert
-              :value="isTransmissionProcessActive"
-              type="warning"
-            >There is already a transmission process going on</v-alert>
-            <v-fade-transition>
-              <v-list v-if="portsList.length !== 0">
-                <v-list-tile
-                  v-for="(port, index) in portsList"
-                  :key="index"
-                  :disabled="isTransmissionProcessActive"
-                  @click="startTransmitingGCode(port.comName)"
-                >
-                  <v-list-tile-content>
-                    <v-list-tile-title class="font-weight-bold">{{ port.comName }}</v-list-tile-title>
-                    <v-list-tile-sub-title
-                      class="font-weight-medium font-italic"
-                    >{{ port.manufacturer }}</v-list-tile-sub-title>
-                  </v-list-tile-content>
-                </v-list-tile>
-              </v-list>
-              <v-list v-else>
-                <v-alert :value="true" type="error">No port is connected!</v-alert>
-              </v-list>
-            </v-fade-transition>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn flat color="teal" @click="portsListDialog = false">Cancel</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <PortsListDialog ref="portsListDialogRef"/>
     <!-- Conversion Process Dialog -->
     <v-dialog v-model="conversionProgressDialog" persistent width="500">
       <v-card color="teal" dark>
@@ -670,12 +621,13 @@ import ConversionServices from "@/services/conversion.js";
 import PortsServices from "@/services/ports.js";
 
 import SnackBar from "@/components/app/SnackBar.vue";
+const PortsListDialog = () => import("../components/ports/PortsListDialog.vue");
 
 import { setTimeout } from "timers";
 import { mapState, mapMutations } from "vuex";
 
 export default {
-  components: {SnackBar},
+  components: { SnackBar, PortsListDialog },
   data: () => ({
     //? to display the results section
     displayResultsPanel: false,
@@ -733,7 +685,6 @@ export default {
     displayPortConsole: true,
     //? for ports list
     portsList: [],
-    portsListProgress: false,
     //? for console
     portConsoleTxt: [],
     //? for transmission process
@@ -785,7 +736,6 @@ export default {
   },
   sockets: {
     onPortData(data) {
-      // console.log('data.target :', data.target);
       if (data.target == localStorage.id) {
         this.onPortDataCallback(data.data);
       }
@@ -961,36 +911,25 @@ export default {
       }
     },
     initializeDrawOperation() {
-      this.portsListDialog = true;
-      PortsServices.getConnectedPortsList()
-        .then(result => {
-          this.portsListProgress = false;
-          if (result.count !== 0) {
-            this.portsList = result.ports;
-          }
-        })
-        .catch(error => {
-          this.portsListProgress = false;
-          this.portsListDialog = false;
-          this.showErrorSnackbar(error);
-        });
+      this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
+      this.$refs.portsListDialogRef.fetchPortsList();
     },
     //! port here is the comName
     startTransmitingGCode(port) {
-      this.portsListProgress = true;
+      this.$refs.portsListDialogRef.showProgress();
       if (this.fileName !== undefined && this.fileName !== "") {
         const splitted = this.fileName.split(".");
         const fileName = splitted[0] + "." + splitted[1];
         this.SET_CURRENT_ACTIVE_PORT(port);
-        this.consolesArea = true;
         PortsServices.performFullDrawOperation(fileName, port)
           .then(result => {
-            this.portsListProgress = false;
             this.pauseSendDis = false;
             this.stopSendDis = false;
-            this.portsListDialog = false;
             this.pausePortDis = false;
             this.flushPortDis = false;
+            this.consolesArea = true;
+            this.$refs.portsListDialogRef.hideProgress();
+            this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
             this.SET_TRANSMISSION_PROCESS_STATE(true);
             this.showSuccessSnackbar(result.success);
           })
