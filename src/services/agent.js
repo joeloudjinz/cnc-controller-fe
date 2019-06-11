@@ -55,11 +55,13 @@ class AgentServices {
         const id = localStorage.id;
         return new Promise(async (resolve, reject) => {
             await axios
-                .get(url + id, {
-                    headers: {
-                        Authorization: "Bearer " + localStorage.token
-                    }
-                })
+                .get(url + id,
+                    // {
+                    // headers: {
+                    //     Authorization: "Bearer " + localStorage.token
+                    // }
+                    // }
+                )
                 .then(result => {
                     let data = result.data.data;
                     resolve(
@@ -104,11 +106,13 @@ class AgentServices {
     static deleteAgentById(id) {
         return new Promise(async (resolve, reject) => {
             await axios
-                .delete(url + id, {
-                    headers: {
-                        Authorization: "Bearer " + localStorage.token
-                    }
-                })
+                .delete(url + id,
+                    // {
+                    // headers: {
+                    //     Authorization: "Bearer " + localStorage.token
+                    // }
+                    // }
+                )
                 .then(result => {
                     resolve(result.data.success);
                 })
@@ -141,12 +145,14 @@ class AgentServices {
         return new Promise((resolve, reject) => {
             axios
                 .post(url + "create", {
-                    ...agent
-                }, {
-                    headers: {
-                        Authorization: "Bearer " + localStorage.token
+                        ...agent
                     }
-                })
+                    // , {
+                    // headers: {
+                    //     Authorization: "Bearer " + localStorage.token
+                    // }
+                    // }
+                )
                 .then(response => {
                     resolve(response.data.success);
                 })
@@ -178,11 +184,13 @@ class AgentServices {
     static UpdateInformation(agent) {
         // console.log('in it ')
         return new Promise((resolve, reject) => {
-            axios.put(url + agent.id, agent, {
-                headers: {
-                    Authorization: "Bearer " + localStorage.token
-                }
-            }).then((response) => {
+            axios.put(url + agent.id, agent
+                // , {
+                // headers: {
+                //     Authorization: "Bearer " + localStorage.token
+                // }
+                // }
+            ).then((response) => {
                 resolve(response.data.success);
             }).catch((error) => {
                 if (error.response) {
@@ -213,12 +221,14 @@ class AgentServices {
             const id = localStorage.id;
             if (id) {
                 axios.put(url + "password/" + id, {
-                        password
-                    }, {
-                        headers: {
-                            Authorization: "Bearer " + localStorage.token
+                            password
                         }
-                    })
+                        // , {
+                        //     headers: {
+                        //         Authorization: "Bearer " + localStorage.token
+                        //     }
+                        // }
+                    )
                     .then((result) => {
                         resolve(result.data.success);
                     }).catch((error) => {
@@ -251,11 +261,13 @@ class AgentServices {
      */
     static resetAgentPassword(id) {
         return new Promise((resolve, reject) => {
-            axios.get(url + "reset/" + id, {
-                    headers: {
-                        Authorization: "Bearer " + localStorage.token
-                    }
-                })
+            axios.get(url + "reset/" + id
+                    // , {
+                    //     headers: {
+                    //         Authorization: "Bearer " + localStorage.token
+                    //     }
+                    // }
+                )
                 .then((result) => {
                     resolve(result);
                 }).catch((error) => {
@@ -341,11 +353,13 @@ class AgentServices {
     static getAdminsCount() {
         return new Promise(async (resolve, reject) => {
             await axios
-                .get(url + "admins/count", {
-                    headers: {
-                        Authorization: "Bearer " + localStorage.token
-                    }
-                })
+                .get(url + "admins/count"
+                    // , {
+                    // headers: {
+                    //     Authorization: "Bearer " + localStorage.token
+                    // }
+                    // }
+                )
                 .then(result => {
                     resolve(result.data.count);
                 })

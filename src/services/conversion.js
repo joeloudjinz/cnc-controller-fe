@@ -7,11 +7,13 @@ class ConversionServices {
   static ConvertImage(formData) {
     return new Promise(async (resolve, reject) => {
       await axios
-        .post(url + "/convert", formData, {
-          headers: {
-            Authorization: "Bearer " + localStorage.token
-          }
-        })
+        .post(url + "/convert", formData
+          // , {
+          // headers: {
+          //   Authorization: "Bearer " + localStorage.token
+          // }
+          // }
+        )
         .then(result => {
           resolve(result.data);
         })
@@ -48,10 +50,11 @@ class ConversionServices {
         }, {
           params: {
             imageName,
-          },
-          headers: {
-            Authorization: "Bearer " + localStorage.token
-          }
+            }
+          //   ,
+          // headers: {
+          //   Authorization: "Bearer " + localStorage.token
+          // }
         })
         .then(result => {
           resolve(result.data);
@@ -83,11 +86,13 @@ class ConversionServices {
   static getConversionsCount() {
     return new Promise(async (resolve, reject) => {
       await axios
-        .get(url + "/count", {
-          headers: {
-            Authorization: "Bearer " + localStorage.token
-          }
-        })
+        .get(url + "/count"
+          // , {
+          // headers: {
+          //   Authorization: "Bearer " + localStorage.token
+          // }
+          // }
+        )
         .then(result => {
           resolve(result.data.count);
         })

@@ -5,8 +5,7 @@ const url = "api/local/ports";
 
 class PortServices {
     /**
-     * TODO: add token to header
-     * result contains success message, ports count and ports list
+     * result containsAuthorization: "Bearer " + localStorage.token success message, ports count and ports list
      */
     static getConnectedPortsList() {
         return new Promise(async (resolve, reject) => {

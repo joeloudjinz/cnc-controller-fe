@@ -34,11 +34,13 @@ class AuthServices {
         return new Promise((resolve, reject) => {
             axios.post(url + 'logout', {
                 id
-            }, {
-                headers: {
-                    Authorization: "Bearer " + localStorage.token
-                }
-            }).then(() => {
+            }
+                // , {
+                // headers: {
+                //     Authorization: "Bearer " + localStorage.token
+                // }
+                // }
+            ).then(() => {
                 resolve(true);
             }).catch((error) => {
                 if (error.response) {

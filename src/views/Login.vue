@@ -61,7 +61,6 @@ import { required, email, minLength } from "vuelidate/lib/validators";
 import { mapMutations } from "vuex";
 
 import AuthServices from "@/services/auth";
-// import SnackBar from "@/components/app/SnackBar.vue";
 import SnackBar from "@/components/app/SnackBar.vue";
 import { setTimeout } from "timers";
 
@@ -110,11 +109,6 @@ export default {
       return errors;
     }
   },
-  // mounted() {
-  //   if (localStorage.getItem("isConnected") === "true") {
-  //     this.$router.replace("/");
-  //   }
-  // },
   methods: {
     ...mapMutations([
       "TOGGLE_IS_CONNECTED_STATE",
@@ -134,8 +128,6 @@ export default {
             localStorage.email = data.agent.email;
             localStorage.last_name = data.agent.last_name;
             localStorage.first_name = data.agent.first_name;
-            // TODO: remove the use of isconnected variable
-            // this.TOGGLE_IS_CONNECTED_STATE();
             localStorage.token = data.token;
             localStorage.refresh_token = data.refresh_token;
             this.$router.replace("/");
