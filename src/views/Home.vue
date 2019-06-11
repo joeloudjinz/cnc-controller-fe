@@ -232,7 +232,7 @@ export default {
   data: () => ({
     portsList: [],
     portsCount: 0,
-    isAdmin: false,
+    // isAdmin: false,
     drawer: false,
     right: null,
     color: "teal",
@@ -240,7 +240,7 @@ export default {
     visibility: false
   }),
   computed: {
-    ...mapState(["doShowSurfaceDimensionsAlert", "isHomePage"]),
+    ...mapState(["doShowSurfaceDimensionsAlert", "isHomePage", "isAdmin"]),
     fullName() {
       return `${localStorage.last_name.toUpperCase()} ${
         localStorage.first_name
@@ -261,7 +261,8 @@ export default {
   methods: {
     ...mapMutations([
       "SET_TRANSMISSION_PROCESS_STATE",
-      "TOGGLE_IS_CONNECTED_STATE"
+      "TOGGLE_IS_CONNECTED_STATE",
+      "SET_IS_ADMIN_VALUE"
     ]),
     onActiveCallback(data) {
       this.portsCount = Object.keys(data).length;
@@ -336,14 +337,17 @@ export default {
       .catch(error => {
         this.showErrorSnackbar(error);
       });
-    AgentServices.getRole(localStorage.id)
-      .then(result => {
-        // TODO: use the store to cache isAdmin variable
-        this.isAdmin = result.data.result;
-      })
-      .catch(error => {
-        this.showErrorSnackbar(error);
-      });
+    if (this.isAdmin == undefined) {
+      AgentServices.getRole(localStorage.id)
+        .then(result => {
+          // TODO: use the store to cache isAdmin variable
+          this.SET_IS_ADMIN_VALUE(result.data.result);
+          // this.isAdmin = ;
+        })
+        .catch(error => {
+          this.showErrorSnackbar(error);
+        });
+    }
   }
 };
 </script>

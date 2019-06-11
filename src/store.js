@@ -16,14 +16,12 @@ const initializeShowSurfaceDimensionsAlertState = () => {
 
 export default new Vuex.Store({
   state: {
-    token: '',
-    refresh_token: '',
-    // isConnected: false,
     doShowSurfaceDimensionsAlert: initializeShowSurfaceDimensionsAlertState(),
     isTransmissionProcessActive: false,
     currentActivePort: undefined,
     currentFileName: undefined,
     isHomePage: false,
+    isAdmin: undefined,
     adminsCount: 0,
     workersCount: 0,
     conversionsCount: 0,
@@ -82,6 +80,9 @@ export default new Vuex.Store({
     },
     SET_IS_CONVERSION_ACTIVE: (state, value) => {
       state.isConversionActive = value;
+    },
+    SET_IS_ADMIN_VALUE: (state, value) => {
+      state.isAdmin = value;
     }
   },
   actions: {
