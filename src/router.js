@@ -23,7 +23,7 @@ const router = new Router({
         {
           path: 'converter',
           name: 'converter',
-          component: () => import( /* webpackChunkName: "images" */ './views/Images.vue'),
+          component: () => import( /* webpackChunkName: "images" */ './views/Converter.vue'),
           meta: {
             requireAuth: true
           }
