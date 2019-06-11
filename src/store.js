@@ -30,6 +30,7 @@ export default new Vuex.Store({
     activePortsCount: 0,
     loginAlertContent: "",
     loginAlertValue: false,
+    isConversionActive: false,
   },
   getters: {
     isGcodeFile: state => state.currentFileName != undefined ? state.currentFileName.includes("gcode") : false,
@@ -74,10 +75,13 @@ export default new Vuex.Store({
     SHOW_LOGIN_ALERT_VALUE: (state, content) => {
       state.loginAlertContent = content;
       state.loginAlertValue = true;
-    }, 
-    HIDE_LOGIN_ALERT_VALUE: (state) => { 
+    },
+    HIDE_LOGIN_ALERT_VALUE: (state) => {
       state.loginAlertValue = false;
       state.loginAlertContent = "";
+    },
+    SET_IS_CONVERSION_ACTIVE: (state, value) => {
+      state.isConversionActive = value;
     }
   },
   actions: {

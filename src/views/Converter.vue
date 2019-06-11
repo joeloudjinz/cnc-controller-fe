@@ -21,7 +21,6 @@
                     ref="selectImageRef"
                   >
                   <div id="preview">
-                    <!--  -->
                     <v-img contain height="650" v-if="url" :src="url"></v-img>
                   </div>
                 </v-card-text>
@@ -29,7 +28,7 @@
               <v-card-actions>
                 <v-btn
                   flat
-                  @click="clearImageDisplayCard()"
+                  @click="initializeInterface()"
                   :disabled="isConversionActive || isTransmissionProcessActive"
                   color="teal darken-4"
                 >Clear</v-btn>
@@ -622,6 +621,8 @@ import PortsServices from "@/services/ports.js";
 
 import SnackBar from "@/components/app/SnackBar.vue";
 const PortsListDialog = () => import("../components/ports/PortsListDialog.vue");
+// const ImageDisplayCard = () =>
+//   import("../components/conversion/ImageDisplayCard.vue");
 
 import { setTimeout } from "timers";
 import { mapState, mapMutations } from "vuex";
@@ -633,13 +634,13 @@ export default {
     displayResultsPanel: false,
     //? to expand the result panel
     showResultsPanel: true,
-    //? for image file
+    // //? for image file
     selectedFile: null,
     url: require("@/assets/default.png"),
     resultsImageSrc: require("@/assets/results.png"),
     //? for conversion button
     showConversionBtn: true,
-    isConversionActive: false,
+    // isConversionActive: false,
     //? for dialog
     conversionProgressDialog: false,
     //? for progress in dialog window
@@ -708,7 +709,11 @@ export default {
     visibility: false
   }),
   computed: {
-    ...mapState(["isTransmissionProcessActive", "currentActivePort"]),
+    ...mapState([
+      "isTransmissionProcessActive",
+      "currentActivePort",
+      "isConversionActive"
+    ]),
     fromatElapsedTimeValue() {
       if (this.elapsedTime != undefined) {
         if (this.elapsedTime < 60) {
@@ -760,7 +765,8 @@ export default {
       if (data.target == localStorage.id) {
         const result = data.conversionDetails;
         this.showDrawBtn = true;
-        this.isConversionActive = false;
+        // this.isConversionActive = false;
+        this.SET_IS_CONVERSION_ACTIVE(false);
         this.displayResultsPanel = true;
         this.conversionProgressDialog = false;
         //? update the conversion result variables
@@ -786,7 +792,8 @@ export default {
     onConversionErrorOccur(data) {
       if (data.target == localStorage.id) {
         this.showDrawBtn = false;
-        this.isConversionActive = false;
+        // this.isConversionActive = false;
+        this.SET_IS_CONVERSION_ACTIVE(false);
         this.displayResultsPanel = false;
         this.conversionProgressDialog = false;
         this.showErrorSnackbar(data.errorData);
@@ -809,6 +816,7 @@ export default {
   },
   methods: {
     ...mapMutations([
+      "SET_IS_CONVERSION_ACTIVE",
       "TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE",
       "SET_TRANSMISSION_PROCESS_STATE",
       "SET_CURRENT_ACTIVE_PORT"
@@ -836,7 +844,7 @@ export default {
       this.url = URL.createObjectURL(this.selectedFile);
       this.showConversionBtn = false;
     },
-    clearImageDisplayCard() {
+    initializeInterface() {
       this.selectedFile = null;
       this.url = require("@/assets/default.png");
       this.showConversionBtn = true;
@@ -887,13 +895,15 @@ export default {
               })
             );
             fd.append("target", localStorage.id);
-            this.isConversionActive = true;
+            // this.isConversionActive = true;
+            this.SET_IS_CONVERSION_ACTIVE(true);
             ConversionServices.ConvertImage(fd)
               .then(result => {
                 this.showSuccessSnackbar(result.success);
               })
               .catch(error => {
-                this.isConversionActive = false;
+                // this.isConversionActive = false;
+                this.SET_IS_CONVERSION_ACTIVE(false);
                 this.conversionProgressDialog = false;
                 this.showErrorSnackbar(error);
                 this.loading = false;
