@@ -6,6 +6,12 @@
           <v-flex xs11 sm8 md5>
             <v-card class="teal lighten-4 elevation-8">
               <v-img :aspect-ratio="16/9" :src="url"></v-img>
+              <v-alert
+                :value="alertValue"
+                type="error"
+                dismissible
+                transition="fade-transition"
+              >{{ alertContent }}</v-alert>
               <v-card-text>
                 <v-form>
                   <v-text-field
@@ -45,6 +51,7 @@
         </v-layout>
       </v-container>
     </v-content>
+    <SnackBar :color="color" :content="content" :visibility="visibility"/>
   </v-app>
 </template>
 
@@ -54,24 +61,38 @@ import { required, email, minLength } from "vuelidate/lib/validators";
 import { mapMutations } from "vuex";
 
 import AuthServices from "@/services/auth";
+import SnackBar from "@/components/app/SnackBar.vue";
+import { setTimeout } from "timers";
 
 export default {
+  name: "login",
   mixins: [validationMixin],
   validations: {
     email: { required, email },
     password: { required, minLength: minLength(6) }
   },
+  components: {
+    SnackBar
+  },
   data: () => ({
     url: require("@/assets/machine.jpg"),
     drawer: null,
     email: "",
-    password: ""
+    password: "",
+    color: "teal",
+    content: "",
+    visibility: false
   }),
   props: {
     source: String
   },
   computed: {
-    // ...mapState(["sbColor", "sbContent", "sbVisibility"]),
+    alertValue() {
+      return this.$store.state.loginAlertValue;
+    },
+    alertContent() {
+      return this.$store.state.loginAlertContent;
+    },
     emailErrors() {
       const errors = [];
       if (!this.$v.email.$dirty) return errors;
@@ -88,13 +109,11 @@ export default {
       return errors;
     }
   },
-  mounted() {
-    if (localStorage.getItem("isConnected") === "true") {
-      this.$router.replace("/");
-    }
-  },
   methods: {
-    ...mapMutations(["SHOW_SNACKBAR", "TOGGLE_SB_VISIBILITY"]),
+    ...mapMutations([
+      "TOGGLE_IS_CONNECTED_STATE",
+      "HIDE_LOGIN_ALERT_VALUE"
+    ]),
     submit() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
@@ -104,13 +123,13 @@ export default {
         })
           //? data contains agent, token and refresh_token and success message
           .then(data => {
-            window.localStorage.setItem("isConnected", true);
-            window.localStorage.setItem("token", data.token);
-            window.localStorage.setItem("refresh_token", data.refresh_token);
-            window.localStorage.setItem("id", data.agent.id);
-            window.localStorage.setItem("email", data.agent.email);
-            window.localStorage.setItem("last_name", data.agent.last_name);
-            window.localStorage.setItem("first_name", data.agent.first_name);
+            this.HIDE_LOGIN_ALERT_VALUE();
+            localStorage.id = data.agent.id;
+            localStorage.email = data.agent.email;
+            localStorage.last_name = data.agent.last_name;
+            localStorage.first_name = data.agent.first_name;
+            localStorage.token = data.token;
+            localStorage.refresh_token = data.refresh_token;
             this.$router.replace("/");
           })
           .catch(error => {
@@ -119,10 +138,11 @@ export default {
       }
     },
     showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
+      this.color = "error";
+      this.content = content;
+      this.visibility = true;
       setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
+        this.visibility = false;
       }, 5000);
     }
   }

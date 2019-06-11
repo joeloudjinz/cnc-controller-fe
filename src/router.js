@@ -1,13 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-// import Login from "./views/Login.vue";
-// import Home from './views/Home.vue';
-// import Dashboard from "./views/Dashboard.vue";
-// import Agents from "./views/Agents.vue";
-// import Images from './views/Images.vue'; //? for converter page
-// import Resources from './views/Resources.vue';
-// import { Agent } from 'https';
-
+import store from './store.js';
 
 Vue.use(Router);
 
@@ -15,39 +8,40 @@ const router = new Router({
   routes: [{
       path: '/',
       name: 'home',
-      component: () => import( /* webpackChunkName: "about" */ './views/Home.vue'),
-      // component: Home,
+      component: () => import( /* webpackChunkName: "home" */ './views/Home.vue'),
       meta: {
         requireAuth: true
       },
-      // component: Home,
       children: [{
-          path: 'dashboard',
-          component: () => import( /* webpackChunkName: "dashboard" */ "./views/Dashboard.vue"),
-          // component: Dashboard
-        },
-        {
-          path: 'agents',
-          component: () => import( /* webpackChunkName: "agents" */ "./views/Agents.vue"),
-          // component: Agents
+          path: 'users',
+          name: 'users',
+          component: () => import( /* webpackChunkName: "users" */ "./views/Workers.vue"),
+          meta: {
+            requireAuth: true
+          }
         },
         {
           path: 'converter',
-          component: () => import( /* webpackChunkName: "images" */ './views/Images.vue'),
-          // component: Images
+          name: 'converter',
+          component: () => import( /* webpackChunkName: "images" */ './views/Converter.vue'),
+          meta: {
+            requireAuth: true
+          }
         },
         {
-          path: 'resources',
-          component: () => import( /* webpackChunkName: "resources" */ './views/Resources.vue'),
-          // component: Resources
+          path: 'files',
+          name: 'files',
+          component: () => import( /* webpackChunkName: "files" */ './views/Files.vue'),
+          meta: {
+            requireAuth: true
+          }
         }
       ]
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import( /* webpackChunkName: "resources" */ "./views/Login.vue"),
-      // component: Login
+      component: () => import( /* webpackChunkName: "login" */ "./views/Login.vue"),
     }
   ]
 });
@@ -59,17 +53,33 @@ const router = new Router({
  *? isConnected variable will be initialized (in the local storage) during login process to 'true', and to 'false' during logout.
  */
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requireAuth)) {
-    const isConnected = window.localStorage.getItem('isConnected');
-    // console.log(isConnected);
-    if (isConnected === 'true') {
-      // console.log(to.name);
-      next();
-    } else {
-      router.replace('/login');
-    }
+  if (to.name === 'home') {
+    store.commit("SET_IS_HOME_PAGE", true);
   } else {
-    next();
+    store.commit("SET_IS_HOME_PAGE", false);
+  }
+  next()
+  if (to.matched.some(record => record.meta.requireAuth)) {
+    //? if the id is defined, means that the user is connected, because when he/she logout data will be wiped out
+    if (localStorage.id != undefined || localStorage.id != '') {
+      //? ensuring that the tokens are defined and not empty
+      if (localStorage.token === "" || localStorage.refresh_token === "") {
+        store.commit(
+          "SHOW_LOGIN_ALERT_VALUE",
+          "Session has expired, login again please"
+        );
+        next("/login");
+        return;
+      }
+      if (to.name === "login") {
+        next('/');
+        return;
+      } else {
+        next()
+        return
+      }
+    }
+    next('/login')
   }
 });
 

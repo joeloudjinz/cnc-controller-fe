@@ -100,8 +100,8 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text
-          class="font-weight-bold teal lighten-5 teal--text text--darken-2"
-        >Confirm the deletion of this agent?</v-card-text>
+          class="font-weight-meduim teal lighten-5 teal--text text--darken-2"
+        >Confirm the deletion of user <span class="font-weight-bold">{{selectedUserFullName}}</span> ?</v-card-text>
         <v-card-actions>
           <v-btn flat @click="cancelConfirmDeleteDialog()" class="teal--text lighten-1">Cancel</v-btn>
           <v-spacer></v-spacer>
@@ -110,12 +110,12 @@
       </v-card>
     </v-dialog>
     <!-- Reset password confirmation -->
-    <v-dialog v-model="confirmResetingPasswordDialog" persistent width="400">
+    <v-dialog v-model="confirmResetingPasswordDialog" persistent width="500">
       <v-card color="teal lighten-5" dark>
         <v-card-title class="teal--text text--darken-2 headline">Worker Password Reset</v-card-title>
         <v-card-text class="font-weight-light teal--text text--darken-4">
           Are you sure you want to reset the password of the user
-          <p class="font-weight-medium">{{selectedUserFullName}}</p>
+          <span class="font-weight-medium">{{selectedUserFullName}}</span>?
         </v-card-text>
         <v-card-actions>
           <v-btn flat @click="confirmResetingPasswordDialog = false" class="teal--text">Close</v-btn>
@@ -125,7 +125,7 @@
       </v-card>
     </v-dialog>
     <!-- Reset password dialog -->
-    <v-dialog v-model="resetingPasswordDialog" persistent width="400">
+    <v-dialog v-model="resetingPasswordDialog" persistent width="500">
       <v-card color="teal lighten-5" dark>
         <v-card-title class="teal--text text--darken-2 headline">Worker Password Reset</v-card-title>
         <v-progress-linear
@@ -140,11 +140,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-            color="teal darken-2"
-            class="white--text"
-            @click="hideResetPasswordDialog()"
-          >Ok</v-btn>
+          <v-btn color="teal darken-2" class="white--text" @click="hideResetPasswordDialog()">Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -166,7 +162,6 @@ export default {
       confirmeDeleteDialog: false,
       headers: [
         { text: "#", value: "index" },
-        // { text: "Priviliges", value: "is_admin" },
         { text: "Activeness", value: "is_active" },
         {
           text: "First Name",
@@ -231,7 +226,7 @@ export default {
       this.selectedAgentId = id;
       this.confirmResetingPasswordDialog = true;
     },
-    hideResetPasswordDialog(){
+    hideResetPasswordDialog() {
       this.resetingPasswordDialog = false;
       this.newPass = "Reseting ...";
     },
@@ -242,7 +237,7 @@ export default {
           this.loading = false;
         })
         .catch(error => {
-          this.showErrorSnackbar(error);
+          this.$parent.showErrorSnackbar(error);
           this.loading = false;
         });
     },
@@ -256,15 +251,15 @@ export default {
     },
     deleteAgent() {
       if (this.selectedAgentId == -1) {
-        this.showErrorSnackbar("Invalide agent id!");
+        this.$parent.showErrorSnackbar("Invalide agent id!");
       } else {
         AgentServices.deleteAgentById(this.selectedAgentId)
           .then(result => {
             this.cancelConfirmDeleteDialog(); //! just to hide it
-            this.showSuccessSnackbar(result);
+            this.$parent.showSuccessSnackbar(result);
           })
           .catch(error => {
-            this.showErrorSnackbar(error);
+            this.$parent.showErrorSnackbar(error);
             this.loading = false;
           });
       }
@@ -276,29 +271,15 @@ export default {
         AgentServices.resetAgentPassword(this.selectedAgentId)
           .then(result => {
             this.loadingPass = false;
-            this.showSuccessSnackbar(result.data.success);
+            this.$parent.showSuccessSnackbar(result.data.success);
             this.newPass = result.data.password;
           })
           .catch(error => {
-            this.showErrorSnackbar(error);
+            this.$parent.showErrorSnackbar(error);
           });
       } else {
-        this.showErrorSnackbar("No id is selected!!");
+        this.$parent.showErrorSnackbar("No id is selected!!");
       }
-    },
-    showSuccessSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "success", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
-    },
-    showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
     }
   }
 };

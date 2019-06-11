@@ -1,4 +1,5 @@
 import axios from 'axios';
+// import store from '../store.js';
 
 const url = 'api/local/auth/';
 
@@ -12,16 +13,15 @@ class AuthServices {
             axios
                 .post(url + "login", credentials)
                 .then(result => {
-                    // console.log(result);
                     resolve(result.data);
                 })
-                .catch(err => {
-                    if (err.response) {
-                        reject(err.response.data.failure);
-                    } else if (err.request) {
-                        reject(err.request);
+                .catch(error => {
+                    if (error.response) {
+                        reject(error.response.data.failure);
+                    } else if (error.request) {
+                        reject(error.request);
                     } else {
-                        reject(err.message);
+                        reject(error.message);
                     }
                 });
         });
@@ -32,14 +32,15 @@ class AuthServices {
      */
     static Logout(id) {
         return new Promise((resolve, reject) => {
-            // console.log(window.localStorage.getItem('token'));
             axios.post(url + 'logout', {
                 id
-            }, {
-                headers: {
-                    Authorization: "Bearer " + window.localStorage.token
-                }
-            }).then(() => {
+            }
+                // , {
+                // headers: {
+                //     Authorization: "Bearer " + localStorage.token
+                // }
+                // }
+            ).then(() => {
                 resolve(true);
             }).catch((error) => {
                 if (error.response) {

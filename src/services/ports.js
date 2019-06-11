@@ -3,11 +3,9 @@ import AgentServices from "./agent.js";
 
 const url = "api/local/ports";
 
-const target = window.localStorage.getItem("id");
 class PortServices {
     /**
-     * TODO: add token to header
-     * result contains success message, ports count and ports list
+     * result containsAuthorization: "Bearer " + localStorage.token success message, ports count and ports list
      */
     static getConnectedPortsList() {
         return new Promise(async (resolve, reject) => {
@@ -109,7 +107,6 @@ class PortServices {
         return new Promise(async (resolve, reject) => {
             await axios.get(url + '/draw/isActive')
                 .then((result) => {
-                    // console.log(result.data.status);
                     resolve(result.data.status);
                 })
                 .catch((error) => {
@@ -141,7 +138,7 @@ class PortServices {
             axios.post(url + "/draw", {
                 fileName,
                 portName,
-                target
+                target: localStorage.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -262,7 +259,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/pause", {
                 portName,
-                target
+                target: localStorage.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -293,7 +290,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/resume", {
                 portName,
-                target
+                target: localStorage.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -324,7 +321,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/draw/stop", {
                 portName,
-                target
+                target: localStorage.id
             }).then((result) => {
                 resolve(result.data);
             }).catch((error) => {
@@ -355,7 +352,7 @@ class PortServices {
         return new Promise((resolve, reject) => {
             axios.post(url + "/open", {
                 portName,
-                target
+                target: localStorage.id
             }).then((result) => {
                 resolve(result.data.success);
             }).catch((error) => {

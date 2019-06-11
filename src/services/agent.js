@@ -1,9 +1,13 @@
 import axios from 'axios';
+import store from '../store.js';
+import router from '../router.js';
+
 const url = "api/local/users/";
 const authURL = 'api/local/auth/';
+
 //! console.log(error.response.status == 406); true
-//! console.log(error.response.status === '406'); false
 //! console.log(error.response.status === 406); true
+//! console.log(error.response.status === '406'); false
 
 class AgentServices {
     /**
@@ -12,21 +16,33 @@ class AgentServices {
      */
     static RefreshToken() {
         return new Promise((resolve, reject) => {
-            const email = window.localStorage.getItem('email');
-            const id = window.localStorage.getItem('id');
-            const refresh_token = window.localStorage.getItem('refresh_token');
+            const email = localStorage.email;
+            const id = localStorage.id;
+            const refresh_token = localStorage.refresh_token;
             axios.post(authURL + 'token/refresh', {
                 email,
                 id,
                 refresh_token
             }).then((result) => {
                 //? result.data holds refresh_token and token
-                // console.log(result.data)
-                window.localStorage.setItem('refresh_token', result.data.refresh_token);
-                window.localStorage.setItem('token', result.data.token);
+                localStorage.refresh_token = result.data.refresh_token;
+                localStorage.token = result.data.token;
                 resolve(true);
             }).catch((error) => {
                 if (error.response) {
+                    //! 401 Unauthorized, invalid refresh token => this is treated by axios interceptor in main.js
+                    //! 406 Not Acceptable, refresh token has expired
+                    //! 409 Conflict, old refresh token
+                    if (error.response.status == 409 || error.response.status == 406) {
+                        window.localStorage.removeItem("id");
+                        window.localStorage.removeItem("first_name");
+                        window.localStorage.removeItem("last_name");
+                        window.localStorage.removeItem("email");
+                        window.localStorage.removeItem("token");
+                        window.localStorage.removeItem("refresh_token");
+                        store.commit('SHOW_LOGIN_ALERT_VALUE', 'Session has expired, login again please')
+                        router.replace('/login');
+                    }
                     reject(error.response.data.failure);
                 } else if (error.request) {
                     reject(error.request);
@@ -41,14 +57,17 @@ class AgentServices {
      * protected by auth middleware
      */
     static getAgents() {
-        const id = window.localStorage.getItem("id");
+        // const id = store.state.id;
+        const id = localStorage.id;
         return new Promise(async (resolve, reject) => {
             await axios
-                .get(url + id, {
-                    headers: {
-                        Authorization: "Bearer " + window.localStorage.token
-                    }
-                })
+                .get(url + id,
+                    // {
+                    // headers: {
+                    //     Authorization: "Bearer " + localStorage.token
+                    // }
+                    // }
+                )
                 .then(result => {
                     let data = result.data.data;
                     resolve(
@@ -93,11 +112,13 @@ class AgentServices {
     static deleteAgentById(id) {
         return new Promise(async (resolve, reject) => {
             await axios
-                .delete(url + id, {
-                    headers: {
-                        Authorization: "Bearer " + window.localStorage.token
-                    }
-                })
+                .delete(url + id,
+                    // {
+                    // headers: {
+                    //     Authorization: "Bearer " + localStorage.token
+                    // }
+                    // }
+                )
                 .then(result => {
                     resolve(result.data.success);
                 })
@@ -130,12 +151,14 @@ class AgentServices {
         return new Promise((resolve, reject) => {
             axios
                 .post(url + "create", {
-                    ...agent
-                }, {
-                    headers: {
-                        Authorization: "Bearer " + window.localStorage.token
+                        ...agent
                     }
-                })
+                    // , {
+                    // headers: {
+                    //     Authorization: "Bearer " + localStorage.token
+                    // }
+                    // }
+                )
                 .then(response => {
                     resolve(response.data.success);
                 })
@@ -167,11 +190,13 @@ class AgentServices {
     static UpdateInformation(agent) {
         // console.log('in it ')
         return new Promise((resolve, reject) => {
-            axios.put(url + agent.id, agent, {
-                headers: {
-                    Authorization: "Bearer " + window.localStorage.token
-                }
-            }).then((response) => {
+            axios.put(url + agent.id, agent
+                // , {
+                // headers: {
+                //     Authorization: "Bearer " + localStorage.token
+                // }
+                // }
+            ).then((response) => {
                 resolve(response.data.success);
             }).catch((error) => {
                 if (error.response) {
@@ -199,15 +224,17 @@ class AgentServices {
      */
     static UpdatePassword(password) {
         return new Promise((resolve, reject) => {
-            const id = window.localStorage.getItem('id');
+            const id = localStorage.id;
             if (id) {
                 axios.put(url + "password/" + id, {
-                        password
-                    }, {
-                        headers: {
-                            Authorization: "Bearer " + window.localStorage.token
+                            password
                         }
-                    })
+                        // , {
+                        //     headers: {
+                        //         Authorization: "Bearer " + localStorage.token
+                        //     }
+                        // }
+                    )
                     .then((result) => {
                         resolve(result.data.success);
                     }).catch((error) => {
@@ -240,11 +267,13 @@ class AgentServices {
      */
     static resetAgentPassword(id) {
         return new Promise((resolve, reject) => {
-            axios.get(url + "reset/" + id, {
-                    headers: {
-                        Authorization: "Bearer " + window.localStorage.token
-                    }
-                })
+            axios.get(url + "reset/" + id
+                    // , {
+                    //     headers: {
+                    //         Authorization: "Bearer " + localStorage.token
+                    //     }
+                    // }
+                )
                 .then((result) => {
                     resolve(result);
                 }).catch((error) => {
@@ -301,7 +330,6 @@ class AgentServices {
             await axios
                 .get(url + "agents/count")
                 .then(result => {
-                    // console.log('result.data :', result.data);
                     resolve(result.data.count);
                 })
                 .catch(error => {
@@ -331,11 +359,13 @@ class AgentServices {
     static getAdminsCount() {
         return new Promise(async (resolve, reject) => {
             await axios
-                .get(url + "admins/count", {
-                    headers: {
-                        Authorization: "Bearer " + window.localStorage.token
-                    }
-                })
+                .get(url + "admins/count"
+                    // , {
+                    // headers: {
+                    //     Authorization: "Bearer " + localStorage.token
+                    // }
+                    // }
+                )
                 .then(result => {
                     resolve(result.data.count);
                 })

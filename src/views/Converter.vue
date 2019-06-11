@@ -21,7 +21,6 @@
                     ref="selectImageRef"
                   >
                   <div id="preview">
-                    <!--  -->
                     <v-img contain height="650" v-if="url" :src="url"></v-img>
                   </div>
                 </v-card-text>
@@ -29,7 +28,7 @@
               <v-card-actions>
                 <v-btn
                   flat
-                  @click="clearImageDisplayCard()"
+                  @click="initializeInterface()"
                   :disabled="isConversionActive || isTransmissionProcessActive"
                   color="teal darken-4"
                 >Clear</v-btn>
@@ -98,27 +97,62 @@
                   ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md6 lg6>
-                  <v-text-field label="Deep Step" v-model="deepStep" class="mt-0" type="number"
-                  color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="Deep Step"
+                    v-model="deepStep"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
               </v-layout>
               <v-layout justify-center row wrap>
                 <v-flex xs12 sm12 md4 lg4>
-                  <v-text-field label="White Z" v-model="whiteZ" class="mt-0" type="number" color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="White Z"
+                    v-model="whiteZ"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md4 lg4>
-                  <v-text-field label="Black Z" v-model="blackZ" class="mt-0" type="number" color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="Black Z"
+                    v-model="blackZ"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md4 lg4>
-                  <v-text-field label="Safe Z" v-model="safeZ" class="mt-0" type="number" color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="Safe Z"
+                    v-model="safeZ"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
               </v-layout>Feed Rate
               <v-layout justify-center row wrap>
                 <v-flex xs12 sm12 md6 lg6>
-                  <v-text-field label="Work" v-model="work" class="mt-0" type="number" color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="Work"
+                    v-model="work"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md6 lg6>
-                  <v-text-field label="Idle" v-model="idle" class="mt-0" type="number" color="teal darken-2"></v-text-field>
+                  <v-text-field
+                    label="Idle"
+                    v-model="idle"
+                    class="mt-0"
+                    type="number"
+                    color="teal darken-2"
+                  ></v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -552,56 +586,7 @@
       </v-flex>
     </v-layout>
     <!-- Ports List dialoge -->
-    <v-dialog v-model="portsListDialog" persistent width="700px">
-      <v-card color="teal lighten-5">
-        <v-card-title class="headline teal--text">Ports List</v-card-title>
-        <v-card-text class="py-0 px-0">
-          <v-progress-linear
-            v-if="portsListProgress"
-            :indeterminate="true"
-            color="teal darken-2"
-            class="pa-0"
-          ></v-progress-linear>
-          <v-container grid-list-sm>
-            <v-alert :value="true" color="teal darken-4" type="info" class="mb-2">
-              Tranmission process consume to mush time, so be patient until it's successfully completed,
-              You can monitor the whole process from the two consoles below after you select the port.
-              If the process hang up for some reasons, you can pause and resume it.
-              Note that the port will be closed after the process is completed or stopped.
-            </v-alert>
-            <p class="title">Chose port:</p>
-            <v-alert
-              :value="isTransmissionProcessActive"
-              type="warning"
-            >There is already a transmission process going on</v-alert>
-            <v-fade-transition>
-              <v-list v-if="portsList.length !== 0">
-                <v-list-tile
-                  v-for="(port, index) in portsList"
-                  :key="index"
-                  :disabled="isTransmissionProcessActive"
-                  @click="startTransmitingGCode(port.comName)"
-                >
-                  <v-list-tile-content>
-                    <v-list-tile-title class="font-weight-bold">{{ port.comName }}</v-list-tile-title>
-                    <v-list-tile-sub-title
-                      class="font-weight-medium font-italic"
-                    >{{ port.manufacturer }}</v-list-tile-sub-title>
-                  </v-list-tile-content>
-                </v-list-tile>
-              </v-list>
-              <v-list v-else>
-                <v-alert :value="true" type="error">No port is connected!</v-alert>
-              </v-list>
-            </v-fade-transition>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn flat color="teal" @click="portsListDialog = false">Cancel</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <PortsListDialog ref="portsListDialogRef"/>
     <!-- Conversion Process Dialog -->
     <v-dialog v-model="conversionProgressDialog" persistent width="500">
       <v-card color="teal" dark>
@@ -627,26 +612,35 @@
       For Scale Axes use the height value of the image, you can multiply it by a number to apply scale up,
       or divide it by a number to apply scale down
     </v-snackbar>
+    <SnackBar :color="color" :content="content" :visibility="visibility"/>
   </v-container>
 </template>
 <script>
 import ConversionServices from "@/services/conversion.js";
 import PortsServices from "@/services/ports.js";
+
+import SnackBar from "@/components/app/SnackBar.vue";
+const PortsListDialog = () => import("../components/ports/PortsListDialog.vue");
+// const ImageDisplayCard = () =>
+//   import("../components/conversion/ImageDisplayCard.vue");
+
 import { setTimeout } from "timers";
 import { mapState, mapMutations } from "vuex";
+
 export default {
+  components: { SnackBar, PortsListDialog },
   data: () => ({
     //? to display the results section
     displayResultsPanel: false,
     //? to expand the result panel
     showResultsPanel: true,
-    //? for image file
+    // //? for image file
     selectedFile: null,
     url: require("@/assets/default.png"),
     resultsImageSrc: require("@/assets/results.png"),
     //? for conversion button
     showConversionBtn: true,
-    isConversionActive: false,
+    // isConversionActive: false,
     //? for dialog
     conversionProgressDialog: false,
     //? for progress in dialog window
@@ -692,7 +686,6 @@ export default {
     displayPortConsole: true,
     //? for ports list
     portsList: [],
-    portsListProgress: false,
     //? for console
     portConsoleTxt: [],
     //? for transmission process
@@ -710,12 +703,16 @@ export default {
     flushPortDis: false,
     pausePortDis: false,
     resumePortDis: true,
-    showDrawBtn: false
+    showDrawBtn: false,
+    color: "teal",
+    content: "",
+    visibility: false
   }),
   computed: {
     ...mapState([
       "isTransmissionProcessActive",
-      "currentActivePort"
+      "currentActivePort",
+      "isConversionActive"
     ]),
     fromatElapsedTimeValue() {
       if (this.elapsedTime != undefined) {
@@ -744,13 +741,12 @@ export default {
   },
   sockets: {
     onPortData(data) {
-      // console.log('data.target :', data.target);
-      if (data.target == window.localStorage.getItem("id")) {
+      if (data.target == localStorage.id) {
         this.onPortDataCallback(data.data);
       }
     },
     onTransmissionLog(data) {
-      if (data.target == window.localStorage.getItem("id")) {
+      if (data.target == localStorage.id) {
         this.onTransmissionLogCallback(data.data);
       }
     },
@@ -758,19 +754,19 @@ export default {
       let status = data.status;
       this.stopSendDis = !status;
       this.pauseSendDis = !status;
-      if (!status && data.target == window.localStorage.getItem("id")) {
+      if (!status && data.target == localStorage.id) {
         this.showSuccessSnackbar(
           "Transmission of file " + this.fileName + " Has been completed"
         );
-        //TODO: close the port here
         this.closePort(this.currentActivePort);
       }
     },
     onConversionEnded(data) {
-      if (data.target == window.localStorage.getItem("id")) {
+      if (data.target == localStorage.id) {
         const result = data.conversionDetails;
         this.showDrawBtn = true;
-        this.isConversionActive = false;
+        // this.isConversionActive = false;
+        this.SET_IS_CONVERSION_ACTIVE(false);
         this.displayResultsPanel = true;
         this.conversionProgressDialog = false;
         //? update the conversion result variables
@@ -794,9 +790,10 @@ export default {
       }
     },
     onConversionErrorOccur(data) {
-      if (data.target == window.localStorage.getItem("id")) {
+      if (data.target == localStorage.id) {
         this.showDrawBtn = false;
-        this.isConversionActive = false;
+        // this.isConversionActive = false;
+        this.SET_IS_CONVERSION_ACTIVE(false);
         this.displayResultsPanel = false;
         this.conversionProgressDialog = false;
         this.showErrorSnackbar(data.errorData);
@@ -804,6 +801,7 @@ export default {
     }
   },
   created() {
+    // listen to window closing
     window.addEventListener("beforeunload", event =>
       this.handleOnBeforeUnload(event)
     );
@@ -818,11 +816,10 @@ export default {
   },
   methods: {
     ...mapMutations([
+      "SET_IS_CONVERSION_ACTIVE",
       "TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE",
       "SET_TRANSMISSION_PROCESS_STATE",
-      "SET_CURRENT_ACTIVE_PORT",
-      "SHOW_SNACKBAR",
-      "TOGGLE_SB_VISIBILITY"
+      "SET_CURRENT_ACTIVE_PORT"
     ]),
     onPortDataCallback(content) {
       if (content.length != 0) {
@@ -847,7 +844,7 @@ export default {
       this.url = URL.createObjectURL(this.selectedFile);
       this.showConversionBtn = false;
     },
-    clearImageDisplayCard() {
+    initializeInterface() {
       this.selectedFile = null;
       this.url = require("@/assets/default.png");
       this.showConversionBtn = true;
@@ -873,9 +870,11 @@ export default {
       this.scaleAxesErrorContent = "";
       if (this.scaleAxes <= 50) {
         this.scaleAxesErrorState = true;
-        this.scaleAxesErrorContent = "Scale Axes must be superior then 50";
+        this.scaleAxesErrorContent = "Scale Axes must be superior then 50mm";
       } else {
-        const surfaceHeight = window.localStorage.getItem("surfaceHeight");
+        const surfaceHeight = parseInt(
+          window.localStorage.getItem("surfaceHeight")
+        );
         if (this.scaleAxes < surfaceHeight) {
           if (this.selectedFile != null) {
             this.conversionProgressDialog = true;
@@ -895,14 +894,16 @@ export default {
                 idle: this.idle
               })
             );
-            fd.append("target", window.localStorage.getItem("id"));
-            this.isConversionActive = true;
+            fd.append("target", localStorage.id);
+            // this.isConversionActive = true;
+            this.SET_IS_CONVERSION_ACTIVE(true);
             ConversionServices.ConvertImage(fd)
               .then(result => {
                 this.showSuccessSnackbar(result.success);
               })
               .catch(error => {
-                this.isConversionActive = false;
+                // this.isConversionActive = false;
+                this.SET_IS_CONVERSION_ACTIVE(false);
                 this.conversionProgressDialog = false;
                 this.showErrorSnackbar(error);
                 this.loading = false;
@@ -915,41 +916,30 @@ export default {
           this.scaleAxesErrorContent =
             "Scale Axes must be less then the height of the surface (" +
             surfaceHeight +
-            ")";
+            "mm)";
         }
       }
     },
     initializeDrawOperation() {
-      this.portsListDialog = true;
-      PortsServices.getConnectedPortsList()
-        .then(result => {
-          this.portsListProgress = false;
-          if (result.count !== 0) {
-            this.portsList = result.ports;
-          }
-        })
-        .catch(error => {
-          this.portsListProgress = false;
-          this.portsListDialog = false;
-          this.showErrorSnackbar(error);
-        });
+      this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
+      this.$refs.portsListDialogRef.fetchPortsList();
     },
     //! port here is the comName
     startTransmitingGCode(port) {
-      this.portsListProgress = true;
+      this.$refs.portsListDialogRef.showProgress();
       if (this.fileName !== undefined && this.fileName !== "") {
         const splitted = this.fileName.split(".");
         const fileName = splitted[0] + "." + splitted[1];
         this.SET_CURRENT_ACTIVE_PORT(port);
-        this.consolesArea = true;
         PortsServices.performFullDrawOperation(fileName, port)
           .then(result => {
-            this.portsListProgress = false;
             this.pauseSendDis = false;
             this.stopSendDis = false;
-            this.portsListDialog = false;
             this.pausePortDis = false;
             this.flushPortDis = false;
+            this.consolesArea = true;
+            this.$refs.portsListDialogRef.hideProgress();
+            this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
             this.SET_TRANSMISSION_PROCESS_STATE(true);
             this.showSuccessSnackbar(result.success);
           })
@@ -1018,13 +1008,15 @@ export default {
     },
     closePort(port) {
       PortsServices.closePort(port)
-        .then( () => {
+        .then(() => {
           this.portConsoleTxt.unshift("|Port was closed successfully");
           this.flushPortDis = true;
           this.pausePortDis = true;
         })
         .catch(error => {
-          this.portConsoleTxt.unshift("Error occurred while closing port: " + error);
+          this.portConsoleTxt.unshift(
+            "Error occurred while closing port: " + error
+          );
           this.showErrorSnackbar(error);
         });
     },
@@ -1083,17 +1075,19 @@ export default {
       this.transmissionConsoleTxt = [];
     },
     showSuccessSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "success", content });
+      this.color = "success";
+      this.content = content;
+      this.visibility = true;
       setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
+        this.visibility = false;
       }, 5000);
     },
     showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
+      this.color = "error";
+      this.content = content;
+      this.visibility = true;
       setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
+        this.visibility = false;
       }, 5000);
     }
   }

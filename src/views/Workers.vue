@@ -9,7 +9,7 @@
             <v-icon color="teal darken-2">fas fa-list-alt</v-icon>
           </v-btn>
         </template>
-        <span>list of all the agents</span>
+        <span>List of all the workers of the system</span>
       </v-tooltip>
       <v-tooltip bottom>
         <template #activator="data">
@@ -17,33 +17,59 @@
             <v-icon color="teal darken-2">fas fa-plus-circle</v-icon>
           </v-btn>
         </template>
-        <span>add new agnet</span>
+        <span>Create a new worker in the system</span>
       </v-tooltip>
     </v-toolbar>
     <v-card :is="currentComponent"></v-card>
+    <SnackBar :color="color" :content="content" :visibility="visibility"/>
   </v-flex>
 </template>
 <script>
-// import AgentsTableVue from "@/components/agents/AgentsTable.vue";
-// import CreateAgent from "@/components/agents/CreateAgent.vue";
-const AgentsTableVue = () => import("../components/agents/AgentsTable.vue");
-const CreateAgent = () => import("../components/agents/CreateAgent.vue");
+const WorkersTable = () => import("../components/agents/WorkersTable.vue");
+const CreateWorker = () => import("../components/agents/CreateWorker.vue");
+
+import SnackBar from "@/components/app/SnackBar.vue";
+
+import { setTimeout } from "timers";
+
 export default {
+  components: {
+    SnackBar
+  },
   data: () => {
     return {
-      title: "Agents List",
+      title: "Workers List",
       disableAddBtn: true,
-      currentComponent: AgentsTableVue
+      currentComponent: WorkersTable,
+      color: "teal",
+      content: "",
+      visibility: false
     };
   },
   methods: {
     mounteAddAgentComponent() {
       this.title = "Add New Worker";
-      this.currentComponent = CreateAgent;
+      this.currentComponent = CreateWorker;
     },
     mounteAgentsTableComponent() {
       this.title = "Workers List";
-      this.currentComponent = AgentsTableVue;
+      this.currentComponent = WorkersTable;
+    },
+    showSuccessSnackbar(content) {
+      this.color = "success";
+      this.content = content;
+      this.visibility = true;
+      setTimeout(() => {
+        this.visibility = false;
+      }, 5000);
+    },
+    showErrorSnackbar(content) {
+      this.color = "error";
+      this.content = content;
+      this.visibility = true;
+      setTimeout(() => {
+        this.visibility = false;
+      }, 5000);
     }
   }
 };

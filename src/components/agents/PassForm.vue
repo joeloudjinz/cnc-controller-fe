@@ -53,6 +53,7 @@ import AgentServices from "@/services/agent.js";
 
 import { validationMixin } from "vuelidate";
 import { required, minLength } from "vuelidate/lib/validators";
+
 export default {
   mixins: [validationMixin],
 
@@ -87,7 +88,6 @@ export default {
     submitPasswordUpdateForm() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
-        // call update endpoint
         AgentServices.UpdatePassword(this.password)
           .then(result => {
             this.clear();

@@ -19,16 +19,23 @@ export default new Vuex.Store({
     doShowSurfaceDimensionsAlert: initializeShowSurfaceDimensionsAlertState(),
     isTransmissionProcessActive: false,
     currentActivePort: undefined,
-    //? sb state
-    sbContent: "",
-    sbColor: "",
-    sbVisibility: false,
+    currentFileName: undefined,
+    isHomePage: false,
+    isAdmin: undefined,
+    adminsCount: 0,
+    workersCount: 0,
+    conversionsCount: 0,
+    activePortsCount: 0,
+    loginAlertContent: "",
+    loginAlertValue: false,
+    isConversionActive: false,
   },
-  // getters: {
-  //   getShowSurfaceDimensionsAlertState: state => {
-  //     return state.doShowSurfaceDimensionsAlert;
-  //   }
-  // },
+  getters: {
+    isGcodeFile: state => state.currentFileName != undefined ? state.currentFileName.includes("gcode") : false,
+    isLogFile: state => state.currentFileName != undefined ? state.currentFileName.includes("log") : false,
+    getToken: state => state.token,
+    getRefreshToken: state => state.refresh_token,
+  },
   mutations: {
     TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE: (state) => {
       state.doShowSurfaceDimensionsAlert = !state.doShowSurfaceDimensionsAlert;
@@ -42,12 +49,40 @@ export default new Vuex.Store({
     SET_CURRENT_ACTIVE_PORT: (state, port) => {
       state.currentActivePort = port;
     },
-    SHOW_SNACKBAR: (state, payload) => {
-      state.sbColor = payload.color;
-      state.sbContent = payload.content;
+    SET_CURRENT_FILE_NAME: (state, currentFileName) => {
+      state.currentFileName = currentFileName;
     },
-    TOGGLE_SB_VISIBILITY: (state, visibility) => {
-      state.sbVisibility = visibility;
+    SET_IS_HOME_PAGE: (state, bool) => {
+      state.isHomePage = bool;
+    },
+    SET_ADMINS_COUNT: (state, count) => {
+      state.adminsCount = count;
+    },
+    SET_WORKERS_COUNT: (state, count) => {
+      state.workersCount = count;
+    },
+    SET_CONVERSIONS_COUNT: (state, count) => {
+      state.conversionsCount = count;
+    },
+    SET_ACTIVE_PORTS_COUNT: (state, count) => {
+      state.activePortsCount = count;
+    },
+    // TOGGLE_IS_CONNECTED_STATE: (state) => {
+    //   state.isConnected = !state.isConnected;
+    // },
+    SHOW_LOGIN_ALERT_VALUE: (state, content) => {
+      state.loginAlertContent = content;
+      state.loginAlertValue = true;
+    },
+    HIDE_LOGIN_ALERT_VALUE: (state) => {
+      state.loginAlertValue = false;
+      state.loginAlertContent = "";
+    },
+    SET_IS_CONVERSION_ACTIVE: (state, value) => {
+      state.isConversionActive = value;
+    },
+    SET_IS_ADMIN_VALUE: (state, value) => {
+      state.isAdmin = value;
     }
   },
   actions: {

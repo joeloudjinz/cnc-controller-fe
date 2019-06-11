@@ -177,28 +177,14 @@ export default {
           is_admin: this.isAdminCheckbox
         })
           .then(result => {
-            this.showSuccessSnackbar(result);
+            this.$parent.showSuccessSnackbar(result);
             this.clear();
           })
           .catch(error => {
-            this.showErrorSnackbar(error);
+            this.$parent.showErrorSnackbar(error);
             this.loading = false;
           });
       }
-    },
-    showSuccessSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "success", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
-    },
-    showErrorSnackbar(content) {
-      this.TOGGLE_SB_VISIBILITY(true);
-      this.SHOW_SNACKBAR({ color: "error", content });
-      setTimeout(() => {
-        this.TOGGLE_SB_VISIBILITY(false);
-      }, 5000);
     },
     clear() {
       this.$v.$reset();
