@@ -34,6 +34,12 @@ class AgentServices {
                     //! 406 Not Acceptable, refresh token has expired
                     //! 409 Conflict, old refresh token
                     if (error.response.status == 409 || error.response.status == 406) {
+                        window.localStorage.removeItem("id");
+                        window.localStorage.removeItem("first_name");
+                        window.localStorage.removeItem("last_name");
+                        window.localStorage.removeItem("email");
+                        window.localStorage.removeItem("token");
+                        window.localStorage.removeItem("refresh_token");
                         store.commit('SHOW_LOGIN_ALERT_VALUE', 'Session has expired, login again please')
                         router.replace('/login');
                     }
