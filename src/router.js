@@ -62,7 +62,7 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requireAuth)) {
     //? if the id is defined, means that the user is connected, because when he/she logout data will be wiped out
     if (localStorage.id != undefined && localStorage.id != '') {
-      console.log('localStorage.id :', localStorage.id);
+      // console.log('localStorage.id :', localStorage.id);
       //? ensuring that the tokens are defined and not empty
       if (localStorage.token === "" && localStorage.refresh_token === "") {
         store.commit(

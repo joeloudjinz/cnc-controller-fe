@@ -148,7 +148,7 @@
 </template>
 <script>
 import AgentServices from "@/services/agent.js";
-import { mapMutations } from "vuex";
+// import { mapMutations } from "vuex";
 
 export default {
   data() {
@@ -183,8 +183,6 @@ export default {
       this.removeDeletedUser(data.userId);
     },
     onNewUserAdded(data) {
-      console.log('data.user :', data.user);
-      // console.log('data.user[0] :', data.user[0]);
       this.addNewUser(data.user);
     }
   },
@@ -206,15 +204,8 @@ export default {
     this.refrechAgentsList();
   },
   methods: {
-    ...mapMutations(["SHOW_SNACKBAR", "TOGGLE_SB_VISIBILITY"]),
     addNewUser(user) {
       this.agents.push(user);
-      this.SHOW_SNACKBAR({
-        color: "success",
-        content: `A new user was added, full name: ${user.firstName} ${
-          user.lastName
-        }`
-      });
     },
     removeDeletedUser(id) {
       for (let i = 0; i < this.agents.length; i++) {
