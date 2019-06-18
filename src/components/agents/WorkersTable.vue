@@ -182,8 +182,10 @@ export default {
     onUserDeleted(data) {
       this.removeDeletedUser(data.userId);
     },
-    OnNewUserAdded(data) {
-      this.addNewUser(data.user[0]);
+    onNewUserAdded(data) {
+      console.log('data.user :', data.user);
+      // console.log('data.user[0] :', data.user[0]);
+      this.addNewUser(data.user);
     }
   },
   computed: {
