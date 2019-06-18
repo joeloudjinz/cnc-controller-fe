@@ -7,7 +7,7 @@
       <v-flex xs12 sm12 md7 lg7>
         <v-card-title primary-title>
           <div>
-            <div class="headline">Cuation Is Needed</div>
+            <div class="headline">Caution Is Needed</div>
             <span class="grey--text">Safety is as simple as ABC - Always Be Careful.</span>
           </div>
         </v-card-title>
