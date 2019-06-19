@@ -29,6 +29,7 @@ export default new Vuex.Store({
     loginAlertContent: "",
     loginAlertValue: false,
     isConversionActive: false,
+    selectedPortObject: undefined
   },
   getters: {
     isGcodeFile: state => state.currentFileName != undefined ? state.currentFileName.includes("gcode") : false,
@@ -83,6 +84,9 @@ export default new Vuex.Store({
     },
     SET_IS_ADMIN_VALUE: (state, value) => {
       state.isAdmin = value;
+    },
+    SET_SELECTED_PORT_OBJECT: (state, object) => {
+      state.selectedPortObject = object;
     }
   },
   actions: {
