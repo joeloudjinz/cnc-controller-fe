@@ -1,7 +1,14 @@
 <template>
   <v-app id="inspire">
     <!-- Navigation Drawer -->
-    <v-navigation-drawer v-model="drawer" :clipped="$vuetify.breakpoint.lgAndUp" fixed app absolute class="grey lighten-5">
+    <v-navigation-drawer
+      v-model="drawer"
+      :clipped="$vuetify.breakpoint.lgAndUp"
+      fixed
+      app
+      absolute
+      class="grey lighten-5"
+    >
       <v-toolbar flat class="transparent">
         <v-list class="pa-0 grey lighten-5">
           <v-list-tile avatar>
@@ -116,7 +123,7 @@
         <v-avatar size="50" color="teal lighten-4 mr-2">
           <img :src="siteAvatar" alt="avatar">
         </v-avatar>
-        <span class="headline font-weight-medium ">Loudjein CNC</span>
+        <span class="headline font-weight-medium">Loudjein CNC</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items class="hidden-sm-and-down">

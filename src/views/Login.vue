@@ -110,10 +110,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations([
-      "TOGGLE_IS_CONNECTED_STATE",
-      "HIDE_LOGIN_ALERT_VALUE"
-    ]),
+    ...mapMutations(["TOGGLE_IS_CONNECTED_STATE", "HIDE_LOGIN_ALERT_VALUE"]),
     submit() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
@@ -148,3 +145,16 @@ export default {
   }
 };
 </script>
+
+<style>
+.wrap-banner {
+  position: relative;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-flex;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+</style>
