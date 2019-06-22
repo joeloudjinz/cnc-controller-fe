@@ -10,7 +10,10 @@ Vue.use(Vuex);
 const initializeShowSurfaceDimensionsAlertState = () => {
   const surfaceHeight = window.localStorage.getItem("surfaceHeight");
   const surfaceWidth = window.localStorage.getItem("surfaceWidth");
-  const booleanValue = (surfaceHeight == null || surfaceWidth == null) || (surfaceHeight == 0 || surfaceWidth == 0);
+  console.log('surfaceHeight, surfaceWidth :', surfaceHeight, surfaceWidth);
+  const booleanValue = (surfaceHeight == null || surfaceWidth == null) ||
+    (surfaceHeight == 0 || surfaceWidth == 0) ||
+    (surfaceHeight == undefined || surfaceWidth == undefined);
   return booleanValue;
 };
 
@@ -68,9 +71,6 @@ export default new Vuex.Store({
     SET_ACTIVE_PORTS_COUNT: (state, count) => {
       state.activePortsCount = count;
     },
-    // TOGGLE_IS_CONNECTED_STATE: (state) => {
-    //   state.isConnected = !state.isConnected;
-    // },
     SHOW_LOGIN_ALERT_VALUE: (state, content) => {
       state.loginAlertContent = content;
       state.loginAlertValue = true;
@@ -87,6 +87,9 @@ export default new Vuex.Store({
     },
     SET_SELECTED_PORT_OBJECT: (state, object) => {
       state.selectedPortObject = object;
+    },
+    initializeShowSurfaceDimensionsAlertState: (state) => {
+      state.doShowSurfaceDimensionsAlert = initializeShowSurfaceDimensionsAlertState();
     }
   },
   actions: {
