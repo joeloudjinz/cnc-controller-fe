@@ -556,7 +556,6 @@ export default {
     //? when sending G01 X0.0000 Y-0.0000 Z1 (X0 Y0 Z1 Line Init) receiving "error:22"
     //? when sending G01 M05 (X0 Y0 M05 Line Init) receiving "error:22"
     returnToZero(portName) {
-      //TODO: add gcode command to move the axis
       this.portConsoleTxt.unshift("Returning Axes to position zero");
       PortsServices.writeToPort(portName, "G90 G28 X0 Y0" + "\r")
         .then(result => {
@@ -585,10 +584,8 @@ export default {
         });
     },
     move_X_Right(portName) {
-      // console.log("move_X_Right is clicked");
-      //TODO: add gcode command to move the axis
       this.portConsoleTxt.unshift("Moving X Axis to right");
-      PortsServices.writeToPort(portName, "" + "\r")
+      PortsServices.writeToPort(portName, "G91 G0 X1" + "\r")
         .then(result => {
           this.$parent.$parent.showSuccessSnackbar(result);
         })
@@ -601,10 +598,8 @@ export default {
         });
     },
     move_X_Left(portName) {
-      // console.log("move_X_Left is clicked");
-      //TODO: add gcode command to move the axis
       this.portConsoleTxt.unshift("Moving X Axis to left");
-      PortsServices.writeToPort(portName, "" + "\r")
+      PortsServices.writeToPort(portName, "G91 G0 X-1" + "\r")
         .then(result => {
           this.$parent.$parent.showSuccessSnackbar(result);
         })
@@ -617,10 +612,8 @@ export default {
         });
     },
     move_Y_Up(portName) {
-      // console.log("move_Y_Up is clicked");
-      //TODO: add gcode command to move the axis
       this.portConsoleTxt.unshift("Moving Y Axis up");
-      PortsServices.writeToPort(portName, "" + "\r")
+      PortsServices.writeToPort(portName, "G91 G0 Y1" + "\r")
         .then(result => {
           this.$parent.$parent.showSuccessSnackbar(result);
         })
@@ -633,10 +626,8 @@ export default {
         });
     },
     move_Y_Down(portName) {
-      // console.log("move_Y_Down is clicked");
-      //TODO: add gcode command to move the axis
       this.portConsoleTxt.unshift("Moving Y Axis down");
-      PortsServices.writeToPort(portName, "" + "\r")
+      PortsServices.writeToPort(portName, "G91 G0 Y-1" + "\r")
         .then(result => {
           this.$parent.$parent.showSuccessSnackbar(result);
         })
@@ -649,10 +640,8 @@ export default {
         });
     },
     move_Z_Up(portName) {
-      // console.log("move_Z_Up is clicked");
-      //TODO: add gcode command to move the axis
       this.portConsoleTxt.unshift("Moving Z Axis up");
-      PortsServices.writeToPort(portName, "" + "\r")
+      PortsServices.writeToPort(portName, "G91 G0 Z1" + "\r")
         .then(result => {
           this.$parent.$parent.showSuccessSnackbar(result);
         })
@@ -665,10 +654,8 @@ export default {
         });
     },
     move_Z_Down(portName) {
-      // console.log("move_Z_Down is clicked");
-      //TODO: add gcode command to move the axis
       this.portConsoleTxt.unshift("Moving Z Axis down");
-      PortsServices.writeToPort(portName, "" + "\r")
+      PortsServices.writeToPort(portName, "G91 G0 Z-1" + "\r")
         .then(result => {
           this.$parent.$parent.showSuccessSnackbar(result);
         })

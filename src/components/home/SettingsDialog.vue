@@ -1,23 +1,25 @@
 <template>
   <!-- Settings dialog -->
-  <v-dialog v-model="settingsDialog" width="900" persistent transition="dialog-bottom-transition">
-    <v-card>
-      <v-toolbar dark color="teal">
+  <v-dialog v-model="settingsDialog" width="900" persistent>
+    <v-card color="teal lighten-5">
+      <v-toolbar dark color="teal lighten-5" class="elevation-0">
         <v-btn
           icon
           dark
           :disabled="doDisableCloseSettingsDialogBtn"
           @click="settingsDialog = false"
         >
-          <v-icon>close</v-icon>
+          <v-icon color="teal darken-2">fas fa-times-circle</v-icon>
         </v-btn>
-        <v-toolbar-title>Settings</v-toolbar-title>
+        <v-toolbar-title class="headline teal--text darken-2">
+          <v-icon large color="teal darken-2" left>fas fa-tools</v-icon>Settings
+        </v-toolbar-title>
         <v-spacer></v-spacer>
       </v-toolbar>
       <v-card-text>
         <v-layout row wrap>
           <v-flex xs12>
-            <v-list class="py-0" three-line>
+            <v-list class="py-0 teal lighten-5" three-line>
               <v-list-tile>
                 <v-list-tile-content>
                   <v-list-tile-title>The Drawing Surface Dimensions</v-list-tile-title>
@@ -52,7 +54,7 @@
           </v-flex>
           <!-- <v-flex xs12 sm12 md2 lg2 px-1>
             <span></span>
-          </v-flex> -->
+          </v-flex>-->
           <v-flex xs12 sm12 md12 lg6 px-1>
             <v-select
               v-model="selectedItem"
