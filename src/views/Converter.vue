@@ -419,17 +419,16 @@
       </v-flex>
     </v-layout>
     <!-- Consoles Area -->
-    <v-layout v-if="consolesArea == true" row wrap>
+    <v-layout v-if="true" row wrap>
       <!-- Transmission Console Area -->
       <v-flex xs12 sm12 md12 lg7 pa-1>
         <v-layout row wrap>
           <v-flex d-flex xs12 sm12 md12 lg12>
             <v-toolbar
-              color="teal lighten-4"
+              color="teal lighten-5"
               class="elevation-0 teal--text text--darken-1"
               card
               dense
-              dark
             >
               <v-toolbar-title>Transmission Process Console</v-toolbar-title>
               <v-spacer></v-spacer>
@@ -487,7 +486,7 @@
               <v-card
                 v-show="showTranmsissionConsole"
                 height="300px"
-                color="teal lighten-4 elevation-0"
+                color="teal lighten-5 elevation-0"
                 class="scroll scrollbar-style"
               >
                 <v-card-text class="teal--text darken-4">
@@ -512,11 +511,10 @@
         <v-layout row wrap>
           <v-flex xs12 sm12 md12 lg12>
             <v-toolbar
-              color="teal lighten-4"
+              color="teal lighten-5"
               class="elevation-0 teal--text text--darken-1"
               card
               dense
-              dark
             >
               <v-toolbar-title>Port Data Console</v-toolbar-title>
               <v-spacer></v-spacer>
@@ -563,7 +561,7 @@
             <v-slide-y-transition>
               <v-card
                 v-show="showPortConsole"
-                color="teal lighten-4 elevation-0"
+                color="teal lighten-5 elevation-0"
                 height="300px"
                 class="scroll scrollbar-style"
               >
@@ -719,8 +717,8 @@ export default {
         if (this.elapsedTime < 60) {
           return `${this.elapsedTime.toFixed(2)} seconds`;
         } else {
-          const minutes = this.elapsedTime / 60;
-          const rest = this.elapsedTime % 60;
+          const minutes = Math.floor(this.elapsedTime / 60);
+          const rest = Math.floor(this.elapsedTime % 60);
           return `${minutes} minute & ${rest} seconds`;
         }
       } else {
@@ -785,6 +783,7 @@ export default {
         this.fileName = result.fileName;
         this.startTime = result.startTime;
         this.endTime = result.endTime;
+        // TODO: fix this number display toFixed(2)
         this.elapsedTime = result.elapsedTime;
         this.size = result.size;
       }
