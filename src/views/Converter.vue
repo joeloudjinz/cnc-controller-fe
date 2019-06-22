@@ -21,7 +21,7 @@
                     ref="selectImageRef"
                   >
                   <div id="preview">
-                    <v-img contain height="650" v-if="url" :src="url"></v-img>
+                    <v-img contain height="656" v-if="url" :src="url"></v-img>
                   </div>
                 </v-card-text>
               </v-layout>
@@ -157,10 +157,36 @@
               </v-layout>
             </v-container>
           </v-card-text>
+          <!-- <v-icon
+              large
+              color="teal darken-2"
+              left
+              @click="showConversionParamsInformationDialog()"
+          >fas fa-</v-icon>-->
           <v-card-actions>
             <v-tooltip top>
               <template #activator="data">
-                <v-btn flat v-on="data.on" @click="restoreDefaultValues">
+                <v-btn
+                  fab
+                  color="transparent"
+                  class="elevation-0"
+                  v-on="data.on"
+                  @click="showConversionParamsInformationDialog()"
+                >
+                  <v-icon color="teal">fas fa-question</v-icon>
+                </v-btn>
+              </template>
+              <span>Information about each parameter</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template #activator="data">
+                <v-btn
+                  fab
+                  color="transparent"
+                  class="elevation-0"
+                  v-on="data.on"
+                  @click="restoreDefaultValues"
+                >
                   <v-icon color="teal">fas fa-undo-alt</v-icon>
                 </v-btn>
               </template>
@@ -173,7 +199,9 @@
                   <v-btn
                     v-show="!showConversionBtn"
                     :disabled="isTransmissionProcessActive || isConversionActive"
-                    flat
+                    fab
+                    color="transparent"
+                    class="elevation-0"
                     v-on="data.on"
                     @click="performConversion"
                   >
@@ -419,7 +447,7 @@
       </v-flex>
     </v-layout>
     <!-- Consoles Area -->
-    <v-layout v-if="true" row wrap>
+    <v-layout v-if="consolesArea == true" row wrap>
       <!-- Transmission Console Area -->
       <v-flex xs12 sm12 md12 lg7 pa-1>
         <v-layout row wrap>
@@ -596,6 +624,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <ConversionParamsInformationDialog ref="conversionParamsInformationDialogRef"/>
     <!-- Scale axes information snackbar -->
     <v-snackbar
       v-model="scaleAccessSnackbar"
@@ -619,14 +648,14 @@ import PortsServices from "@/services/ports.js";
 
 import SnackBar from "@/components/app/SnackBar.vue";
 const PortsListDialog = () => import("../components/ports/PortsListDialog.vue");
-// const ImageDisplayCard = () =>
-//   import("../components/conversion/ImageDisplayCard.vue");
+const ConversionParamsInformationDialog = () =>
+  import("../components/converter/ConversionParamsInformation.vue");
 
 import { setTimeout } from "timers";
 import { mapState, mapMutations } from "vuex";
 
 export default {
-  components: { SnackBar, PortsListDialog },
+  components: { SnackBar, PortsListDialog, ConversionParamsInformationDialog },
   data: () => ({
     //? to display the results section
     displayResultsPanel: false,
@@ -820,6 +849,9 @@ export default {
       "SET_TRANSMISSION_PROCESS_STATE",
       "SET_CURRENT_ACTIVE_PORT"
     ]),
+    showConversionParamsInformationDialog() {
+      this.$refs.conversionParamsInformationDialogRef.showDialog();
+    },
     onPortDataCallback(content) {
       if (content.length != 0) {
         this.portConsoleTxt.unshift(content);

@@ -10,7 +10,6 @@ Vue.use(Vuex);
 const initializeShowSurfaceDimensionsAlertState = () => {
   const surfaceHeight = window.localStorage.getItem("surfaceHeight");
   const surfaceWidth = window.localStorage.getItem("surfaceWidth");
-  console.log('surfaceHeight, surfaceWidth :', surfaceHeight, surfaceWidth);
   const booleanValue = (surfaceHeight == null || surfaceWidth == null) ||
     (surfaceHeight == 0 || surfaceWidth == 0) ||
     (surfaceHeight == undefined || surfaceWidth == undefined);
