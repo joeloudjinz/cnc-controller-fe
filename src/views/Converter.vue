@@ -21,7 +21,7 @@
                     ref="selectImageRef"
                   >
                   <div id="preview">
-                    <v-img contain height="656" v-if="url" :src="url"></v-img>
+                    <v-img contain height="817" v-if="url" :src="url"></v-img>
                   </div>
                 </v-card-text>
               </v-layout>
@@ -56,8 +56,26 @@
               you can leave them by default as well
             </v-alert>
           </v-card-title>
-          <v-card-text>
+          <v-card-text class="pt-0">
             <v-container fluid grid-list-lg>
+              <v-flex xs12>
+                <v-list three-line class="teal lighten-5 pt-0">
+                  <v-list-tile>
+                    <!-- <v-list-tile-avatar>
+                      <v-icon color="teal darken-2" x-large>fas fa-exclamation-circle</v-icon>
+                    </v-list-tile-avatar>-->
+                    <v-list-tile-content>
+                      <v-list-tile-title class="title">Laser Mode</v-list-tile-title>
+                      <v-list-tile-sub-title
+                        class="teal--text font-weight-medium"
+                      >If you are using CNC machine with laser tool, activate the laser mode, IF NOT leave it off</v-list-tile-sub-title>
+                    </v-list-tile-content>
+                    <v-list-tile-action>
+                      <v-switch v-model="laserModeStatus" color="teal darken-2"></v-switch>
+                    </v-list-tile-action>
+                  </v-list-tile>
+                </v-list>
+              </v-flex>
               <v-flex xs12>
                 <v-subheader class="pl-0">Tool Diameter</v-subheader>
                 <v-slider
@@ -152,6 +170,28 @@
                     class="mt-0"
                     type="number"
                     color="teal darken-2"
+                  ></v-text-field>
+                </v-flex>
+              </v-layout>
+              <v-layout justify-center row wrap>
+                <v-flex xs12 sm12 md6 lg6>
+                  <v-text-field
+                    label="Command Power On"
+                    v-model="powerOn"
+                    class="mt-0"
+                    type="text"
+                    color="teal darken-2"
+                    :disabled="!laserModeStatus"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm12 md6 lg6>
+                  <v-text-field
+                    label="Command Power Off"
+                    v-model="powerOff"
+                    class="mt-0"
+                    type="text"
+                    color="teal darken-2"
+                    :disabled="!laserModeStatus"
                   ></v-text-field>
                 </v-flex>
               </v-layout>
@@ -684,6 +724,9 @@ export default {
     safeZ: 1,
     work: 1200,
     idle: 3000,
+    laserModeStatus: false,
+    powerOn: "M04",
+    powerOff: "M05",
     //? for gcode file
     fileName: "",
     size: 0,
@@ -910,7 +953,6 @@ export default {
           if (this.selectedFile != null) {
             this.conversionProgressDialog = true;
             const fd = new FormData();
-            fd.append("image", this.selectedFile, this.selectedFile.name);
             fd.append(
               "parameters",
               JSON.stringify({
@@ -923,9 +965,21 @@ export default {
                 safeZ: this.safeZ,
                 work: this.work,
                 idle: this.idle
+                // laserModeStatus: this.laserModeStatus,
+                // powerOn: this.powerOn,
+                // powerOff: this.powerOff
               })
             );
             fd.append("target", localStorage.id);
+            fd.append("laserModeStatus", this.laserModeStatus);
+            if (this.laserModeStatus) {
+              fd.append("powerOn", this.powerOn);
+              fd.append("powerOff", this.powerOff);
+            }
+            fd.append("image", this.selectedFile, this.selectedFile.name);
+            // console.log('fd :', fd);
+            // TODO: append laserModeStatus to fd
+            // TODO: if laserModeStatus true, append powerOff & powerOn
             // this.isConversionActive = true;
             this.SET_IS_CONVERSION_ACTIVE(true);
             ConversionServices.ConvertImage(fd)
@@ -970,6 +1024,7 @@ export default {
             this.flushPortDis = false;
             this.consolesArea = true;
             this.$refs.portsListDialogRef.hideProgress();
+            // TODO: initialize laserModeStatus to false
             this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
             this.SET_TRANSMISSION_PROCESS_STATE(true);
             this.showSuccessSnackbar(result.success);

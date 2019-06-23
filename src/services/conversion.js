@@ -5,6 +5,7 @@ const url = "api/local/conversions";
 
 class ConversionServices {
   static ConvertImage(formData) {
+    // console.log('formData :', formData);
     return new Promise(async (resolve, reject) => {
       await axios
         .post(url + "/convert", formData

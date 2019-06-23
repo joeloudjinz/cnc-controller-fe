@@ -387,6 +387,7 @@ export default {
             this.$refs.portsListDialogRef.hideProgress();
             //? show consoles area
             this.consolesArea = true;
+            // TODO: initialize laserModeStatus to false
             //? hiding ports list dialog
             this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
             //? enabling pause & stop tranmission operations btns
