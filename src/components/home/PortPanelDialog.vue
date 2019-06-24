@@ -365,7 +365,8 @@ export default {
     writeToPortTextField: "",
     writeToPortProgress: false,
     writeToPortProgressValue: "",
-    portConsoleTxt: []
+    portConsoleTxt: [],
+    step: 10
   }),
   sockets: {
     onSinglePortData(data) {
@@ -478,9 +479,9 @@ export default {
       ) {
         this.portConsoleTxt.unshift("Writing: " + this.writeToPortTextField);
         PortsServices.writeToPort(portName, this.writeToPortTextField + "\r")
-          .then(result => {
-            this.writeToPortTextField = "";
-            this.$parent.$parent.showSuccessSnackbar(result);
+          .then(() => {
+            // this.writeToPortTextField = "";
+            // this.$parent.$parent.showSuccessSnackbar(result);
           })
           .catch(error => {
             if (!error.includes("TypeError")) {
@@ -558,8 +559,8 @@ export default {
     returnToZero(portName) {
       this.portConsoleTxt.unshift("Returning Axes to position zero");
       PortsServices.writeToPort(portName, "G90 G28 X0 Y0" + "\r")
-        .then(result => {
-          this.$parent.$parent.showSuccessSnackbar(result);
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
         })
         .catch(error => {
           if (!error.includes("TypeError")) {
@@ -572,8 +573,8 @@ export default {
     resetToZero(portName) {
       this.portConsoleTxt.unshift("Reseting Axes to position zero");
       PortsServices.writeToPort(portName, "G10 P0 X0 Y0 Z0" + "\r")
-        .then(result => {
-          this.$parent.$parent.showSuccessSnackbar(result);
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
         })
         .catch(error => {
           if (!error.includes("TypeError")) {
@@ -585,9 +586,9 @@ export default {
     },
     move_X_Right(portName) {
       this.portConsoleTxt.unshift("Moving X Axis to right");
-      PortsServices.writeToPort(portName, "G91 G0 X1" + "\r")
-        .then(result => {
-          this.$parent.$parent.showSuccessSnackbar(result);
+      PortsServices.writeToPort(portName, "G91 G0 X" + this.step + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
         })
         .catch(error => {
           if (!error.includes("TypeError")) {
@@ -599,9 +600,9 @@ export default {
     },
     move_X_Left(portName) {
       this.portConsoleTxt.unshift("Moving X Axis to left");
-      PortsServices.writeToPort(portName, "G91 G0 X-1" + "\r")
-        .then(result => {
-          this.$parent.$parent.showSuccessSnackbar(result);
+      PortsServices.writeToPort(portName, "G91 G0 X-" + this.step + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
         })
         .catch(error => {
           if (!error.includes("TypeError")) {
@@ -613,9 +614,9 @@ export default {
     },
     move_Y_Up(portName) {
       this.portConsoleTxt.unshift("Moving Y Axis up");
-      PortsServices.writeToPort(portName, "G91 G0 Y1" + "\r")
-        .then(result => {
-          this.$parent.$parent.showSuccessSnackbar(result);
+      PortsServices.writeToPort(portName, "G91 G0 Y" + this.step + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
         })
         .catch(error => {
           if (!error.includes("TypeError")) {
@@ -627,9 +628,9 @@ export default {
     },
     move_Y_Down(portName) {
       this.portConsoleTxt.unshift("Moving Y Axis down");
-      PortsServices.writeToPort(portName, "G91 G0 Y-1" + "\r")
-        .then(result => {
-          this.$parent.$parent.showSuccessSnackbar(result);
+      PortsServices.writeToPort(portName, "G91 G0 Y-" + this.step + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
         })
         .catch(error => {
           if (!error.includes("TypeError")) {
@@ -642,8 +643,8 @@ export default {
     move_Z_Up(portName) {
       this.portConsoleTxt.unshift("Moving Z Axis up");
       PortsServices.writeToPort(portName, "G91 G0 Z1" + "\r")
-        .then(result => {
-          this.$parent.$parent.showSuccessSnackbar(result);
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
         })
         .catch(error => {
           if (!error.includes("TypeError")) {
@@ -656,8 +657,8 @@ export default {
     move_Z_Down(portName) {
       this.portConsoleTxt.unshift("Moving Z Axis down");
       PortsServices.writeToPort(portName, "G91 G0 Z-1" + "\r")
-        .then(result => {
-          this.$parent.$parent.showSuccessSnackbar(result);
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
         })
         .catch(error => {
           if (!error.includes("TypeError")) {
