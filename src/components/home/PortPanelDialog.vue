@@ -627,7 +627,9 @@ export default {
         });
     },
     move_X_Right(portName) {
-      this.portConsoleTxt.unshift("Moving X Axis to right");
+      this.portConsoleTxt.unshift(
+        "Moving X Axis to right by " + this.step + " mm"
+      );
       PortsServices.writeToPort(portName, "G91 G0 X" + this.step + "\r")
         .then(() => {
           // this.$parent.$parent.showSuccessSnackbar(result);
@@ -641,7 +643,9 @@ export default {
         });
     },
     move_X_Left(portName) {
-      this.portConsoleTxt.unshift("Moving X Axis to left");
+      this.portConsoleTxt.unshift(
+        "Moving X Axis to left by " + this.step + " mm"
+      );
       PortsServices.writeToPort(portName, "G91 G0 X-" + this.step + "\r")
         .then(() => {
           // this.$parent.$parent.showSuccessSnackbar(result);
@@ -655,7 +659,7 @@ export default {
         });
     },
     move_Y_Up(portName) {
-      this.portConsoleTxt.unshift("Moving Y Axis up");
+      this.portConsoleTxt.unshift("Moving Y Axis up by " + this.step + " mm");
       PortsServices.writeToPort(portName, "G91 G0 Y" + this.step + "\r")
         .then(() => {
           // this.$parent.$parent.showSuccessSnackbar(result);
@@ -669,7 +673,7 @@ export default {
         });
     },
     move_Y_Down(portName) {
-      this.portConsoleTxt.unshift("Moving Y Axis down");
+      this.portConsoleTxt.unshift("Moving Y Axis down by " + this.step + " mm");
       PortsServices.writeToPort(portName, "G91 G0 Y-" + this.step + "\r")
         .then(() => {
           // this.$parent.$parent.showSuccessSnackbar(result);
