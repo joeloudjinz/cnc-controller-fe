@@ -22,14 +22,11 @@
           <v-flex xs12>
             <v-list three-line class="teal lighten-5 pt-0">
               <v-list-tile>
-                <!-- <v-list-tile-avatar>
-                      <v-icon color="teal darken-2" x-large>fas fa-exclamation-circle</v-icon>
-                </v-list-tile-avatar>-->
                 <v-list-tile-content>
                   <v-list-tile-title class="title">Laser Mode</v-list-tile-title>
                   <v-list-tile-sub-title
                     class="teal--text font-weight-medium"
-                  >If you are using CNC machine with laser tool, activate the laser mode, IF NOT leave it off</v-list-tile-sub-title>
+                  >If you are using CNC machine with laser tool, activate the laser mode, IF NOT turn it off</v-list-tile-sub-title>
                 </v-list-tile-content>
                 <v-list-tile-action>
                   <v-switch v-model="laserModeStatus" color="teal darken-2"></v-switch>
@@ -133,7 +130,7 @@
             </v-flex>
           </v-layout>
           <v-layout justify-center row wrap>
-            <v-flex xs12 sm12 md6 lg6>
+            <v-flex xs12 sm12 md4 lg4>
               <v-text-field
                 label="Command Power On"
                 v-model="powerOn"
@@ -143,7 +140,17 @@
                 :disabled="!laserModeStatus"
               ></v-text-field>
             </v-flex>
-            <v-flex xs12 sm12 md6 lg6>
+            <v-flex xs12 sm12 md4 lg4>
+              <v-text-field
+                label="Spindle"
+                v-model="spindle"
+                class="mt-0"
+                type="text"
+                color="teal darken-2"
+                :disabled="!laserModeStatus"
+              ></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm12 md4 lg4>
               <v-text-field
                 label="Command Power Off"
                 v-model="powerOff"
@@ -244,7 +251,8 @@ export default {
     work: 1200,
     idle: 3000,
     laserModeStatus: false,
-    powerOn: "M3 s700",
+    powerOn: "M3",
+    spindle: "s600",
     powerOff: "M05",
     showBeforConversionAlert: true,
     //? conversion results section
@@ -292,6 +300,11 @@ export default {
   methods: {
     toggleDialogVisibility() {
       this.showConversionParamsDialog = !this.showConversionParamsDialog;
+      if (this.currentFileName.includes("M")) {
+        this.laserModeStatus = true;
+      } else {
+        this.laserModeStatus = false;
+      }
     },
     hideDialog() {
       this.showConversionParamsDialog = false;
@@ -311,17 +324,25 @@ export default {
           this.doShowParamsForm = false;
           this.scaleAxesErrorState = false;
           this.scaleAxesErrorContent = "";
-          ConversionServices.QuickConvertImage(this.currentFileName, {
-            toolDiameter: this.toolDiameter,
-            sensitivity: this.sensitivity,
-            scaleAxes: this.scaleAxes,
-            deepStep: this.deepStep,
-            blackZ: this.blackZ,
-            whiteZ: this.whiteZ,
-            safeZ: this.safeZ,
-            work: this.work,
-            idle: this.idle
-          })
+          ConversionServices.QuickConvertImage(
+            this.currentFileName,
+            {
+              toolDiameter: this.toolDiameter,
+              sensitivity: this.sensitivity,
+              scaleAxes: this.scaleAxes,
+              deepStep: this.deepStep,
+              blackZ: this.blackZ,
+              whiteZ: this.whiteZ,
+              safeZ: this.safeZ,
+              work: this.work,
+              idle: this.idle
+            },
+            {
+              laserModeStatus: this.laserModeStatus,
+              powerOn: this.powerOn + " " + this.spindle,
+              powerOff: this.powerOff
+            }
+          )
             .then(result => {
               this.$parent.$parent.showSuccessSnackbar(result.success);
             })
@@ -341,6 +362,7 @@ export default {
     },
     initializeDialog() {
       this.scaleAxes = 0;
+      this.laserModeStatus = false;
       this.doShowParamsForm = true;
       this.proccessBlackPixelsValue = 0;
       this.unproccessBlackPixelsValue = 0;

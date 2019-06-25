@@ -174,7 +174,7 @@
                 </v-flex>
               </v-layout>
               <v-layout justify-center row wrap>
-                <v-flex xs12 sm12 md6 lg6>
+                <v-flex xs12 sm12 md4 lg4>
                   <v-text-field
                     label="Command Power On"
                     v-model="powerOn"
@@ -184,7 +184,17 @@
                     :disabled="!laserModeStatus"
                   ></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm12 md6 lg6>
+                <v-flex xs12 sm12 md4 lg4>
+                  <v-text-field
+                    label="Spindle"
+                    v-model="spindle"
+                    class="mt-0"
+                    type="text"
+                    color="teal darken-2"
+                    :disabled="!laserModeStatus"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm12 md4 lg4>
                   <v-text-field
                     label="Command Power Off"
                     v-model="powerOff"
@@ -725,7 +735,8 @@ export default {
     work: 1200,
     idle: 3000,
     laserModeStatus: false,
-    powerOn: "M3 s700",
+    powerOn: "M3",
+    spindle: "s600",
     powerOff: "M05",
     //? for gcode file
     fileName: "",
@@ -965,22 +976,16 @@ export default {
                 safeZ: this.safeZ,
                 work: this.work,
                 idle: this.idle
-                // laserModeStatus: this.laserModeStatus,
-                // powerOn: this.powerOn,
-                // powerOff: this.powerOff
               })
             );
             fd.append("target", localStorage.id);
             fd.append("laserModeStatus", this.laserModeStatus);
             if (this.laserModeStatus) {
-              fd.append("powerOn", this.powerOn);
+              fd.append("powerOn", this.powerOn+" "+this.spindle);
+              // console.log('this.powerOn+" "+this.spindle :', this.powerOn+" "+this.spindle);
               fd.append("powerOff", this.powerOff);
             }
             fd.append("image", this.selectedFile, this.selectedFile.name);
-            // console.log('fd :', fd);
-            // TODO: append laserModeStatus to fd
-            // TODO: if laserModeStatus true, append powerOff & powerOn
-            // this.isConversionActive = true;
             this.SET_IS_CONVERSION_ACTIVE(true);
             ConversionServices.ConvertImage(fd)
               .then(result => {

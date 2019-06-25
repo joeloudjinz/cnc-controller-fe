@@ -42,12 +42,13 @@ class ConversionServices {
         });
     });
   }
-  static QuickConvertImage(imageName, params) {
+  static QuickConvertImage(imageName, params, laserConfig) {
     return new Promise(async (resolve, reject) => {
       await axios
         .post(url + "/convert/quick", {
           parameters: params,
-          target: localStorage.id
+          target: localStorage.id,
+          laserConfig: laserConfig
         }, {
           params: {
             imageName,
