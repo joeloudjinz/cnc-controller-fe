@@ -368,6 +368,46 @@
                             >{{ imegSize }}</v-list-tile-sub-title>
                           </v-list-tile-content>
                         </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Laser Mode</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ laserModeStatus ? "On" : "Off" }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile v-if="laserModeStatus">
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Power On Command</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ powerOn }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile v-if="laserModeStatus">
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Spindle</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ spindle }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile v-if="laserModeStatus">
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Power Off Command</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ powerOff }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
                       </v-list>
                     </v-flex>
                     <v-flex xs12 sm12 md12 lg9>
@@ -434,7 +474,7 @@
                         </v-flex>
                       </v-layout>
                       <v-layout align-center justify-center row fill-height pt-2 wrap>
-                        <v-flex xs12 sm12 md12 lg6>
+                        <v-flex xs12 sm12 md6 lg6>
                           <v-layout align-center justify-center row fill-height>
                             <v-tooltip bottom>
                               <template #activator="data">
@@ -450,13 +490,14 @@
                               <span>The percentage of the proccessed black pixels in the picture</span>
                             </v-tooltip>
                           </v-layout>
+                          <p class="teal--text font-weight-meduim title text-xs-center mt-3">Percentage of proccessed black pixels</p>
                         </v-flex>
-                        <v-flex xs12 sm12 md12 lg6>
+                        <v-flex xs12 sm12 md6 lg6>
                           <v-layout align-center justify-center row fill-height>
                             <v-tooltip bottom>
                               <template #activator="data">
                                 <v-progress-circular
-                                  :rotate="360"
+                                  :rotate="180"
                                   :size="200"
                                   :width="10"
                                   :value="errorValue"
@@ -467,6 +508,7 @@
                               <span>The percentage of the unproccessed black pixels in the picture</span>
                             </v-tooltip>
                           </v-layout>
+                          <p class="teal--text font-weight-meduim title text-xs-center mt-3">Percentage of unproccessed black pixels</p>
                         </v-flex>
                       </v-layout>
                     </v-flex>
