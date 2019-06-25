@@ -20,24 +20,7 @@
             :value="isTransmissionProcessActive"
             type="warning"
           >There is already a transmission process going on</v-alert>
-          <v-list three-line class="teal lighten-5">
-            <v-list-tile>
-              <v-list-tile-avatar>
-                <v-icon color="teal darken-2" x-large>fas fa-exclamation-circle</v-icon>
-              </v-list-tile-avatar>
-              <v-list-tile-content>
-                <v-list-tile-title>Laser Mode</v-list-tile-title>
-                <v-list-tile-sub-title
-                  class="red--text"
-                >If you are using CNC machine with laser tool, don't forget to activate the mode first, IF NOT leave it off</v-list-tile-sub-title>
-              </v-list-tile-content>
-              <v-list-tile-action>
-                <v-switch v-model="laserModeStatus" color="teal darken-2"></v-switch>
-              </v-list-tile-action>
-            </v-list-tile>
-          </v-list>
           <p class="title">Chose port:</p>
-
           <v-fade-transition>
             <v-list v-if="portsList.length !== 0" class="teal lighten-5">
               <v-list-tile
@@ -79,7 +62,6 @@ export default {
     showPortsListDialog: false,
     portsList: [],
     progressStatus: false,
-    laserModeStatus: false
   }),
   computed: {
     ...mapState(["isTransmissionProcessActive"])

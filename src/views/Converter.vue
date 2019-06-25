@@ -725,7 +725,7 @@ export default {
     work: 1200,
     idle: 3000,
     laserModeStatus: false,
-    powerOn: "M04",
+    powerOn: "M3 s700",
     powerOff: "M05",
     //? for gcode file
     fileName: "",
