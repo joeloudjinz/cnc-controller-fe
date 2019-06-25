@@ -51,16 +51,16 @@
             </v-btn>
           </v-toolbar-items>
         </v-toolbar>
+        <v-alert
+          :value="true"
+          type="info"
+          color="teal darken-4"
+          transition="fade-transition"
+          class="mx-3"
+        >Only "Port Name" is guaranteed 100%, other data are related to the connected device of the current port.</v-alert>
         <v-layout row wrap>
           <!-- Port information -->
           <v-flex xs12 sm12 ms9 lg8>
-            <v-alert
-              :value="true"
-              type="info"
-              color="teal darken-4"
-              transition="fade-transition"
-              class="mx-3"
-            >Only "Port Name" is guaranteed 100%, other data are related to the connected device to current port.</v-alert>
             <v-list v-if="selectedPortObject != undefined">
               <v-list-tile avatar>
                 <v-list-tile-content>
@@ -104,11 +104,6 @@
           <v-flex xs12 sm12 md3 lg4>
             <v-container>
               <p class="font-weight-light title text-xs-center">Machine Axes Movement</p>
-              <!-- <v-layout align-center justify-center row>
-                <v-flex xs4>
-                  <v-text-field label="Solo" solo></v-text-field>
-                </v-flex>
-              </v-layout>-->
               <v-layout align-center justify-space-around row>
                 <v-flex xs4>
                   <v-btn
@@ -200,6 +195,28 @@
                 </v-flex>
               </v-layout>
               <v-layout align-center justify-center row>
+                <v-flex xs3>
+                  <span>Step Size (mm):</span>
+                </v-flex>
+                <v-flex xs8>
+                  <v-text-field
+                    type="number"
+                    max="50"
+                    v-model="step"
+                    color="teal"
+                    suffix="mm"
+                    hint="For safety, Don't pass 40mm"
+                    persistent-hint
+                    :error="stepError"
+                    :error-messages="stepErrorMsg"
+                    @input="validateStepSize()"
+                    @blur="validateStepSize()"
+                  ></v-text-field>
+                    <!-- @change="validateStepSize()" -->
+                </v-flex>
+                <v-spacer></v-spacer>
+              </v-layout>
+              <!-- <v-layout align-center justify-center row>
                 <v-flex xs6>
                   <v-btn
                     color="teal"
@@ -220,109 +237,109 @@
                     Return To Zero
                   </v-btn>
                 </v-flex>
-              </v-layout>
+              </v-layout>-->
             </v-container>
           </v-flex>
         </v-layout>
         <v-divider></v-divider>
         <!-- Port console -->
-        <v-container>
-          <v-layout row wrap>
-            <v-flex xs12 sm12 px-3 class="hidden-md-and-up">
-              <v-toolbar
-                color="teal lighten-4"
-                class="elevation-0 mt-2 teal--text text--darken-1"
-                card
-              >
-                <v-toolbar-items>
-                  <v-btn
-                    dark
-                    flat
-                    :disabled="openPortDis"
-                    @click="openPort(selectedPortObject.comName)"
-                  >
-                    <v-icon>fas fa-door-open</v-icon>
-                  </v-btn>
-                  <v-btn
-                    dark
-                    flat
-                    :disabled="closePortDis"
-                    @click="closePort(selectedPortObject.comName)"
-                  >
-                    <v-icon>fas fa-door-closed</v-icon>
-                  </v-btn>
-                  <v-btn
-                    dark
-                    flat
-                    :disabled="flushPortDis"
-                    @click="flushPort(selectedPortObject.comName)"
-                  >
-                    <v-icon>fas fa-arrow-alt-circle-down</v-icon>
-                  </v-btn>
-                  <v-btn
-                    dark
-                    flat
-                    :disabled="resumePortDis"
-                    @click="resumePort(selectedPortObject.comName)"
-                  >
-                    <v-icon>fas fa-play-circle</v-icon>
-                  </v-btn>
-                  <v-btn
-                    dark
-                    flat
-                    :disabled="pausePortDis"
-                    @click="pausePort(selectedPortObject.comName)"
-                  >
-                    <v-icon>fas fa-pause-circle</v-icon>
-                  </v-btn>
-                </v-toolbar-items>
-              </v-toolbar>
-            </v-flex>
-            <v-flex xs12 sm12 px-3>
-              <v-toolbar
-                color="teal lighten-4"
-                class="elevation-0 mt-2 teal--text text--darken-1"
-                card
-              >
-                <v-text-field
-                  v-model="writeToPortTextField"
-                  label="Commands"
-                  solo
-                  class="pt-2 teal--text text--darken-4"
-                ></v-text-field>
-                <v-fade-transition>
-                  <v-btn
-                    v-if="writeToPortTextField != ''"
-                    icon
-                    :disabled="!openPortDis"
-                    @click="sendCommandToPort(selectedPortObject.comName)"
-                  >
-                    <v-icon color="teal darken-4">fas fa-paper-plane</v-icon>
-                  </v-btn>
-                </v-fade-transition>
-                <v-btn icon @click="clearPortConsole()">
-                  <v-icon color="teal darken-4">fas fa-eraser</v-icon>
+        <v-layout row wrap>
+          <v-flex xs12 sm12 px-3 class="hidden-md-and-up">
+            <v-toolbar
+              color="teal lighten-4"
+              class="elevation-0 mt-2 teal--text text--darken-1"
+              card
+            >
+              <v-toolbar-items>
+                <v-btn
+                  dark
+                  flat
+                  :disabled="openPortDis"
+                  @click="openPort(selectedPortObject.comName)"
+                >
+                  <v-icon>fas fa-door-open</v-icon>
                 </v-btn>
-              </v-toolbar>
-            </v-flex>
-            <v-flex xs12 sm12 pb-3>
-              <v-card
-                height="300px"
-                color="teal lighten-4 elevation-0"
-                class="scroll scrollbar-style mx-3"
-              >
-                <v-card-text class="black--text text-darken-4">
-                  <table>
-                    <tr v-for="(line, index) in portConsoleTxt" :key="index">
-                      <td v-if="line.charAt(1) == '>'" class="font-weight-meduim">{{line}}</td>
-                      <td v-else class="red--text text-darken-1 font-weight-meduim">{{line}}</td>
-                    </tr>
-                  </table>
-                </v-card-text>
-              </v-card>
-            </v-flex>
-          </v-layout>
-        </v-container>
+                <v-btn
+                  dark
+                  flat
+                  :disabled="closePortDis"
+                  @click="closePort(selectedPortObject.comName)"
+                >
+                  <v-icon>fas fa-door-closed</v-icon>
+                </v-btn>
+                <v-btn
+                  dark
+                  flat
+                  :disabled="flushPortDis"
+                  @click="flushPort(selectedPortObject.comName)"
+                >
+                  <v-icon>fas fa-arrow-alt-circle-down</v-icon>
+                </v-btn>
+                <v-btn
+                  dark
+                  flat
+                  :disabled="resumePortDis"
+                  @click="resumePort(selectedPortObject.comName)"
+                >
+                  <v-icon>fas fa-play-circle</v-icon>
+                </v-btn>
+                <v-btn
+                  dark
+                  flat
+                  :disabled="pausePortDis"
+                  @click="pausePort(selectedPortObject.comName)"
+                >
+                  <v-icon>fas fa-pause-circle</v-icon>
+                </v-btn>
+              </v-toolbar-items>
+            </v-toolbar>
+          </v-flex>
+          <v-flex xs12 sm12 px-3>
+            <v-toolbar
+              color="teal lighten-4"
+              class="elevation-0 mt-2 teal--text text--darken-1"
+              card
+            >
+              <v-text-field
+                v-model="writeToPortTextField"
+                label="Commands"
+                solo
+                class="pt-2 teal--text text--darken-4"
+              ></v-text-field>
+              <v-fade-transition>
+                <v-btn
+                  v-if="writeToPortTextField != ''"
+                  icon
+                  :disabled="!openPortDis"
+                  @click="sendCommandToPort(selectedPortObject.comName)"
+                >
+                  <v-icon color="teal darken-4">fas fa-paper-plane</v-icon>
+                </v-btn>
+              </v-fade-transition>
+              <v-btn icon @click="clearPortConsole()">
+                <v-icon color="teal darken-4">fas fa-eraser</v-icon>
+              </v-btn>
+            </v-toolbar>
+          </v-flex>
+          <v-flex xs12 sm12 pb-3>
+            <v-card
+              height="300px"
+              color="teal lighten-4 elevation-0"
+              class="scroll scrollbar-style mx-3"
+            >
+              <v-card-text class="black--text text-darken-4">
+                <table>
+                  <tr v-for="(line, index) in portConsoleTxt" :key="index">
+                    <td v-if="line.charAt(1) == '>'" class="font-weight-meduim">{{line}}</td>
+                    <td v-else class="red--text text-darken-1 font-weight-meduim">{{line}}</td>
+                  </tr>
+                </table>
+              </v-card-text>
+            </v-card>
+          </v-flex>
+        </v-layout>
+        <!-- <v-container>
+        </v-container>-->
       </v-card>
     </v-dialog>
     <!-- Leave Port panel Dialog -->
@@ -364,7 +381,9 @@ export default {
     writeToPortProgress: false,
     writeToPortProgressValue: "",
     portConsoleTxt: [],
-    step: 10
+    step: 10,
+    stepError: false,
+    stepErrorMsg: ""
   }),
   sockets: {
     onSinglePortData(data) {
@@ -551,6 +570,15 @@ export default {
     clearPortConsole() {
       this.portConsoleTxt = [];
     },
+    validateStepSize() {
+      if (this.step >= 50) {
+        this.stepError = true;
+        this.stepErrorMsg = "For safety, step size should be less than 50mm";
+      } else {
+        this.stepError = false;
+        this.stepErrorMsg = "";
+      }
+    },
     //? when sending G90 (Absolute positioning) receiving "ok"
     //? when sending G01 X0.0000 Y-0.0000 Z1 (X0 Y0 Z1 Line Init) receiving "error:22"
     //? when sending G01 M05 (X0 Y0 M05 Line Init) receiving "error:22"
@@ -568,6 +596,7 @@ export default {
           }
         });
     },
+    // ! gcode command is not working here
     resetToZero(portName) {
       this.portConsoleTxt.unshift("Reseting Axes to position zero");
       PortsServices.writeToPort(portName, "G10 P0 X0 Y0 Z0" + "\r")
