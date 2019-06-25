@@ -60,8 +60,8 @@
         >Only "Port Name" is guaranteed 100%, other data are related to the connected device of the current port.</v-alert>
         <v-layout row wrap>
           <!-- Port information -->
-          <v-flex xs12 sm12 ms9 lg8>
-            <v-list v-if="selectedPortObject != undefined">
+          <v-flex xs12 sm12 ms12 lg8>
+            <v-list two-line v-if="selectedPortObject != undefined">
               <v-list-tile avatar>
                 <v-list-tile-content>
                   <v-list-tile-title>Port Name</v-list-tile-title>
@@ -101,9 +101,15 @@
             </v-list>
           </v-flex>
           <!-- Machine Control Btns -->
-          <v-flex xs12 sm12 md3 lg4>
+          <v-flex xs12 sm12 md12 lg4>
             <v-container>
-              <p class="font-weight-light title text-xs-center">Machine Axes Movement</p>
+              <!-- Section Title -->
+              <v-layout row>
+                <v-spacer></v-spacer>
+                <p class="font-weight-light title text-xs-center">Machine Axes Movement</p>
+                <v-spacer></v-spacer>
+              </v-layout>
+              <!-- Y up & Z up -->
               <v-layout align-center justify-space-around row>
                 <v-flex xs4>
                   <v-btn
@@ -153,6 +159,7 @@
                   </v-btn>
                 </v-flex>
               </v-layout>
+              <!-- X left & right -->
               <v-layout align-center justify-space-around row>
                 <v-flex xs4>
                   <v-btn
@@ -177,6 +184,7 @@
                   </v-btn>
                 </v-flex>
               </v-layout>
+              <!-- Y & Z down -->
               <v-layout align-center justify-center row>
                 <v-flex xs12>
                   <v-chip>
@@ -194,11 +202,13 @@
                   </v-chip>
                 </v-flex>
               </v-layout>
+              <!-- Step -->
               <v-layout align-center justify-center row>
-                <v-flex xs3>
-                  <span>Step Size (mm):</span>
+                <v-spacer></v-spacer>
+                <v-flex xs2>
+                  <span>Step Size:</span>
                 </v-flex>
-                <v-flex xs8>
+                <v-flex xs5>
                   <v-text-field
                     type="number"
                     max="50"
@@ -212,7 +222,7 @@
                     @input="validateStepSize()"
                     @blur="validateStepSize()"
                   ></v-text-field>
-                    <!-- @change="validateStepSize()" -->
+                  <!-- @change="validateStepSize()" -->
                 </v-flex>
                 <v-spacer></v-spacer>
               </v-layout>
@@ -251,46 +261,53 @@
               card
             >
               <v-toolbar-items>
-                <v-btn
-                  dark
-                  flat
-                  :disabled="openPortDis"
-                  @click="openPort(selectedPortObject.comName)"
-                >
-                  <v-icon>fas fa-door-open</v-icon>
-                </v-btn>
-                <v-btn
-                  dark
-                  flat
-                  :disabled="closePortDis"
-                  @click="closePort(selectedPortObject.comName)"
-                >
-                  <v-icon>fas fa-door-closed</v-icon>
-                </v-btn>
-                <v-btn
-                  dark
-                  flat
-                  :disabled="flushPortDis"
-                  @click="flushPort(selectedPortObject.comName)"
-                >
-                  <v-icon>fas fa-arrow-alt-circle-down</v-icon>
-                </v-btn>
-                <v-btn
-                  dark
-                  flat
-                  :disabled="resumePortDis"
-                  @click="resumePort(selectedPortObject.comName)"
-                >
-                  <v-icon>fas fa-play-circle</v-icon>
-                </v-btn>
-                <v-btn
-                  dark
-                  flat
-                  :disabled="pausePortDis"
-                  @click="pausePort(selectedPortObject.comName)"
-                >
-                  <v-icon>fas fa-pause-circle</v-icon>
-                </v-btn>
+                <v-btn-toggle>
+                  <v-btn
+                    dark
+                    color="teal darken-2"
+                    flat
+                    :disabled="openPortDis"
+                    @click="openPort(selectedPortObject.comName)"
+                  >
+                    <v-icon>fas fa-door-open</v-icon>
+                  </v-btn>
+                  <v-btn
+                    dark
+                    color="teal darken-2"
+                    flat
+                    :disabled="closePortDis"
+                    @click="closePort(selectedPortObject.comName)"
+                  >
+                    <v-icon>fas fa-door-closed</v-icon>
+                  </v-btn>
+                  <v-btn
+                    dark
+                    color="teal darken-2"
+                    flat
+                    :disabled="flushPortDis"
+                    @click="flushPort(selectedPortObject.comName)"
+                  >
+                    <v-icon>fas fa-arrow-alt-circle-down</v-icon>
+                  </v-btn>
+                  <v-btn
+                    dark
+                    color="teal darken-2"
+                    flat
+                    :disabled="resumePortDis"
+                    @click="resumePort(selectedPortObject.comName)"
+                  >
+                    <v-icon>fas fa-play-circle</v-icon>
+                  </v-btn>
+                  <v-btn
+                    dark
+                    color="teal darken-2"
+                    flat
+                    :disabled="pausePortDis"
+                    @click="pausePort(selectedPortObject.comName)"
+                  >
+                    <v-icon>fas fa-pause-circle</v-icon>
+                  </v-btn>
+                </v-btn-toggle>
               </v-toolbar-items>
             </v-toolbar>
           </v-flex>
@@ -338,8 +355,6 @@
             </v-card>
           </v-flex>
         </v-layout>
-        <!-- <v-container>
-        </v-container>-->
       </v-card>
     </v-dialog>
     <!-- Leave Port panel Dialog -->
