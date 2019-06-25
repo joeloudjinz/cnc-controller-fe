@@ -208,7 +208,6 @@
                     @click="resetToZero(selectedPortObject.comName)"
                   >
                     Reset To Zero
-                    <!-- <v-icon color="white">fas fa-dot-circle</v-icon> -->
                   </v-btn>
                 </v-flex>
                 <v-flex xs6>
@@ -219,7 +218,6 @@
                     @click="returnToZero(selectedPortObject.comName)"
                   >
                     Return To Zero
-                    <!-- <v-icon color="white">fas fa-dot-circle</v-icon> -->
                   </v-btn>
                 </v-flex>
               </v-layout>
@@ -496,11 +494,11 @@ export default {
     hidePanel() {
       this.leavePortPanelDialog = false;
       this.doShowPortPanel = false;
-      this.openPortDis = true;
+      this.openPortDis = false;
       this.resumePortDis = true;
-      this.closePortDis = false;
-      this.pausePortDis = false;
-      this.flushPortDis = false;
+      this.closePortDis = true;
+      this.pausePortDis = true;
+      this.flushPortDis = true;
       this.clearPortConsole();
     },
     closePortPanelDialog() {
