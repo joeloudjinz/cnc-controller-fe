@@ -1,23 +1,25 @@
 <template>
   <!-- Settings dialog -->
-  <v-dialog v-model="settingsDialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-    <v-card>
-      <v-toolbar dark color="teal">
+  <v-dialog v-model="settingsDialog" width="900" persistent>
+    <v-card color="teal lighten-5">
+      <v-toolbar dark color="teal lighten-5" class="elevation-0">
         <v-btn
           icon
           dark
           :disabled="doDisableCloseSettingsDialogBtn"
           @click="settingsDialog = false"
         >
-          <v-icon>close</v-icon>
+          <v-icon color="teal darken-2">fas fa-times-circle</v-icon>
         </v-btn>
-        <v-toolbar-title>Settings</v-toolbar-title>
+        <v-toolbar-title class="headline teal--text darken-2">
+          <v-icon large color="teal darken-2" left>fas fa-tools</v-icon>Settings
+        </v-toolbar-title>
         <v-spacer></v-spacer>
       </v-toolbar>
       <v-card-text>
         <v-layout row wrap>
           <v-flex xs12>
-            <v-list class="py-0" three-line>
+            <v-list class="py-0 teal lighten-5" three-line>
               <v-list-tile>
                 <v-list-tile-content>
                   <v-list-tile-title>The Drawing Surface Dimensions</v-list-tile-title>
@@ -27,8 +29,8 @@
             </v-list>
           </v-flex>
         </v-layout>
-        <v-layout row wrap>
-          <v-flex xs12 sm12 md6 lg3 px-2 pl-4>
+        <v-layout row wrap px-2>
+          <v-flex xs12 sm12 md6 lg3 px-1>
             <v-text-field
               type="number"
               label="Width"
@@ -39,7 +41,7 @@
               @blur="$v.surfaceWidth.$touch()"
             ></v-text-field>
           </v-flex>
-          <v-flex xs12 sm12 md6 lg3 px-2>
+          <v-flex xs12 sm12 md6 lg3 px-1>
             <v-text-field
               type="number"
               label="Height"
@@ -49,6 +51,17 @@
               @input="$v.surfaceHeight.$touch()"
               @blur="$v.surfaceHeight.$touch()"
             ></v-text-field>
+          </v-flex>
+          <!-- <v-flex xs12 sm12 md2 lg2 px-1>
+            <span></span>
+          </v-flex>-->
+          <v-flex xs12 sm12 md12 lg6 px-1>
+            <v-select
+              v-model="selectedItem"
+              :items="paperSizes"
+              label="Or choose from predefined sizes"
+              @change="setDimensionsToFields()"
+            ></v-select>
           </v-flex>
         </v-layout>
         <v-layout row wrap>
@@ -86,6 +99,18 @@ export default {
     }
   },
   data: () => ({
+    paperSizes: [
+      { value: "0", text: "A0", width: "841", height: "1189" },
+      { value: "1", text: "A1", width: "594", height: "841" },
+      { value: "2", text: "A2", width: "420", height: "594" },
+      { value: "3", text: "A3", width: "297", height: "420" },
+      { value: "4", text: "A4", width: "210", height: "297" },
+      { value: "5", text: "A5", width: "148", height: "210" },
+      { value: "6", text: "A6", width: "105", height: "148" },
+      { value: "7", text: "A7", width: "74", height: "105" },
+      { value: "8", text: "Set custom dimensions", width: "0", height: "0" }
+    ],
+    selectedItem: undefined,
     //? Settings dialog data
     settingsDialog: false,
     surfaceHeight: 0,
@@ -131,6 +156,10 @@ export default {
       this.surfaceHeight = window.localStorage.getItem("surfaceHeight");
       this.settingsDialog = true;
     },
+    setDimensionsToFields() {
+      this.surfaceHeight = this.paperSizes[this.selectedItem].height;
+      this.surfaceWidth = this.paperSizes[this.selectedItem].width;
+    },
     updateSurfaceDimensions() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
@@ -139,8 +168,9 @@ export default {
         if (this.doShowSurfaceDimensionsAlert) {
           this.TOGGLE_SURFACE_DIMENSIONS_ALERT_STATE();
         }
-        // console.log('this.$parent :', this.$parent);
-        this.$parent.$parent.showSuccessSnackbar("Information Updated Successfully");
+        this.$parent.$parent.showSuccessSnackbar(
+          "Information Updated Successfully"
+        );
       }
     }
   }

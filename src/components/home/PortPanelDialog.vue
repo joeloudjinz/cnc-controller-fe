@@ -13,22 +13,18 @@
           </v-btn>
           <v-toolbar-title>Port Panel</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-toolbar-items>
+          <v-toolbar-items class="hidden-sm-and-down">
             <v-btn dark flat :disabled="openPortDis" @click="openPort(selectedPortObject.comName)">
               <v-icon left>fas fa-door-open</v-icon>Open Port
             </v-btn>
-          </v-toolbar-items>
-          <v-toolbar-items>
             <v-btn
               dark
               flat
               :disabled="closePortDis"
               @click="closePort(selectedPortObject.comName)"
             >
-              <v-icon left>fas fa-times-circle</v-icon>Close Port
+              <v-icon left>fas fa-door-closed</v-icon>Close Port
             </v-btn>
-          </v-toolbar-items>
-          <v-toolbar-items>
             <v-btn
               dark
               flat
@@ -37,8 +33,6 @@
             >
               <v-icon left>fas fa-arrow-alt-circle-down</v-icon>Flush Data
             </v-btn>
-          </v-toolbar-items>
-          <v-toolbar-items>
             <v-btn
               dark
               flat
@@ -47,8 +41,6 @@
             >
               <v-icon left>fas fa-play-circle</v-icon>Resume Data
             </v-btn>
-          </v-toolbar-items>
-          <v-toolbar-items>
             <v-btn
               dark
               flat
@@ -65,48 +57,261 @@
           color="teal darken-4"
           transition="fade-transition"
           class="mx-3"
-        >Only "Port Name" is guaranteed 100%, other information is related to the connected device of the current port.</v-alert>
-        <v-list v-if="selectedPortObject != undefined">
-          <v-list-tile avatar>
-            <v-list-tile-content>
-              <v-list-tile-title>Port Name</v-list-tile-title>
-              <v-list-tile-sub-title>{{ selectedPortObject.comName }}</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile avatar>
-            <v-list-tile-content>
-              <v-list-tile-title>Manufacturer</v-list-tile-title>
-              <v-list-tile-sub-title>{{ selectedPortObject.manufacturer }}</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile avatar>
-            <v-list-tile-content>
-              <v-list-tile-title>Serial Number</v-list-tile-title>
-              <v-list-tile-sub-title>{{ selectedPortObject.serialNumber }}</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile avatar>
-            <v-list-tile-content>
-              <v-list-tile-title>Plug and Play ID</v-list-tile-title>
-              <v-list-tile-sub-title>{{ selectedPortObject.pnpId }}</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile avatar>
-            <v-list-tile-content>
-              <v-list-tile-title>Procudt ID</v-list-tile-title>
-              <v-list-tile-sub-title>{{ selectedPortObject.productId }}</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile avatar>
-            <v-list-tile-content>
-              <v-list-tile-title>Vendor ID</v-list-tile-title>
-              <v-list-tile-sub-title>{{ selectedPortObject.vendorId }}</v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list>
-        <v-divider></v-divider>
+        >Only "Port Name" is guaranteed 100%, other data are related to the connected device of the current port.</v-alert>
         <v-layout row wrap>
-          <v-flex xs12 px-3>
+          <!-- Port information -->
+          <v-flex xs12 sm12 ms12 lg8>
+            <v-list two-line v-if="selectedPortObject != undefined">
+              <v-list-tile avatar>
+                <v-list-tile-content>
+                  <v-list-tile-title>Port Name</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ selectedPortObject.comName }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile avatar>
+                <v-list-tile-content>
+                  <v-list-tile-title>Manufacturer</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ selectedPortObject.manufacturer }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile avatar>
+                <v-list-tile-content>
+                  <v-list-tile-title>Serial Number</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ selectedPortObject.serialNumber }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile avatar>
+                <v-list-tile-content>
+                  <v-list-tile-title>Plug and Play ID</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ selectedPortObject.pnpId }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile avatar>
+                <v-list-tile-content>
+                  <v-list-tile-title>Procudt ID</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ selectedPortObject.productId }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile avatar>
+                <v-list-tile-content>
+                  <v-list-tile-title>Vendor ID</v-list-tile-title>
+                  <v-list-tile-sub-title>{{ selectedPortObject.vendorId }}</v-list-tile-sub-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+          </v-flex>
+          <!-- Machine Control Btns -->
+          <v-flex xs12 sm12 md12 lg4>
+            <v-container>
+              <!-- Section Title -->
+              <v-layout row>
+                <v-spacer></v-spacer>
+                <p class="font-weight-light title text-xs-center">Machine Axes Movement</p>
+                <v-spacer></v-spacer>
+              </v-layout>
+              <!-- Y up & Z up -->
+              <v-layout align-center justify-space-around row>
+                <v-flex xs4>
+                  <v-btn
+                    color="red"
+                    fab
+                    class="elevation-2"
+                    :disabled="!openPortDis"
+                    @click="move_Y_Up(selectedPortObject.comName)"
+                  >
+                    <v-icon color="white">fas fa-chevron-circle-up</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-flex xs4>
+                  <v-btn
+                    color="blue"
+                    fab
+                    class="elevation-2"
+                    :disabled="!openPortDis"
+                    @click="move_Z_Up(selectedPortObject.comName)"
+                  >
+                    <v-icon color="white">fas fa-chevron-circle-up</v-icon>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+              <v-layout row>
+                <v-flex xs4>
+                  <v-btn
+                    color="green"
+                    fab
+                    class="elevation-2"
+                    :disabled="!openPortDis"
+                    @click="move_X_Left(selectedPortObject.comName)"
+                  >
+                    <v-icon color="white">fas fa-chevron-circle-left</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-spacer></v-spacer>
+                <v-flex xs4>
+                  <v-btn
+                    color="green"
+                    fab
+                    class="elevation-2"
+                    :disabled="!openPortDis"
+                    @click="move_X_Right(selectedPortObject.comName)"
+                  >
+                    <v-icon color="white">fas fa-chevron-circle-right</v-icon>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+              <!-- X left & right -->
+              <v-layout align-center justify-space-around row>
+                <v-flex xs4>
+                  <v-btn
+                    color="red"
+                    fab
+                    class="elevation-2"
+                    :disabled="!openPortDis"
+                    @click="move_Y_Down(selectedPortObject.comName)"
+                  >
+                    <v-icon color="white">fas fa-chevron-circle-down</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-flex xs4>
+                  <v-btn
+                    color="blue"
+                    fab
+                    class="elevation-2"
+                    :disabled="!openPortDis"
+                    @click="move_Z_Down(selectedPortObject.comName)"
+                  >
+                    <v-icon color="white">fas fa-chevron-circle-down</v-icon>
+                  </v-btn>
+                </v-flex>
+              </v-layout>
+              <!-- Y & Z down -->
+              <v-layout align-center justify-center row>
+                <v-flex xs12>
+                  <v-chip>
+                    <v-avatar class="red"></v-avatar>Y axis
+                  </v-chip>
+                </v-flex>
+                <v-flex xs12>
+                  <v-chip>
+                    <v-avatar class="green"></v-avatar>X axis
+                  </v-chip>
+                </v-flex>
+                <v-flex xs12>
+                  <v-chip>
+                    <v-avatar class="blue"></v-avatar>Z axis
+                  </v-chip>
+                </v-flex>
+              </v-layout>
+              <!-- Step -->
+              <v-layout align-center justify-center row>
+                <v-spacer></v-spacer>
+                <v-flex xs2>
+                  <span>Step Size:</span>
+                </v-flex>
+                <v-flex xs5>
+                  <v-text-field
+                    type="number"
+                    max="50"
+                    v-model="step"
+                    color="teal"
+                    suffix="mm"
+                    hint="For safety, Don't pass 40mm"
+                    persistent-hint
+                    :error="stepError"
+                    :error-messages="stepErrorMsg"
+                    @input="validateStepSize()"
+                    @blur="validateStepSize()"
+                  ></v-text-field>
+                  <!-- @change="validateStepSize()" -->
+                </v-flex>
+                <v-spacer></v-spacer>
+              </v-layout>
+              <!-- <v-layout align-center justify-center row>
+                <v-flex xs6>
+                  <v-btn
+                    color="teal"
+                    class="elevation-2"
+                    :disabled="!openPortDis"
+                    @click="resetToZero(selectedPortObject.comName)"
+                  >
+                    Reset To Zero
+                  </v-btn>
+                </v-flex>
+                <v-flex xs6>
+                  <v-btn
+                    color="teal"
+                    class="elevation-2"
+                    :disabled="!openPortDis"
+                    @click="returnToZero(selectedPortObject.comName)"
+                  >
+                    Return To Zero
+                  </v-btn>
+                </v-flex>
+              </v-layout>-->
+            </v-container>
+          </v-flex>
+        </v-layout>
+        <v-divider></v-divider>
+        <!-- Port console -->
+        <v-layout row wrap>
+          <v-flex xs12 sm12 px-3 class="hidden-md-and-up">
+            <v-toolbar
+              color="teal lighten-4"
+              class="elevation-0 mt-2 teal--text text--darken-1"
+              card
+            >
+              <v-toolbar-items>
+                <v-btn-toggle>
+                  <v-btn
+                    dark
+                    color="teal darken-2"
+                    flat
+                    :disabled="openPortDis"
+                    @click="openPort(selectedPortObject.comName)"
+                  >
+                    <v-icon>fas fa-door-open</v-icon>
+                  </v-btn>
+                  <v-btn
+                    dark
+                    color="teal darken-2"
+                    flat
+                    :disabled="closePortDis"
+                    @click="closePort(selectedPortObject.comName)"
+                  >
+                    <v-icon>fas fa-door-closed</v-icon>
+                  </v-btn>
+                  <v-btn
+                    dark
+                    color="teal darken-2"
+                    flat
+                    :disabled="flushPortDis"
+                    @click="flushPort(selectedPortObject.comName)"
+                  >
+                    <v-icon>fas fa-arrow-alt-circle-down</v-icon>
+                  </v-btn>
+                  <v-btn
+                    dark
+                    color="teal darken-2"
+                    flat
+                    :disabled="resumePortDis"
+                    @click="resumePort(selectedPortObject.comName)"
+                  >
+                    <v-icon>fas fa-play-circle</v-icon>
+                  </v-btn>
+                  <v-btn
+                    dark
+                    color="teal darken-2"
+                    flat
+                    :disabled="pausePortDis"
+                    @click="pausePort(selectedPortObject.comName)"
+                  >
+                    <v-icon>fas fa-pause-circle</v-icon>
+                  </v-btn>
+                </v-btn-toggle>
+              </v-toolbar-items>
+            </v-toolbar>
+          </v-flex>
+          <v-flex xs12 sm12 px-3>
             <v-toolbar
               color="teal lighten-4"
               class="elevation-0 mt-2 teal--text text--darken-1"
@@ -122,6 +327,7 @@
                 <v-btn
                   v-if="writeToPortTextField != ''"
                   icon
+                  :disabled="!openPortDis"
                   @click="sendCommandToPort(selectedPortObject.comName)"
                 >
                   <v-icon color="teal darken-4">fas fa-paper-plane</v-icon>
@@ -132,7 +338,7 @@
               </v-btn>
             </v-toolbar>
           </v-flex>
-          <v-flex xs12 pb-3>
+          <v-flex xs12 sm12 pb-3>
             <v-card
               height="300px"
               color="teal lighten-4 elevation-0"
@@ -169,16 +375,15 @@
     </v-dialog>
   </v-layout>
 </template>
-
 <script>
 import PortsServices from "@/services/ports.js";
-import { mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
 
 export default {
   data: () => ({
     //? to show or hide ports console bottom sheet
     doShowPortPanel: false,
-    selectedPortObject: undefined,
+    // selectedPortObject: undefined,
     //? to enable and disable control btns of port console panel
     leavePortPanelDialog: false,
     flushPortDis: true,
@@ -190,15 +395,24 @@ export default {
     writeToPortTextField: "",
     writeToPortProgress: false,
     writeToPortProgressValue: "",
-    portConsoleTxt: []
+    portConsoleTxt: [],
+    step: 10,
+    stepError: false,
+    stepErrorMsg: ""
   }),
   sockets: {
     onSinglePortData(data) {
       if (data.target === localStorage.id) this.onSinglePortDataCallback(data);
     }
   },
+  computed: {
+    ...mapState(["selectedPortObject"])
+  },
   methods: {
-    ...mapMutations(["SET_TRANSMISSION_PROCESS_STATE"]),
+    ...mapMutations([
+      "SET_TRANSMISSION_PROCESS_STATE",
+      "SET_SELECTED_PORT_OBJECT"
+    ]),
     onSinglePortDataCallback(data) {
       this.portConsoleTxt.unshift("-> data received: " + data.data);
     },
@@ -297,9 +511,9 @@ export default {
       ) {
         this.portConsoleTxt.unshift("Writing: " + this.writeToPortTextField);
         PortsServices.writeToPort(portName, this.writeToPortTextField + "\r")
-          .then(result => {
-            this.writeToPortTextField = "";
-            this.$parent.$parent.showSuccessSnackbar(result);
+          .then(() => {
+            // this.writeToPortTextField = "";
+            // this.$parent.$parent.showSuccessSnackbar(result);
           })
           .catch(error => {
             if (!error.includes("TypeError")) {
@@ -311,16 +525,20 @@ export default {
         this.$parent.$parent.showErrorSnackbar("Can NOT send empty data!!");
       }
     },
+    hidePanel() {
+      this.leavePortPanelDialog = false;
+      this.doShowPortPanel = false;
+      this.openPortDis = false;
+      this.resumePortDis = true;
+      this.closePortDis = true;
+      this.pausePortDis = true;
+      this.flushPortDis = true;
+      this.clearPortConsole();
+    },
     closePortPanelDialog() {
       PortsServices.closePort(this.selectedPortObject.comName)
         .then(() => {
-          this.leavePortPanelDialog = false;
-          this.doShowPortPanel = false;
-          this.openPortDis = true;
-          this.resumePortDis = true;
-          this.closePortDis = false;
-          this.pausePortDis = false;
-          this.flushPortDis = false;
+          this.hidePanel();
         })
         .catch(error => {
           if (!error.includes("TypeError")) {
@@ -330,7 +548,7 @@ export default {
         });
     },
     showPortPanel(portObject) {
-      this.selectedPortObject = portObject;
+      // this.selectedPortObject = portObject;
       PortsServices.isPortOpen(portObject.comName)
         .then(isOpen => {
           this.isSelectedPortOpened = isOpen;
@@ -366,10 +584,138 @@ export default {
     },
     clearPortConsole() {
       this.portConsoleTxt = [];
+    },
+    validateStepSize() {
+      if (this.step >= 50) {
+        this.stepError = true;
+        this.stepErrorMsg = "For safety, step size should be less than 50mm";
+      } else {
+        this.stepError = false;
+        this.stepErrorMsg = "";
+      }
+    },
+    //? when sending G90 (Absolute positioning) receiving "ok"
+    //? when sending G01 X0.0000 Y-0.0000 Z1 (X0 Y0 Z1 Line Init) receiving "error:22"
+    //? when sending G01 M05 (X0 Y0 M05 Line Init) receiving "error:22"
+    returnToZero(portName) {
+      this.portConsoleTxt.unshift("Returning Axes to position zero");
+      PortsServices.writeToPort(portName, "G90 G28 X0 Y0" + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
+        })
+        .catch(error => {
+          if (!error.includes("TypeError")) {
+            this.portConsoleTxt.unshift("Error occurred: " + error);
+          } else {
+            this.$parent.$parent.showErrorSnackbar(error);
+          }
+        });
+    },
+    // ! gcode command is not working here
+    resetToZero(portName) {
+      this.portConsoleTxt.unshift("Reseting Axes to position zero");
+      PortsServices.writeToPort(portName, "G10 P0 X0 Y0 Z0" + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
+        })
+        .catch(error => {
+          if (!error.includes("TypeError")) {
+            this.portConsoleTxt.unshift("Error occurred: " + error);
+          } else {
+            this.$parent.$parent.showErrorSnackbar(error);
+          }
+        });
+    },
+    move_X_Right(portName) {
+      this.portConsoleTxt.unshift(
+        "Moving X Axis to right by " + this.step + " mm"
+      );
+      PortsServices.writeToPort(portName, "G91 G0 X" + this.step + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
+        })
+        .catch(error => {
+          if (!error.includes("TypeError")) {
+            this.portConsoleTxt.unshift("Error occurred: " + error);
+          } else {
+            this.$parent.$parent.showErrorSnackbar(error);
+          }
+        });
+    },
+    move_X_Left(portName) {
+      this.portConsoleTxt.unshift(
+        "Moving X Axis to left by " + this.step + " mm"
+      );
+      PortsServices.writeToPort(portName, "G91 G0 X-" + this.step + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
+        })
+        .catch(error => {
+          if (!error.includes("TypeError")) {
+            this.portConsoleTxt.unshift("Error occurred: " + error);
+          } else {
+            this.$parent.$parent.showErrorSnackbar(error);
+          }
+        });
+    },
+    move_Y_Up(portName) {
+      this.portConsoleTxt.unshift("Moving Y Axis up by " + this.step + " mm");
+      PortsServices.writeToPort(portName, "G91 G0 Y" + this.step + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
+        })
+        .catch(error => {
+          if (!error.includes("TypeError")) {
+            this.portConsoleTxt.unshift("Error occurred: " + error);
+          } else {
+            this.$parent.$parent.showErrorSnackbar(error);
+          }
+        });
+    },
+    move_Y_Down(portName) {
+      this.portConsoleTxt.unshift("Moving Y Axis down by " + this.step + " mm");
+      PortsServices.writeToPort(portName, "G91 G0 Y-" + this.step + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
+        })
+        .catch(error => {
+          if (!error.includes("TypeError")) {
+            this.portConsoleTxt.unshift("Error occurred: " + error);
+          } else {
+            this.$parent.$parent.showErrorSnackbar(error);
+          }
+        });
+    },
+    move_Z_Up(portName) {
+      this.portConsoleTxt.unshift("Moving Z Axis up");
+      PortsServices.writeToPort(portName, "G91 G0 Z1" + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
+        })
+        .catch(error => {
+          if (!error.includes("TypeError")) {
+            this.portConsoleTxt.unshift("Error occurred: " + error);
+          } else {
+            this.$parent.$parent.showErrorSnackbar(error);
+          }
+        });
+    },
+    move_Z_Down(portName) {
+      this.portConsoleTxt.unshift("Moving Z Axis down");
+      PortsServices.writeToPort(portName, "G91 G0 Z-1" + "\r")
+        .then(() => {
+          // this.$parent.$parent.showSuccessSnackbar(result);
+        })
+        .catch(error => {
+          if (!error.includes("TypeError")) {
+            this.portConsoleTxt.unshift("Error occurred: " + error);
+          } else {
+            this.$parent.$parent.showErrorSnackbar(error);
+          }
+        });
     }
   }
 };
 </script>
-
 <style>
 </style>

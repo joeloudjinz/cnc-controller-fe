@@ -110,10 +110,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations([
-      "TOGGLE_IS_CONNECTED_STATE",
-      "HIDE_LOGIN_ALERT_VALUE"
-    ]),
+    ...mapMutations(["TOGGLE_IS_CONNECTED_STATE", "HIDE_LOGIN_ALERT_VALUE", "initializeShowSurfaceDimensionsAlertState"]),
     submit() {
       this.$v.$touch();
       if (!this.$v.$invalid) {
@@ -130,6 +127,7 @@ export default {
             localStorage.first_name = data.agent.first_name;
             localStorage.token = data.token;
             localStorage.refresh_token = data.refresh_token;
+            this.initializeShowSurfaceDimensionsAlertState();
             this.$router.replace("/");
           })
           .catch(error => {
@@ -148,3 +146,16 @@ export default {
   }
 };
 </script>
+
+<style>
+.wrap-banner {
+  position: relative;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-flex;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+</style>

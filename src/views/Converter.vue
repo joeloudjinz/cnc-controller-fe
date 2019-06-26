@@ -21,7 +21,7 @@
                     ref="selectImageRef"
                   >
                   <div id="preview">
-                    <v-img contain height="650" v-if="url" :src="url"></v-img>
+                    <v-img contain height="817" v-if="url" :src="url"></v-img>
                   </div>
                 </v-card-text>
               </v-layout>
@@ -56,8 +56,26 @@
               you can leave them by default as well
             </v-alert>
           </v-card-title>
-          <v-card-text>
+          <v-card-text class="pt-0">
             <v-container fluid grid-list-lg>
+              <v-flex xs12>
+                <v-list three-line class="teal lighten-5 pt-0">
+                  <v-list-tile>
+                    <!-- <v-list-tile-avatar>
+                      <v-icon color="teal darken-2" x-large>fas fa-exclamation-circle</v-icon>
+                    </v-list-tile-avatar>-->
+                    <v-list-tile-content>
+                      <v-list-tile-title class="title">Laser Mode</v-list-tile-title>
+                      <v-list-tile-sub-title
+                        class="teal--text font-weight-medium"
+                      >If you are using CNC machine with laser tool, activate the laser mode, IF NOT leave it off</v-list-tile-sub-title>
+                    </v-list-tile-content>
+                    <v-list-tile-action>
+                      <v-switch v-model="laserModeStatus" color="teal darken-2"></v-switch>
+                    </v-list-tile-action>
+                  </v-list-tile>
+                </v-list>
+              </v-flex>
               <v-flex xs12>
                 <v-subheader class="pl-0">Tool Diameter</v-subheader>
                 <v-slider
@@ -155,12 +173,70 @@
                   ></v-text-field>
                 </v-flex>
               </v-layout>
+              <v-layout justify-center row wrap>
+                <v-flex xs12 sm12 md4 lg4>
+                  <v-text-field
+                    label="Command Power On"
+                    v-model="powerOn"
+                    class="mt-0"
+                    type="text"
+                    color="teal darken-2"
+                    :disabled="!laserModeStatus"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm12 md4 lg4>
+                  <v-text-field
+                    label="Spindle"
+                    v-model="spindle"
+                    class="mt-0"
+                    type="text"
+                    color="teal darken-2"
+                    :disabled="!laserModeStatus"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm12 md4 lg4>
+                  <v-text-field
+                    label="Command Power Off"
+                    v-model="powerOff"
+                    class="mt-0"
+                    type="text"
+                    color="teal darken-2"
+                    :disabled="!laserModeStatus"
+                  ></v-text-field>
+                </v-flex>
+              </v-layout>
             </v-container>
           </v-card-text>
+          <!-- <v-icon
+              large
+              color="teal darken-2"
+              left
+              @click="showConversionParamsInformationDialog()"
+          >fas fa-</v-icon>-->
           <v-card-actions>
             <v-tooltip top>
               <template #activator="data">
-                <v-btn flat v-on="data.on" @click="restoreDefaultValues">
+                <v-btn
+                  fab
+                  color="transparent"
+                  class="elevation-0"
+                  v-on="data.on"
+                  @click="showConversionParamsInformationDialog()"
+                >
+                  <v-icon color="teal">fas fa-question</v-icon>
+                </v-btn>
+              </template>
+              <span>Information about each parameter</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template #activator="data">
+                <v-btn
+                  fab
+                  color="transparent"
+                  class="elevation-0"
+                  v-on="data.on"
+                  @click="restoreDefaultValues"
+                >
                   <v-icon color="teal">fas fa-undo-alt</v-icon>
                 </v-btn>
               </template>
@@ -173,7 +249,9 @@
                   <v-btn
                     v-show="!showConversionBtn"
                     :disabled="isTransmissionProcessActive || isConversionActive"
-                    flat
+                    fab
+                    color="transparent"
+                    class="elevation-0"
                     v-on="data.on"
                     @click="performConversion"
                   >
@@ -290,6 +368,46 @@
                             >{{ imegSize }}</v-list-tile-sub-title>
                           </v-list-tile-content>
                         </v-list-tile>
+                        <v-list-tile>
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Laser Mode</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ laserModeStatus ? "On" : "Off" }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile v-if="laserModeStatus">
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Power On Command</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ powerOn }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile v-if="laserModeStatus">
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Spindle</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ spindle }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
+                        <v-list-tile v-if="laserModeStatus">
+                          <v-list-tile-content>
+                            <v-list-tile-title
+                              class="font-weight-meduim teal--text text--lighten-2"
+                            >Power Off Command</v-list-tile-title>
+                            <v-list-tile-sub-title
+                              class="font-weight-bold teal--text text--darken-2"
+                            >{{ powerOff }}</v-list-tile-sub-title>
+                          </v-list-tile-content>
+                        </v-list-tile>
                       </v-list>
                     </v-flex>
                     <v-flex xs12 sm12 md12 lg9>
@@ -356,7 +474,7 @@
                         </v-flex>
                       </v-layout>
                       <v-layout align-center justify-center row fill-height pt-2 wrap>
-                        <v-flex xs12 sm12 md12 lg6>
+                        <v-flex xs12 sm12 md6 lg6>
                           <v-layout align-center justify-center row fill-height>
                             <v-tooltip bottom>
                               <template #activator="data">
@@ -372,13 +490,14 @@
                               <span>The percentage of the proccessed black pixels in the picture</span>
                             </v-tooltip>
                           </v-layout>
+                          <p class="teal--text font-weight-meduim title text-xs-center mt-3">Percentage of proccessed black pixels</p>
                         </v-flex>
-                        <v-flex xs12 sm12 md12 lg6>
+                        <v-flex xs12 sm12 md6 lg6>
                           <v-layout align-center justify-center row fill-height>
                             <v-tooltip bottom>
                               <template #activator="data">
                                 <v-progress-circular
-                                  :rotate="360"
+                                  :rotate="180"
                                   :size="200"
                                   :width="10"
                                   :value="errorValue"
@@ -389,6 +508,7 @@
                               <span>The percentage of the unproccessed black pixels in the picture</span>
                             </v-tooltip>
                           </v-layout>
+                          <p class="teal--text font-weight-meduim title text-xs-center mt-3">Percentage of unproccessed black pixels</p>
                         </v-flex>
                       </v-layout>
                     </v-flex>
@@ -425,11 +545,10 @@
         <v-layout row wrap>
           <v-flex d-flex xs12 sm12 md12 lg12>
             <v-toolbar
-              color="teal lighten-4"
+              color="teal lighten-5"
               class="elevation-0 teal--text text--darken-1"
               card
               dense
-              dark
             >
               <v-toolbar-title>Transmission Process Console</v-toolbar-title>
               <v-spacer></v-spacer>
@@ -487,7 +606,7 @@
               <v-card
                 v-show="showTranmsissionConsole"
                 height="300px"
-                color="teal lighten-4 elevation-0"
+                color="teal lighten-5 elevation-0"
                 class="scroll scrollbar-style"
               >
                 <v-card-text class="teal--text darken-4">
@@ -512,11 +631,10 @@
         <v-layout row wrap>
           <v-flex xs12 sm12 md12 lg12>
             <v-toolbar
-              color="teal lighten-4"
+              color="teal lighten-5"
               class="elevation-0 teal--text text--darken-1"
               card
               dense
-              dark
             >
               <v-toolbar-title>Port Data Console</v-toolbar-title>
               <v-spacer></v-spacer>
@@ -563,7 +681,7 @@
             <v-slide-y-transition>
               <v-card
                 v-show="showPortConsole"
-                color="teal lighten-4 elevation-0"
+                color="teal lighten-5 elevation-0"
                 height="300px"
                 class="scroll scrollbar-style"
               >
@@ -598,6 +716,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <ConversionParamsInformationDialog ref="conversionParamsInformationDialogRef"/>
     <!-- Scale axes information snackbar -->
     <v-snackbar
       v-model="scaleAccessSnackbar"
@@ -621,14 +740,14 @@ import PortsServices from "@/services/ports.js";
 
 import SnackBar from "@/components/app/SnackBar.vue";
 const PortsListDialog = () => import("../components/ports/PortsListDialog.vue");
-// const ImageDisplayCard = () =>
-//   import("../components/conversion/ImageDisplayCard.vue");
+const ConversionParamsInformationDialog = () =>
+  import("../components/converter/ConversionParamsInformation.vue");
 
 import { setTimeout } from "timers";
 import { mapState, mapMutations } from "vuex";
 
 export default {
-  components: { SnackBar, PortsListDialog },
+  components: { SnackBar, PortsListDialog, ConversionParamsInformationDialog },
   data: () => ({
     //? to display the results section
     displayResultsPanel: false,
@@ -657,6 +776,10 @@ export default {
     safeZ: 1,
     work: 1200,
     idle: 3000,
+    laserModeStatus: false,
+    powerOn: "M3",
+    spindle: "s600",
+    powerOff: "M05",
     //? for gcode file
     fileName: "",
     size: 0,
@@ -719,8 +842,8 @@ export default {
         if (this.elapsedTime < 60) {
           return `${this.elapsedTime.toFixed(2)} seconds`;
         } else {
-          const minutes = this.elapsedTime / 60;
-          const rest = this.elapsedTime % 60;
+          const minutes = Math.floor(this.elapsedTime / 60);
+          const rest = Math.floor(this.elapsedTime % 60);
           return `${minutes} minute & ${rest} seconds`;
         }
       } else {
@@ -785,6 +908,7 @@ export default {
         this.fileName = result.fileName;
         this.startTime = result.startTime;
         this.endTime = result.endTime;
+        // TODO: fix this number display toFixed(2)
         this.elapsedTime = result.elapsedTime;
         this.size = result.size;
       }
@@ -821,6 +945,9 @@ export default {
       "SET_TRANSMISSION_PROCESS_STATE",
       "SET_CURRENT_ACTIVE_PORT"
     ]),
+    showConversionParamsInformationDialog() {
+      this.$refs.conversionParamsInformationDialogRef.showDialog();
+    },
     onPortDataCallback(content) {
       if (content.length != 0) {
         this.portConsoleTxt.unshift(content);
@@ -879,7 +1006,6 @@ export default {
           if (this.selectedFile != null) {
             this.conversionProgressDialog = true;
             const fd = new FormData();
-            fd.append("image", this.selectedFile, this.selectedFile.name);
             fd.append(
               "parameters",
               JSON.stringify({
@@ -895,7 +1021,13 @@ export default {
               })
             );
             fd.append("target", localStorage.id);
-            // this.isConversionActive = true;
+            fd.append("laserModeStatus", this.laserModeStatus);
+            if (this.laserModeStatus) {
+              fd.append("powerOn", this.powerOn+" "+this.spindle);
+              // console.log('this.powerOn+" "+this.spindle :', this.powerOn+" "+this.spindle);
+              fd.append("powerOff", this.powerOff);
+            }
+            fd.append("image", this.selectedFile, this.selectedFile.name);
             this.SET_IS_CONVERSION_ACTIVE(true);
             ConversionServices.ConvertImage(fd)
               .then(result => {
@@ -939,6 +1071,7 @@ export default {
             this.flushPortDis = false;
             this.consolesArea = true;
             this.$refs.portsListDialogRef.hideProgress();
+            // TODO: initialize laserModeStatus to false
             this.$refs.portsListDialogRef.togglePortsListDialogeVisibility();
             this.SET_TRANSMISSION_PROCESS_STATE(true);
             this.showSuccessSnackbar(result.success);

@@ -1,9 +1,16 @@
 <template>
   <v-app id="inspire">
     <!-- Navigation Drawer -->
-    <v-navigation-drawer v-model="drawer" :clipped="$vuetify.breakpoint.lgAndUp" fixed app absolute>
+    <v-navigation-drawer
+      v-model="drawer"
+      :clipped="$vuetify.breakpoint.lgAndUp"
+      fixed
+      app
+      absolute
+      class="grey lighten-5"
+    >
       <v-toolbar flat class="transparent">
-        <v-list class="pa-0">
+        <v-list class="pa-0 grey lighten-5">
           <v-list-tile avatar>
             <v-list-tile-avatar v-if="isAdmin">
               <v-icon color="teal darker-2" x-large>fas fa-crown</v-icon>
@@ -29,7 +36,7 @@
       </v-toolbar>
       <v-divider></v-divider>
       <div class="hidden-md-and-up">
-        <v-list dense class="pt-0">
+        <v-list dense class="pt-0 grey lighten-5">
           <v-list-tile to="/">
             <v-list-tile-action>
               <v-icon left>fas fa-tachometer-alt</v-icon>
@@ -74,7 +81,7 @@
         </v-list>
       </div>
       <v-divider></v-divider>
-      <v-list class="pt-0" dense>
+      <v-list class="pt-0 grey lighten-5" dense>
         <v-list-tile @click="showSettingsDialog()">
           <v-list-tile-action>
             <v-icon>fas fa-tools</v-icon>
@@ -113,7 +120,10 @@
     <v-toolbar :clipped-left="$vuetify.breakpoint.lgAndUp" color="teal" dark app fixed>
       <v-toolbar-title class="ml-0 pl-0">
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-        <span class="center">LOUDJEIN CNC</span>
+        <v-avatar size="50" color="teal lighten-4 mr-2">
+          <img :src="siteAvatar" alt="avatar">
+        </v-avatar>
+        <span class="headline font-weight-medium">CNC System</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items class="hidden-sm-and-down">
@@ -232,7 +242,7 @@ export default {
   data: () => ({
     portsList: [],
     portsCount: 0,
-    // isAdmin: false,
+    siteAvatar: require("@/assets/logo.png"),
     drawer: false,
     right: null,
     color: "teal",
@@ -240,7 +250,12 @@ export default {
     visibility: false
   }),
   computed: {
-    ...mapState(["doShowSurfaceDimensionsAlert", "isHomePage", "isAdmin"]),
+    ...mapState([
+      "doShowSurfaceDimensionsAlert",
+      "isHomePage",
+      "isAdmin",
+      "selectedPortObject"
+    ]),
     fullName() {
       return `${localStorage.last_name.toUpperCase()} ${
         localStorage.first_name
@@ -262,7 +277,8 @@ export default {
     ...mapMutations([
       "SET_TRANSMISSION_PROCESS_STATE",
       "TOGGLE_IS_CONNECTED_STATE",
-      "SET_IS_ADMIN_VALUE"
+      "SET_IS_ADMIN_VALUE",
+      "SET_SELECTED_PORT_OBJECT"
     ]),
     onActiveCallback(data) {
       this.portsCount = Object.keys(data).length;
@@ -277,8 +293,11 @@ export default {
         this.showErrorSnackbar(
           `${this.selectedPortObject.comName} is not active anymore`
         );
-        this.doShowPortPanel = false;
-        this.selectedPortObject = undefined;
+        //TODO: close the port panel from inside
+        // this.doShowPortPanel = false;
+        this.$refs.portPanelDialogRef.hidePanel();
+        // this.selectedPortObject = undefined;
+        this.SET_SELECTED_PORT_OBJECT(undefined);
       }
       this.portsList = newList;
     },
@@ -301,6 +320,7 @@ export default {
         });
     },
     showPortPanel(portObject) {
+      this.SET_SELECTED_PORT_OBJECT(portObject);
       this.$refs.portPanelDialogRef.showPortPanel(portObject);
     },
     launcheEditProfile() {

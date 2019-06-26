@@ -16,13 +16,13 @@
             You can monitor the whole process from the two consoles below after you select the port.
             If the process hang up for some reasons, you can pause and resume it.
           </v-alert>
-          <p class="title">Chose port:</p>
           <v-alert
             :value="isTransmissionProcessActive"
             type="warning"
           >There is already a transmission process going on</v-alert>
+          <p class="title">Chose port:</p>
           <v-fade-transition>
-            <v-list v-if="portsList.length !== 0">
+            <v-list v-if="portsList.length !== 0" class="teal lighten-5">
               <v-list-tile
                 v-for="(port, index) in portsList"
                 :key="index"
@@ -37,7 +37,7 @@
                 </v-list-tile-content>
               </v-list-tile>
             </v-list>
-            <v-list v-else>
+            <v-list v-else class="teal lighten-5">
               <v-alert :value="true" type="error">No port is connected!</v-alert>
             </v-list>
           </v-fade-transition>
@@ -61,7 +61,7 @@ export default {
     //? ports list data ---------------------
     showPortsListDialog: false,
     portsList: [],
-    progressStatus: false
+    progressStatus: false,
   }),
   computed: {
     ...mapState(["isTransmissionProcessActive"])
@@ -90,6 +90,9 @@ export default {
           this.$parent.showErrorSnackbar(error);
         });
     },
+    // ll() {
+    //   console.log(this.laserModeStatus);
+    // },
     startTransmitingGCode(portName) {
       this.$parent.startTransmitingGCode(portName);
     }
