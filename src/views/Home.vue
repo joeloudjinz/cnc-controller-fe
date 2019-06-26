@@ -123,7 +123,7 @@
         <v-avatar size="50" color="teal lighten-4 mr-2">
           <img :src="siteAvatar" alt="avatar">
         </v-avatar>
-        <span class="headline font-weight-medium">Loudjein CNC</span>
+        <span class="headline font-weight-medium">CNC System</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items class="hidden-sm-and-down">
